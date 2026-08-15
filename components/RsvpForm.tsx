@@ -1,0 +1,114 @@
+'use client'
+import { useState } from 'react'
+import { t, type Lang } from '@/lib/i18n'
+import ConfettiCelebration from './ConfettiCelebration'
+
+interface Props {
+  token: string
+  guestName: string
+  invitedDays: '22+23' | '23'
+  lang: Lang
+  existingRsvp?: { attending22: boolean | null; attending23: boolean; note: string | null } | null
+}
+
+type Choice = 'yes' | 'no' | 'maybe' | null
+
+export default function RsvpForm({ token, guestName, invitedDays, lang, existingRsvp }: Props) {
+  const [choice22, setChoice22] = useState<Choice>(
+    existingRsvp?.attending22 === true ? 'yes' : existingRsvp?.attending22 === false ? 'no' : null
+  )
+  const [choice23, setChoice23] = useState<Choice>(
+    existingRsvp?.attending23 === true ? 'yes' : existingRsvp?.attending23 === false ? 'no' : null
+  )
+  const [note, setNote] = useState(existingRsvp?.note ?? '')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const choiceToBoolean = (c: Choice): boolean => c === 'yes' || c === 'maybe'
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!choice23) return
+    setLoading(true)
+    await fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        attending22: invitedDays === '22+23' ? choiceToBoolean(choice22) : undefined,
+        attending23: choiceToBoolean(choice23),
+        note: note || null,
+      }),
+    })
+    setSubmitted(true)
+    setLoading(false)
+  }
+
+  const ChoiceButtons = ({ value, onChange }: { value: Choice; onChange: (c: Choice) => void }) => (
+    <div className="flex gap-3">
+      {(['yes', 'no', 'maybe'] as const).map(c => (
+        <button
+          key={c}
+          type="button"
+          onClick={() => onChange(c)}
+          className={`flex-1 py-2.5 rounded-lg font-serif text-sm border transition-all ${
+            value === c
+              ? 'bg-[#c9a84c] text-[#1a0a0a] border-[#c9a84c] font-semibold'
+              : 'bg-transparent text-[#f5f0e8] border-[#c9a84c]/40 hover:border-[#c9a84c]'
+          }`}
+        >
+          {t(c === 'yes' ? 'rsvpYes' : c === 'no' ? 'rsvpNo' : 'rsvpMaybe', lang)}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (submitted) {
+    return (
+      <>
+        <ConfettiCelebration />
+        <div className="text-center py-12">
+          <p className="font-script text-5xl text-[#c9a84c] mb-4">🎉</p>
+          <p className="font-serif text-xl text-[#f5f0e8]">{t('rsvpConfirmation', lang)}</p>
+        </div>
+      </>
+    )
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-md mx-auto">
+      <p className="font-serif text-[#f5f0e8]/80 text-center">{t('rsvpQuestion', lang)}</p>
+
+      {invitedDays === '22+23' && (
+        <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
+          <p className="font-serif text-[#c9a84c] text-sm mb-3">{t('inviteDate22', lang)}</p>
+          <ChoiceButtons value={choice22} onChange={setChoice22} />
+        </div>
+      )}
+
+      <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
+        <p className="font-serif text-[#c9a84c] text-sm mb-3">{t('inviteDate23', lang)}</p>
+        <ChoiceButtons value={choice23} onChange={setChoice23} />
+      </div>
+
+      <div>
+        <label className="block font-serif text-sm text-[#f5f0e8]/60 mb-2">{t('rsvpNote', lang)}</label>
+        <textarea
+          value={note}
+          onChange={e => setNote(e.target.value)}
+          placeholder={t('rsvpNotePlaceholder', lang)}
+          rows={3}
+          className="w-full bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl px-4 py-3 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c] resize-none"
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading || !choice23}
+        className="bg-[#c9a84c] text-[#1a0a0a] font-serif font-semibold py-3 rounded-xl hover:bg-[#c9a84c]/80 transition-colors disabled:opacity-40"
+      >
+        {loading ? '...' : t(existingRsvp ? 'rsvpUpdate' : 'rsvpSubmit', lang)}
+      </button>
+    </form>
+  )
+}
