@@ -59,11 +59,11 @@ export const translations: Record<Lang, Translations> = {
     countdownSeconds: 'Sekunden',
     inviteHeading: 'Wir sagen Ja!',
     inviteBody22and23:
-      'Wir heiraten am Freitag, 22. Januar 2027 & Samstag, 23. Januar 2027 in Berlin. Deshalb haltet Euch bitte diese Termine frei! Die Einladung & nähere Informationen folgen.',
+      'Wir heiraten am Freitag, 22. Januar 2027 in Berlin. Am Samstag, 23. Januar 2027 feiern wir gemeinsam weiter. Haltet Euch bitte diese Termine frei! Die Einladung & nähere Informationen folgen.',
     inviteBody23only:
-      'Wir heiraten am Samstag, 23. Januar 2027 in Berlin. Deshalb haltet Euch bitte diesen Termin frei! Die Einladung & nähere Informationen folgen.',
-    inviteDate22: 'Freitag, 22. Januar 2027',
-    inviteDate23: 'Samstag, 23. Januar 2027',
+      'Wir feiern am Samstag, 23. Januar 2027 in Berlin. Haltet Euch bitte diesen Termin frei! Die Einladung & nähere Informationen folgen.',
+    inviteDate22: 'Hochzeit — Freitag, 22. Januar 2027',
+    inviteDate23: 'Feier — Samstag, 23. Januar 2027',
     inviteClosing: 'Liebe Grüße — Julia & Ravi',
     rsvpGreeting: 'Liebe/r',
     rsvpInvited22and23: 'Du bist herzlich eingeladen zur Hochzeit am 22. & 23. Januar 2027.',
@@ -108,11 +108,11 @@ export const translations: Record<Lang, Translations> = {
     countdownSeconds: 'Seconds',
     inviteHeading: "We're saying yes!",
     inviteBody22and23:
-      'We are getting married on Friday, 22nd January 2027 & Saturday, 23rd January 2027 in Berlin. Please save the dates! Full invitation and details to follow.',
+      'We are getting married on Friday, 22nd January 2027 in Berlin. On Saturday, 23rd January 2027 we continue the celebrations. Please save both dates! Full invitation and details to follow.',
     inviteBody23only:
-      'We are getting married on Saturday, 23rd January 2027 in Berlin. Please save the date! Full invitation and details to follow.',
-    inviteDate22: 'Friday, 22nd January 2027',
-    inviteDate23: 'Saturday, 23rd January 2027',
+      'We are celebrating on Saturday, 23rd January 2027 in Berlin. Please save the date! Full invitation and details to follow.',
+    inviteDate22: 'Wedding — Friday, 22nd January 2027',
+    inviteDate23: 'Celebration — Saturday, 23rd January 2027',
     inviteClosing: 'With love — Julia & Ravi',
     rsvpGreeting: 'Dear',
     rsvpInvited22and23: 'You are cordially invited to our Hochzeit on 22nd & 23rd January 2027.',

@@ -113,7 +113,7 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
           <BgPhoto src={bgHero} alt="Wedding venue" />
           <MandalaDecor />
           <div className="absolute top-4 right-4 z-20">
-            <LanguageToggle lang={lang} />
+            <LanguageToggle lang={lang} token={guest?.token} />
           </div>
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-3 px-6">
             <FadeIn inView={v1} delay={0}>
