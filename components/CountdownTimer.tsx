@@ -34,7 +34,7 @@ export default function CountdownTimer({ lang }: Props) {
         { value: timeLeft.seconds, label: t('countdownSeconds', lang) },
       ].map(({ value, label }) => (
         <div key={label} className="text-center">
-          <div className="text-4xl font-serif text-[#c9a84c] tabular-nums">
+          <div className="text-2xl sm:text-4xl font-serif text-[#c9a84c] tabular-nums">
             {String(value).padStart(2, '0')}
           </div>
           <div className="text-xs font-serif text-[#f5f0e8]/60 uppercase tracking-widest mt-1">{label}</div>

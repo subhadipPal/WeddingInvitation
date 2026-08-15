@@ -14,7 +14,7 @@ export default function LanguageToggle({ lang, token }: Props) {
     if (token) {
       router.push(`/${next}/invite/${token}`)
     } else {
-      router.push('/')
+      router.push(next === 'de' ? '/' : '/en')
     }
   }
 

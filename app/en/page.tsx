@@ -18,21 +18,18 @@ function getPhotoList(): string[] {
   }
 }
 
-export default function HomePage() {
+export default function HomePageEn() {
   const photos = getPhotoList()
 
   return (
     <main className="relative min-h-[100dvh] overflow-hidden flex flex-col">
       <MandalaDecor />
 
-      {/* Language toggle */}
       <div className="absolute top-4 right-4 z-20">
-        <LanguageToggle lang="de" />
+        <LanguageToggle lang="en" />
       </div>
 
-      {/* Single-screen hero — everything visible without scrolling on mobile */}
       <div className="flex-1 flex flex-col items-center justify-center gap-3 px-6 py-8 z-10 min-h-[100dvh]">
-
         <p className="font-serif text-[#c9a84c]/70 text-[10px] tracking-[0.5em] uppercase">
           Save the Date
         </p>
@@ -46,16 +43,13 @@ export default function HomePage() {
 
         <div className="w-16 h-px bg-[#c9a84c]/40 my-1" />
 
-        {/* Envelope — compact */}
-        <EnvelopeAnimation lang="de" />
+        <EnvelopeAnimation lang="en" />
 
-        {/* Countdown — compact */}
         <div className="mt-2">
-          <CountdownTimer lang="de" />
+          <CountdownTimer lang="en" />
         </div>
       </div>
 
-      {/* Photo gallery — only visible on scroll, below the fold */}
       {photos.length > 0 && (
         <div className="px-4 pb-12 z-10 max-w-lg mx-auto w-full">
           <div className="w-16 h-px bg-[#c9a84c]/40 mx-auto mb-6" />
