@@ -49,10 +49,10 @@ const Section = React.forwardRef<HTMLElement, { children: React.ReactNode; class
 )
 Section.displayName = 'Section'
 
-function BgPhoto({ src, alt }: { src: string; alt: string }) {
+function BgPhoto({ src, alt, position = 'center' }: { src: string; alt: string; position?: string }) {
   return (
     <>
-      <Image src={src} alt={alt} fill className="object-cover" sizes="100vw" unoptimized />
+      <Image src={src} alt={alt} fill className="object-cover" style={{ objectPosition: position }} sizes="100vw" unoptimized />
       <div className="absolute inset-0 bg-black/40" />
     </>
   )
@@ -110,7 +110,7 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
       >
         {/* ── Section 1: Hero ─────────────────────────────── */}
         <Section ref={s1} style={{ scrollSnapAlign: 'start' }}>
-          <BgPhoto src={bgHero} alt="Wedding venue" />
+          <BgPhoto src={bgHero} alt="Wedding venue" position="center top" />
           <MandalaDecor />
           <div className="absolute top-4 right-4 z-20">
             <LanguageToggle lang={lang} token={guest?.token} />
@@ -144,7 +144,7 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
 
         {/* ── Section 2: Wir sagen Ja ─────────────────────── */}
         <Section ref={s2} style={{ scrollSnapAlign: 'start' }}>
-          <BgPhoto src={bgHeart} alt="Julia und Ravi" />
+          <BgPhoto src={bgHeart} alt="Julia und Ravi" position="center 20%" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-5 px-8 text-center">
             <FadeIn inView={v2} delay={0}>
               {guest ? (
@@ -175,7 +175,7 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
 
         {/* ── Section 3: Date ──────────────────────────────── */}
         <Section ref={s3} style={{ scrollSnapAlign: 'start' }}>
-          <BgPhoto src={bgDate} alt="Roses" />
+          <BgPhoto src={bgDate} alt="Roses" position="center center" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-6 px-8 text-center">
             <FadeIn inView={v3} delay={0}>
               <p className="font-serif text-[#c9a84c] text-xs tracking-[0.4em] uppercase">
@@ -232,7 +232,7 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
 
         {/* ── Section 5: Closing / RSVP ────────────────────── */}
         <Section ref={s5} style={{ scrollSnapAlign: 'start' }}>
-          <BgPhoto src={bgClosing} alt="Julia und Ravi" />
+          <BgPhoto src={bgClosing} alt="Julia und Ravi" position="center top" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-4 px-6 text-center overflow-y-auto py-12">
             {guest ? (
               <>

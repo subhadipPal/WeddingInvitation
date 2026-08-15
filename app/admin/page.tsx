@@ -87,9 +87,10 @@ export default function AdminPage() {
   const pending = guests.filter(g => !g.rsvp).length
 
   return (
-    <div className="min-h-screen text-[#f5f0e8] p-6"
-      style={{ background: 'radial-gradient(ellipse at 20% 0%, #5a1010 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, #2a0505 0%, transparent 50%), #1a0505' }}>
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen text-[#f5f0e8] p-6 relative"
+      style={{ backgroundImage: 'url(/photos/rose/roses.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" />
+      <div className="relative z-10 max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
@@ -121,7 +122,7 @@ export default function AdminPage() {
             { label: 'Absagen', value: declined, color: '#f87171' },
             { label: 'Ausstehend', value: pending, color: '#94a3b8' },
           ].map(s => (
-            <div key={s.label} className="bg-[#3a0808]/50 border border-[#c9a84c]/20 rounded-xl p-4 text-center">
+            <div key={s.label} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-center shadow-lg">
               <div className="text-3xl font-serif" style={{ color: s.color }}>{s.value}</div>
               <div className="text-xs font-serif text-[#f5f0e8]/50 mt-1 uppercase tracking-wider">{s.label}</div>
             </div>
@@ -129,10 +130,10 @@ export default function AdminPage() {
         </div>
 
         {/* Table */}
-        <div className="overflow-x-auto rounded-xl border border-[#c9a84c]/20">
+        <div className="overflow-x-auto rounded-xl border border-white/20 shadow-2xl bg-white/10 backdrop-blur-md">
           <table className="w-full font-serif text-sm">
             <thead>
-              <tr className="bg-[#3a0808]/80 text-[#c9a84c] text-xs uppercase tracking-wider">
+              <tr className="bg-black/30 text-[#c9a84c] text-xs uppercase tracking-wider">
                 <th className="px-4 py-3 text-left">Name</th>
                 <th className="px-4 py-3 text-left">Kontakt</th>
                 <th className="px-4 py-3 text-left">Eingeladen</th>
@@ -153,7 +154,7 @@ export default function AdminPage() {
                   v === true ? 'text-green-400' : v === false ? 'text-red-400' : 'text-[#f5f0e8]/30'
                 return (
                   <tr key={g.id}
-                    className={`border-t border-[#c9a84c]/10 transition-colors hover:bg-[#c9a84c]/5 ${i % 2 === 0 ? 'bg-[#1a0505]' : 'bg-[#3a0808]/20'}`}>
+                    className={`border-t border-white/10 transition-colors hover:bg-white/10 ${i % 2 === 0 ? 'bg-transparent' : 'bg-white/5'}`}>
                     <td className="px-4 py-3 text-[#f5f0e8] font-medium">{g.name}</td>
                     <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs">{g.email ?? g.phone ?? '—'}</td>
                     <td className="px-4 py-3">
@@ -173,11 +174,11 @@ export default function AdminPage() {
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
                         <button onClick={() => copyLink(linkDe, `de-${g.id}`)}
-                          className="text-xs bg-[#3a0808] border border-[#c9a84c]/30 px-2 py-1 rounded hover:border-[#c9a84c] transition-colors text-[#c9a84c]">
+                          className="text-xs bg-black/30 border border-[#c9a84c]/40 px-2 py-1 rounded hover:border-[#c9a84c] transition-colors text-[#c9a84c]">
                           {copied === `de-${g.id}` ? '✓' : 'DE'}
                         </button>
                         <button onClick={() => copyLink(linkEn, `en-${g.id}`)}
-                          className="text-xs bg-[#3a0808] border border-[#c9a84c]/30 px-2 py-1 rounded hover:border-[#c9a84c] transition-colors text-[#c9a84c]">
+                          className="text-xs bg-black/30 border border-[#c9a84c]/40 px-2 py-1 rounded hover:border-[#c9a84c] transition-colors text-[#c9a84c]">
                           {copied === `en-${g.id}` ? '✓' : 'EN'}
                         </button>
                       </div>
