@@ -1,0 +1,42 @@
+{
+  "schema": "local-repo-knowledge-graph/v1",
+  "generated_at_local": "2026-08-15T18:10:59.209941+02:00",
+  "root": "/Users/I584745/WeddingInvitation",
+  "content_indexed": false,
+  "network_used": false,
+  "notes": [
+    "Filesystem/Git metadata only by default.",
+    "This graph is a navigation/index layer, not a behavioral source of truth."
+  ],
+  "nodes": [
+    {
+      "id": ".",
+      "kind": "directory"
+    },
+    {
+      "id": "docs",
+      "kind": "directory"
+    },
+    {
+      "id": "docs/WEDDING_INVITATION_PLAN.md",
+      "kind": "file",
+      "size_bytes": 10548,
+      "extension": ".md",
+      "language": "Markdown",
+      "git_status": "??",
+      "prominent": false
+    }
+  ],
+  "edges": [
+    {
+      "from": "docs",
+      "to": "docs/WEDDING_INVITATION_PLAN.md",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "docs",
+      "type": "CONTAINS"
+    }
+  ]
+}
