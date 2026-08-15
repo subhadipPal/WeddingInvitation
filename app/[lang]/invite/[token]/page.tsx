@@ -2,6 +2,9 @@ import { readdirSync } from 'fs'
 import { join } from 'path'
 import type { Lang } from '@/lib/i18n'
 import ScrollInvitation from '@/components/ScrollInvitation'
+import { db } from '@/lib/db'
+import { guests, rsvps } from '@/lib/schema'
+import { eq } from 'drizzle-orm'
 
 interface Props { params: Promise<{ lang: string; token: string }> }
 
@@ -17,10 +20,10 @@ function getPhotoList(): string[] {
 }
 
 async function getGuest(token: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/guests/${token}`, { cache: 'no-store' })
-  if (!res.ok) return null
-  return res.json()
+  const rows = await db.select().from(guests).where(eq(guests.token, token)).limit(1)
+  if (!rows.length) return null
+  const rsvp = await db.select().from(rsvps).where(eq(rsvps.guestId, rows[0].id)).limit(1)
+  return { guest: rows[0], rsvp: rsvp[0] ?? null }
 }
 
 export default async function InvitePage({ params }: Props) {
