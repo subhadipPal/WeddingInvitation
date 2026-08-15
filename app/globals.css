@@ -8,14 +8,16 @@
   --color-cream: #f5f0e8;
 }
 
-/* Textured burgundy background — matches the reference image */
+/* Textured burgundy — used by Section 1 hero and admin pages */
 body {
   background-color: #3a0808;
   background-image:
     radial-gradient(ellipse at 20% 20%, #5a1010 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, #2a0505 0%, transparent 60%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
+    radial-gradient(ellipse at 80% 80%, #2a0505 0%, transparent 60%);
 }
+
+/* Prevent body scroll — scroll-snap container handles it */
+html, body { height: 100%; overflow: hidden; }
 
 @keyframes envelope-flap {
   0%   { transform: rotateX(0deg); }
