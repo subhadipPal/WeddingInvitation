@@ -1,13 +1,20 @@
-import { notFound } from 'next/navigation'
+import { readdirSync } from 'fs'
+import { join } from 'path'
 import type { Lang } from '@/lib/i18n'
-import { t } from '@/lib/i18n'
-import MandalaDecor from '@/components/MandalaDecor'
-import LanguageToggle from '@/components/LanguageToggle'
-import MusicPlayer from '@/components/MusicPlayer'
-import RsvpForm from '@/components/RsvpForm'
-import CountdownTimer from '@/components/CountdownTimer'
+import ScrollInvitation from '@/components/ScrollInvitation'
 
 interface Props { params: Promise<{ lang: string; token: string }> }
+
+function getPhotoList(): string[] {
+  try {
+    const dir = join(process.cwd(), 'public', 'photos')
+    return readdirSync(dir)
+      .filter(f => /\.(jpe?g|png|webp)$/i.test(f))
+      .map(f => `/photos/${f}`)
+  } catch {
+    return []
+  }
+}
 
 async function getGuest(token: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'
@@ -20,47 +27,36 @@ export default async function InvitePage({ params }: Props) {
   const { lang: langParam, token } = await params
   const lang = (langParam === 'en' ? 'en' : 'de') as Lang
   const data = await getGuest(token)
-  if (!data) notFound()
+
+  // Invalid / missing token — show friendly error page
+  if (!data) {
+    return (
+      <main className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center"
+        style={{ background: 'radial-gradient(ellipse at 20% 20%, #5a1010 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, #2a0505 0%, transparent 60%), #3a0808' }}>
+        <p className="font-script text-5xl text-[#c9a84c] mb-4">Julia & Ravi</p>
+        <div className="w-16 h-px bg-[#c9a84c]/40 mb-6" />
+        <p className="font-serif text-[#f5f0e8]/70 text-base max-w-xs leading-relaxed">
+          {lang === 'de'
+            ? 'Dieser Einladungslink ist leider ungültig. Bitte wende dich an Julia oder Ravi.'
+            : 'This invitation link is invalid. Please contact Julia or Ravi.'}
+        </p>
+        <p className="font-script text-2xl text-[#c9a84c]/60 mt-6">♥</p>
+      </main>
+    )
+  }
 
   const { guest, rsvp } = data
-  const invitedDays = guest.invitedDays as '22+23' | '23'
 
   return (
-    <main className="relative min-h-screen bg-[#1a0a0a] overflow-hidden">
-      <MandalaDecor />
-
-      <div className="absolute top-4 right-4 z-20">
-        <LanguageToggle lang={lang} token={token} />
-      </div>
-
-      <div className="relative z-10 flex flex-col items-center px-4 py-16 gap-8">
-        <h1 className="font-script text-5xl sm:text-6xl text-[#c9a84c] text-center">
-          {t('rsvpGreeting', lang)} {guest.name}!
-        </h1>
-
-        <div className="w-24 h-px bg-[#c9a84c]/50" />
-
-        <p className="font-serif text-[#f5f0e8]/80 text-center text-lg max-w-md">
-          {t(invitedDays === '22+23' ? 'rsvpInvited22and23' : 'rsvpInvited23only', lang)}
-        </p>
-
-        <CountdownTimer lang={lang} />
-
-        <div className="w-full max-w-md mt-4">
-          <RsvpForm
-            token={token}
-            guestName={guest.name}
-            invitedDays={invitedDays}
-            lang={lang}
-            existingRsvp={rsvp}
-          />
-        </div>
-
-        <div className="w-24 h-px bg-[#c9a84c]/50 mt-4" />
-        <p className="font-script text-2xl text-[#f5f0e8]/50">Julia & Ravi · 2027</p>
-      </div>
-
-      <MusicPlayer />
-    </main>
+    <ScrollInvitation
+      lang={lang}
+      photos={getPhotoList()}
+      guest={{
+        name: guest.name,
+        invitedDays: guest.invitedDays as '22+23' | '23',
+        token,
+      }}
+      existingRsvp={rsvp}
+    />
   )
 }
