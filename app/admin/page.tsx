@@ -355,7 +355,8 @@ export default function AdminPage() {
 
         {/* ── Content tab ── */}
         {tab === 'content' && (
-          <div className="max-w-5xl overflow-y-auto max-h-[calc(100vh-220px)] pr-2 scrollbar-gold">
+          <div className="max-w-5xl flex flex-col gap-0">
+            <div className="overflow-y-auto max-h-[calc(100vh-360px)] pr-2 pb-6 scrollbar-gold">
             {contentLoading ? (
               <p className="font-serif text-[#f5f0e8]/40 py-12 text-center">Loading…</p>
             ) : (
@@ -396,30 +397,35 @@ export default function AdminPage() {
                   </div>
                 ))}
 
-                {/* Action bar */}
-                <div className="flex items-center gap-4 pt-4 pb-8 sticky bottom-0 bg-gradient-to-t from-black/60 to-transparent">
-                  <button
-                    onClick={handleSaveContent}
-                    disabled={savingContent}
-                    className="bg-[#c9a84c] text-[#1a0a0a] font-serif font-semibold px-6 py-2.5 rounded-xl hover:bg-[#e0bd6e] transition-colors disabled:opacity-40"
-                  >
-                    {savingContent ? 'Saving…' : 'Save'}
-                  </button>
-                  <button
-                    onClick={handleResetDefaults}
-                    className="border border-[#c9a84c]/40 text-[#c9a84c] font-serif text-sm px-4 py-2.5 rounded-xl hover:bg-[#c9a84c]/10 transition-colors"
-                  >
-                    Reset to defaults
-                  </button>
-                  {saveStatus === 'saved' && (
-                    <span className="font-serif text-green-400 text-sm">Saved ✓</span>
-                  )}
-                  {saveStatus === 'error' && (
-                    <span className="font-serif text-red-400 text-sm">Save failed — try again</span>
-                  )}
-                </div>
+                {/* Action bar — outside scroll container so it's always reachable */}
               </>
             )}
+          </div>
+
+          {/* Action bar */}
+          {!contentLoading && (
+            <div className="flex items-center gap-4 pt-4 pb-6 border-t border-[#c9a84c]/20 mt-2">
+              <button
+                onClick={handleSaveContent}
+                disabled={savingContent}
+                className="bg-[#c9a84c] text-[#1a0a0a] font-serif font-semibold px-6 py-2.5 rounded-xl hover:bg-[#e0bd6e] transition-colors disabled:opacity-40"
+              >
+                {savingContent ? 'Saving…' : 'Save'}
+              </button>
+              <button
+                onClick={handleResetDefaults}
+                className="border border-[#c9a84c]/40 text-[#c9a84c] font-serif text-sm px-4 py-2.5 rounded-xl hover:bg-[#c9a84c]/10 transition-colors"
+              >
+                Reset to defaults
+              </button>
+              {saveStatus === 'saved' && (
+                <span className="font-serif text-green-400 text-sm">Saved ✓</span>
+              )}
+              {saveStatus === 'error' && (
+                <span className="font-serif text-red-400 text-sm">Save failed — try again</span>
+              )}
+            </div>
+          )}
           </div>
         )}
         {/* Version footer */}
