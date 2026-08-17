@@ -243,7 +243,6 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
                 <FadeIn inView={v5} delay={150} className="w-full max-w-sm">
                   <RsvpForm
                     token={guest.token}
-                    guestName={guest.name}
                     invitedDays={guest.invitedDays}
                     lang={lang}
                     translations={translations}

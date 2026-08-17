@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
   for (const lang of ['de', 'en'] as const) {
     for (const key of GUEST_FACING_KEYS) {
       const value = body[lang]?.[key]
-      if (value === undefined) continue
+      if (typeof value !== 'string') continue
       upserts.push(
         db.insert(content)
           .values({ key, lang, value })

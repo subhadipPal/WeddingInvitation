@@ -5,7 +5,6 @@ import ConfettiCelebration from './ConfettiCelebration'
 
 interface Props {
   token: string
-  guestName: string
   invitedDays: '22+23' | '23'
   lang: Lang
   translations: Translations
