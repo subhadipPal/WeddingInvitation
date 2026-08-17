@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { translations as defaults, GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
 
@@ -107,6 +107,7 @@ export default function AdminPage() {
   const [contentLoading, setContentLoading] = useState(false)
   const [savingContent, setSavingContent] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── Guests tab logic ────────────────────────────────────────────────────────
 
@@ -201,7 +202,8 @@ export default function AdminPage() {
       setSaveStatus('error')
     }
     setSavingContent(false)
-    setTimeout(() => setSaveStatus('idle'), 3000)
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => setSaveStatus('idle'), 3000)
   }
 
   const handleResetDefaults = () => {
