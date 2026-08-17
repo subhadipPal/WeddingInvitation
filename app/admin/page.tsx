@@ -422,6 +422,12 @@ export default function AdminPage() {
             )}
           </div>
         )}
+        {/* Version footer */}
+        <div className="mt-10 pb-4 text-center">
+          <p className="font-serif text-[#f5f0e8]/20 text-xs tracking-widest">
+            deploy {process.env.NEXT_PUBLIC_COMMIT_SHA ?? 'local'}
+          </p>
+        </div>
       </div>
     </div>
   )
