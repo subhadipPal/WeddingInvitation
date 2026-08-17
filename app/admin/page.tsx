@@ -123,7 +123,7 @@ export default function AdminPage() {
   // Content tab state
   const [content, setContent] = useState<ContentState>(defaultContent())
   const [savingContent, setSavingContent] = useState(false)
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'pending' | 'saving' | 'saved' | 'error'>('idle')
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const contentRef = useRef<ContentState>(defaultContent())
@@ -210,13 +210,14 @@ export default function AdminPage() {
       contentRef.current = next
       if (debounceRef.current) clearTimeout(debounceRef.current)
       debounceRef.current = setTimeout(() => doSave(contentRef.current), 5000)
-      setSaveStatus('idle')
+      setSaveStatus('pending')
       return next
     })
   }
 
   const doSave = async (data: ContentState) => {
     setSavingContent(true)
+    setSaveStatus('saving')
     try {
       const res = await fetch('/api/content', {
         method: 'POST',
@@ -243,7 +244,7 @@ export default function AdminPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
-  const toastVisible = savingContent || saveStatus !== 'idle'
+  const toastVisible = saveStatus !== 'idle'
 
   return (
     <div className="h-screen text-[#f5f0e8] p-6 relative flex flex-col overflow-hidden"
@@ -292,7 +293,8 @@ export default function AdminPage() {
 
         {/* ── Guests tab ── */}
         {tab === 'guests' && (
-          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold">
+          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold pr-2 pb-6">
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
@@ -388,6 +390,7 @@ export default function AdminPage() {
               </table>
             </div>
           </div>
+          </div>
         )}
 
         {/* ── Content tab ── */}
@@ -441,15 +444,14 @@ export default function AdminPage() {
                 ))}
             </div>
 
-          {/* Status indicator */}
             <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
-              {savingContent && (
-                <span className="font-serif text-[#c9a84c]/60 text-xs">Saving…</span>
+              {(saveStatus === 'pending' || saveStatus === 'saving') && (
+                <span className="font-serif text-[#c9a84c]/60 text-xs">{saveStatus === 'pending' ? 'Unsaved changes…' : 'Saving…'}</span>
               )}
-              {!savingContent && saveStatus === 'saved' && (
+              {saveStatus === 'saved' && (
                 <span className="font-serif text-green-400 text-xs">Saved ✓</span>
               )}
-              {!savingContent && saveStatus === 'error' && (
+              {saveStatus === 'error' && (
                 <span className="font-serif text-red-400 text-xs">Save failed — will retry on next change</span>
               )}
             </div>
@@ -463,12 +465,14 @@ export default function AdminPage() {
         {/* Save toast */}
         <div className={`fixed top-4 right-4 z-50 transition-all duration-300 ${toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
           <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-serif text-sm shadow-2xl border backdrop-blur-md ${
-            savingContent ? 'bg-black/70 border-[#c9a84c]/30 text-[#c9a84c]/70' :
             saveStatus === 'saved' ? 'bg-black/70 border-green-400/30 text-green-400' :
-            'bg-black/70 border-red-400/30 text-red-400'
+            saveStatus === 'error' ? 'bg-black/70 border-red-400/30 text-red-400' :
+            'bg-black/70 border-[#c9a84c]/30 text-[#c9a84c]/70'
           }`}>
-            {savingContent && <span className="animate-pulse">●</span>}
-            {savingContent ? 'Saving…' : saveStatus === 'saved' ? '✓ Saved' : '✕ Save failed'}
+            {(saveStatus === 'pending' || saveStatus === 'saving') && <span className="animate-pulse">●</span>}
+            {saveStatus === 'pending' ? 'Unsaved changes…' :
+             saveStatus === 'saving' ? 'Saving…' :
+             saveStatus === 'saved' ? '✓ Saved' : '✕ Save failed'}
           </div>
         </div>
       </div>
