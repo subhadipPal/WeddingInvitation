@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 export default function CreateGuestPage() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', invitedDays: '23' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', invitedDays: '23', isMulti: false })
   const [links, setLinks] = useState<{ linkDe: string; linkEn: string } | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -18,7 +18,7 @@ export default function CreateGuestPage() {
     })
     const data = await res.json()
     setLinks({ linkDe: data.linkDe, linkEn: data.linkEn })
-    setForm({ name: '', email: '', phone: '', invitedDays: '23' })
+    setForm({ name: '', email: '', phone: '', invitedDays: '23', isMulti: false })
     setLoading(false)
   }
 
@@ -47,7 +47,7 @@ export default function CreateGuestPage() {
               <input
                 type={type}
                 required={required}
-                value={form[key as keyof typeof form]}
+                value={form[key as 'name' | 'email' | 'phone']}
                 onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
                 className="w-full bg-[#1a0a0a] border border-[#c9a84c]/30 rounded px-4 py-2 text-[#f5f0e8] font-serif focus:outline-none focus:border-[#c9a84c]"
               />
@@ -64,6 +64,19 @@ export default function CreateGuestPage() {
               <option value="23">23. Januar (Hochzeit)</option>
               <option value="22+23">22. + 23. Januar (beide Tage)</option>
             </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              id="isMulti"
+              type="checkbox"
+              checked={form.isMulti}
+              onChange={e => setForm(f => ({ ...f, isMulti: e.target.checked }))}
+              className="w-4 h-4 accent-[#c9a84c] cursor-pointer"
+            />
+            <label htmlFor="isMulti" className="text-[#c9a84c] text-sm font-serif cursor-pointer">
+              Multi-person invite (couple / family) — uses "Ihr/Euch" in German
+            </label>
           </div>
 
           <button

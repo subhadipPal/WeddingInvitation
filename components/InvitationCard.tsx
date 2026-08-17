@@ -1,11 +1,15 @@
 import type { Lang, Translations } from '@/lib/i18n'
 
-interface Props { lang: Lang; translations: Translations; invitedDays?: '22+23' | '23' }
+interface Props { lang: Lang; translations: Translations; invitedDays?: '22+23' | '23'; isMulti?: boolean }
 
-export default function InvitationCard({ translations, invitedDays }: Props) {
+function tv(lang: Lang, isMulti: boolean, singular: string, multi: string) {
+  return lang === 'de' && isMulti ? multi : singular
+}
+
+export default function InvitationCard({ lang, translations, invitedDays, isMulti = false }: Props) {
   const body = invitedDays === '22+23'
-    ? translations.inviteBody22and23
-    : translations.inviteBody23only
+    ? tv(lang, isMulti, translations.inviteBody22and23, translations.inviteBody22and23Multi)
+    : tv(lang, isMulti, translations.inviteBody23only, translations.inviteBody23onlyMulti)
 
   return (
     <div className="animate-card-rise bg-[#f5f0e8] text-[#1a0a0a] rounded-2xl p-8 max-w-lg mx-auto text-center shadow-2xl border border-[#c9a84c]/40">

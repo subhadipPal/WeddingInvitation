@@ -18,12 +18,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { name, email, phone, invitedDays } = await req.json()
+  const { name, email, phone, invitedDays, isMulti } = await req.json()
   if (!name || !invitedDays) {
     return NextResponse.json({ error: 'name and invitedDays required' }, { status: 400 })
   }
   const token = generateToken()
-  await db.insert(guests).values({ token, name, email, phone, invitedDays })
+  await db.insert(guests).values({ token, name, email, phone, invitedDays, isMulti: !!isMulti })
   const base = req.headers.get('origin') ?? ''
   return NextResponse.json({
     token,

@@ -60,6 +60,7 @@ export default async function InvitePage({ params }: Props) {
         name: guest.name,
         invitedDays: guest.invitedDays as '22+23' | '23',
         token,
+        isMulti: guest.isMulti,
       }}
       existingRsvp={rsvp}
     />

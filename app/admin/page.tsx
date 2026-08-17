@@ -18,6 +18,7 @@ interface Guest {
   email: string | null
   phone: string | null
   invitedDays: string
+  isMulti: boolean
   createdAt: string
   rsvp: Rsvp | null
 }
@@ -27,7 +28,7 @@ type ContentState = { de: Record<string, string>; en: Record<string, string> }
 
 // ── Content key groups for the editor UI ───────────────────────────────────────
 
-const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[] }[] = [
+const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[]; deOnly?: boolean }[] = [
   {
     label: 'General',
     keys: ['coupleNames', 'saveTheDate', 'tapToOpen'],
@@ -38,7 +39,7 @@ const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[] }[] = [
   },
   {
     label: 'Invitation',
-    keys: ['inviteHeading', 'inviteBody22and23', 'inviteBody23only', 'inviteDate22', 'inviteDate23', 'inviteClosing', 'calendarLabel'],
+    keys: ['inviteHeading', 'inviteBody22and23', 'inviteBody23only', 'section2Body22and23', 'section2Body23only', 'inviteDate22', 'inviteDate23', 'inviteClosing', 'calendarLabel'],
   },
   {
     label: 'No-guest closing (shown when link has no token)',
@@ -47,6 +48,11 @@ const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[] }[] = [
   {
     label: 'RSVP',
     keys: ['rsvpGreeting', 'rsvpInvited22and23', 'rsvpInvited23only', 'rsvpQuestion', 'rsvpYes', 'rsvpNo', 'rsvpMaybe', 'rsvpNote', 'rsvpNotePlaceholder', 'rsvpSubmit', 'rsvpUpdate', 'rsvpConfirmation'],
+  },
+  {
+    label: 'Multi-person invite — DE only (Ihr/Euch forms)',
+    keys: ['inviteBody22and23Multi', 'inviteBody23onlyMulti', 'section2Body22and23Multi', 'section2Body23onlyMulti', 'rsvpGreetingMulti', 'rsvpInvited22and23Multi', 'rsvpInvited23onlyMulti', 'rsvpQuestionMulti', 'rsvpYesMulti', 'rsvpConfirmationMulti'],
+    deOnly: true,
   },
 ]
 
@@ -63,6 +69,12 @@ const KEY_LABELS: Partial<Record<keyof Translations, string>> = {
   inviteHeading: 'Main heading ("We\'re saying yes!")',
   inviteBody22and23: 'Invitation body — guests invited to both days',
   inviteBody23only: 'Invitation body — guests invited to celebration only',
+  inviteBody22and23Multi: '[Multi] Envelope card body — both days (DE)',
+  inviteBody23onlyMulti: '[Multi] Envelope card body — celebration only (DE)',
+  section2Body22and23: 'Page 2 body — guests invited to both days',
+  section2Body23only: 'Page 2 body — guests invited to celebration only',
+  section2Body22and23Multi: '[Multi] Page 2 body — both days (DE)',
+  section2Body23onlyMulti: '[Multi] Page 2 body — celebration only (DE)',
   inviteDate22: 'Date line — wedding day (22 Jan)',
   inviteDate23: 'Date line — celebration day (23 Jan)',
   inviteClosing: 'Closing sign-off',
@@ -70,9 +82,13 @@ const KEY_LABELS: Partial<Record<keyof Translations, string>> = {
   noGuestClosingBody: 'Closing paragraph (shown when no guest token in URL)',
   noGuestClosingSign: 'Closing sign (shown when no guest token in URL)',
   rsvpGreeting: 'RSVP greeting prefix ("Dear")',
+  rsvpGreetingMulti: '[Multi] RSVP greeting prefix (DE)',
   rsvpInvited22and23: 'RSVP — invited to both days line',
+  rsvpInvited22and23Multi: '[Multi] RSVP — invited to both days (DE)',
   rsvpInvited23only: 'RSVP — invited to celebration only line',
+  rsvpInvited23onlyMulti: '[Multi] RSVP — invited to celebration only (DE)',
   rsvpQuestion: 'RSVP question ("Will you be joining us?")',
+  rsvpQuestionMulti: '[Multi] RSVP question (DE)',
   rsvpYes: 'RSVP Yes button',
   rsvpNo: 'RSVP No button',
   rsvpMaybe: 'RSVP Maybe button',
@@ -81,6 +97,8 @@ const KEY_LABELS: Partial<Record<keyof Translations, string>> = {
   rsvpSubmit: 'Submit button',
   rsvpUpdate: 'Update button (when re-submitting)',
   rsvpConfirmation: 'Confirmation message after submit',
+  rsvpConfirmationMulti: '[Multi] Confirmation message after submit (DE)',
+  rsvpYesMulti: '[Multi] Yes button (DE)',
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -225,6 +243,8 @@ export default function AdminPage() {
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
+  const toastVisible = savingContent || saveStatus !== 'idle'
+
   return (
     <div className="h-screen text-[#f5f0e8] p-6 relative flex flex-col overflow-hidden"
       style={{ backgroundImage: 'url(/photos/rose/roses.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
@@ -314,7 +334,12 @@ export default function AdminPage() {
                     return (
                       <tr key={g.id}
                         className={`border-t border-white/10 transition-colors hover:bg-white/10 ${i % 2 === 0 ? 'bg-transparent' : 'bg-white/5'}`}>
-                        <td className="px-4 py-3 text-[#f5f0e8] font-medium">{g.name}</td>
+                        <td className="px-4 py-3 text-[#f5f0e8] font-medium">
+                          <span>{g.name}</span>
+                          {g.isMulti && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-[#c9a84c]/10 text-[#c9a84c]/70 border border-[#c9a84c]/20 font-serif align-middle">Group</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs hidden sm:table-cell">{g.email ?? g.phone ?? '—'}</td>
                         <td className="px-4 py-3">
                           <span className="px-2 py-0.5 rounded-full text-xs bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/30 whitespace-nowrap">
@@ -392,12 +417,14 @@ export default function AdminPage() {
                           <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
                             {KEY_LABELS[key] ?? key}
                           </p>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {(['de', 'en'] as const).map(lang => (
+                          <div className={`grid gap-3 ${group.deOnly ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                            {(group.deOnly ? ['de'] as const : ['de', 'en'] as const).map(lang => (
                               <div key={lang}>
-                                <label className="block text-[#c9a84c]/70 text-xs font-serif mb-1 uppercase tracking-wider">
-                                  {lang === 'de' ? 'German' : 'English'}
-                                </label>
+                                {!group.deOnly && (
+                                  <label className="block text-[#c9a84c]/70 text-xs font-serif mb-1 uppercase tracking-wider">
+                                    {lang === 'de' ? 'German' : 'English'}
+                                  </label>
+                                )}
                                 <textarea
                                   value={content[lang][key] ?? ''}
                                   onChange={e => handleContentChange(lang, key, e.target.value)}
@@ -432,6 +459,18 @@ export default function AdminPage() {
         <p className="fixed bottom-2 right-3 z-20 font-serif text-[#f5f0e8]/20 text-[10px] tracking-widest pointer-events-none">
           {process.env.NEXT_PUBLIC_COMMIT_SHA ?? 'local'}
         </p>
+
+        {/* Save toast */}
+        <div className={`fixed top-4 right-4 z-50 transition-all duration-300 ${toastVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+          <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-serif text-sm shadow-2xl border backdrop-blur-md ${
+            savingContent ? 'bg-black/70 border-[#c9a84c]/30 text-[#c9a84c]/70' :
+            saveStatus === 'saved' ? 'bg-black/70 border-green-400/30 text-green-400' :
+            'bg-black/70 border-red-400/30 text-red-400'
+          }`}>
+            {savingContent && <span className="animate-pulse">●</span>}
+            {savingContent ? 'Saving…' : saveStatus === 'saved' ? '✓ Saved' : '✕ Save failed'}
+          </div>
+        </div>
       </div>
     </div>
   )

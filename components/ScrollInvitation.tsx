@@ -13,6 +13,7 @@ interface Guest {
   name: string
   invitedDays: '22+23' | '23'
   token: string
+  isMulti?: boolean
 }
 
 interface RsvpData {
@@ -72,7 +73,13 @@ function FadeIn({ children, inView, delay = 0, className = '' }: {
   )
 }
 
+// Resolve DE singular vs plural — EN is always the singular value
+function tv(lang: Lang, isMulti: boolean, singular: string, multi: string) {
+  return lang === 'de' && isMulti ? multi : singular
+}
+
 export default function ScrollInvitation({ lang, translations, photos, guest, existingRsvp }: Props) {
+  const isMulti = guest?.isMulti ?? false
   const scrollRef = useRef<HTMLDivElement>(null)
   const s1 = useRef<HTMLElement>(null)
   const s2 = useRef<HTMLElement>(null)
@@ -146,6 +153,8 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
               <EnvelopeAnimation
                 lang={lang}
                 translations={translations}
+                invitedDays={guest?.invitedDays}
+                isMulti={isMulti}
                 onScrollToRsvp={() => s5.current?.scrollIntoView({ behavior: 'smooth' })}
               />
             </FadeIn>
@@ -164,7 +173,7 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
             <FadeIn inView={v2} delay={0}>
               {guest ? (
                 <p className="font-script text-4xl sm:text-5xl text-[#f5f0e8]">
-                  {translations.rsvpGreeting} {guest.name}!
+                  {tv(lang, isMulti, translations.rsvpGreeting, translations.rsvpGreetingMulti)} {guest.name}!
                 </p>
               ) : (
                 <p className="font-script text-5xl sm:text-7xl text-[#f5f0e8]">
@@ -178,8 +187,10 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
             <FadeIn inView={v2} delay={350}>
               <p className="font-serif text-[#f5f0e8]/90 text-sm sm:text-base leading-relaxed max-w-sm">
                 {guest
-                  ? (guest.invitedDays === '22+23' ? translations.inviteBody22and23 : translations.inviteBody23only)
-                  : translations.inviteBody23only}
+                  ? (guest.invitedDays === '22+23'
+                      ? tv(lang, isMulti, translations.section2Body22and23, translations.section2Body22and23Multi)
+                      : tv(lang, isMulti, translations.section2Body23only, translations.section2Body23onlyMulti))
+                  : translations.section2Body23only}
               </p>
             </FadeIn>
             <FadeIn inView={v2} delay={500}>
@@ -251,14 +262,23 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
             {guest ? (
               <>
                 <FadeIn inView={v5} delay={0}>
-                  <p className="font-script text-3xl text-[#c9a84c]">{translations.rsvpQuestion}</p>
+                  <p className="font-script text-4xl sm:text-5xl text-[#f5f0e8]">{guest.name}</p>
+                  <p className="font-script text-2xl text-[#c9a84c] mt-1">
+                    {tv(lang, isMulti, translations.rsvpQuestion, translations.rsvpQuestionMulti)}
+                  </p>
                 </FadeIn>
                 <FadeIn inView={v5} delay={150} className="w-full max-w-sm">
                   <RsvpForm
                     token={guest.token}
                     invitedDays={guest.invitedDays}
                     lang={lang}
-                    translations={translations}
+                    translations={{
+                      ...translations,
+                      rsvpYes: tv(lang, isMulti, translations.rsvpYes, translations.rsvpYesMulti),
+                      rsvpConfirmation: tv(lang, isMulti, translations.rsvpConfirmation, translations.rsvpConfirmationMulti),
+                      rsvpInvited22and23: tv(lang, isMulti, translations.rsvpInvited22and23, translations.rsvpInvited22and23Multi),
+                      rsvpInvited23only: tv(lang, isMulti, translations.rsvpInvited23only, translations.rsvpInvited23onlyMulti),
+                    }}
                     existingRsvp={existingRsvp}
                   />
                 </FadeIn>

@@ -7,6 +7,7 @@ export const guests = pgTable('guests', {
   email: varchar('email', { length: 200 }),
   phone: varchar('phone', { length: 30 }),
   invitedDays: varchar('invited_days', { length: 10 }).notNull(),
+  isMulti: boolean('is_multi').notNull().default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 

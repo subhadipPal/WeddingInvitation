@@ -6,11 +6,13 @@ import InvitationCard from './InvitationCard'
 interface Props {
   lang: Lang
   translations: Translations
+  invitedDays?: '22+23' | '23'
+  isMulti?: boolean
   onOpen?: () => void
   onScrollToRsvp?: () => void
 }
 
-export default function EnvelopeAnimation({ lang, translations, onOpen, onScrollToRsvp }: Props) {
+export default function EnvelopeAnimation({ lang, translations, invitedDays, isMulti, onOpen, onScrollToRsvp }: Props) {
   const [opened, setOpened] = useState(false)
   const [animating, setAnimating] = useState(false)
 
@@ -52,7 +54,7 @@ export default function EnvelopeAnimation({ lang, translations, onOpen, onScroll
         </div>
       ) : (
         <div className="flex flex-col items-center gap-5">
-          <InvitationCard lang={lang} translations={translations} />
+          <InvitationCard lang={lang} translations={translations} invitedDays={invitedDays} isMulti={isMulti} />
           {onScrollToRsvp && (
             <button
               onClick={onScrollToRsvp}
