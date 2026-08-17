@@ -1,6 +1,6 @@
 {
   "schema": "local-repo-knowledge-graph/v1",
-  "generated_at_local": "2026-08-15T18:10:59.209941+02:00",
+  "generated_at_local": "2026-08-17T13:29:51.477225+02:00",
   "root": "/Users/I584745/WeddingInvitation",
   "content_indexed": false,
   "network_used": false,
@@ -14,28 +14,1294 @@
       "kind": "directory"
     },
     {
+      "id": ".claude",
+      "kind": "directory"
+    },
+    {
+      "id": ".github",
+      "kind": "directory"
+    },
+    {
+      "id": ".github/workflows",
+      "kind": "directory"
+    },
+    {
+      "id": "app",
+      "kind": "directory"
+    },
+    {
+      "id": "app/[lang]",
+      "kind": "directory"
+    },
+    {
+      "id": "app/[lang]/invite",
+      "kind": "directory"
+    },
+    {
+      "id": "app/[lang]/invite/[token]",
+      "kind": "directory"
+    },
+    {
+      "id": "app/admin",
+      "kind": "directory"
+    },
+    {
+      "id": "app/admin/create",
+      "kind": "directory"
+    },
+    {
+      "id": "app/admin/login",
+      "kind": "directory"
+    },
+    {
+      "id": "app/api",
+      "kind": "directory"
+    },
+    {
+      "id": "app/api/admin-auth",
+      "kind": "directory"
+    },
+    {
+      "id": "app/api/guests",
+      "kind": "directory"
+    },
+    {
+      "id": "app/api/guests/[token]",
+      "kind": "directory"
+    },
+    {
+      "id": "app/api/rsvp",
+      "kind": "directory"
+    },
+    {
+      "id": "app/en",
+      "kind": "directory"
+    },
+    {
+      "id": "components",
+      "kind": "directory"
+    },
+    {
       "id": "docs",
       "kind": "directory"
     },
     {
-      "id": "docs/WEDDING_INVITATION_PLAN.md",
+      "id": "docs/superpowers",
+      "kind": "directory"
+    },
+    {
+      "id": "docs/superpowers/plans",
+      "kind": "directory"
+    },
+    {
+      "id": "lib",
+      "kind": "directory"
+    },
+    {
+      "id": "public",
+      "kind": "directory"
+    },
+    {
+      "id": "public/audio",
+      "kind": "directory"
+    },
+    {
+      "id": "public/photos",
+      "kind": "directory"
+    },
+    {
+      "id": "public/photos/rose",
+      "kind": "directory"
+    },
+    {
+      "id": ".DS_Store",
       "kind": "file",
-      "size_bytes": 10548,
+      "size_bytes": 6148,
+      "extension": null,
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": ".claude/repo-graph.json",
+      "kind": "file",
+      "size_bytes": 902,
+      "extension": ".json",
+      "language": "JSON",
+      "git_status": "",
+      "prominent": true
+    },
+    {
+      "id": ".claude/settings.local.json",
+      "kind": "file",
+      "size_bytes": 387,
+      "extension": ".json",
+      "language": "JSON",
+      "git_status": "",
+      "prominent": true
+    },
+    {
+      "id": ".env.example",
+      "kind": "file",
+      "size_bytes": 157,
+      "extension": ".example",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": ".env.local",
+      "kind": "file",
+      "size_bytes": 258,
+      "extension": ".local",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": ".github/workflows/keep-alive.yml",
+      "kind": "file",
+      "size_bytes": 264,
+      "extension": ".yml",
+      "language": "YAML",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": ".gitignore",
+      "kind": "file",
+      "size_bytes": 491,
+      "extension": null,
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "AGENTS.md",
+      "kind": "file",
+      "size_bytes": 678,
       "extension": ".md",
       "language": "Markdown",
-      "git_status": "??",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "CLAUDE.md",
+      "kind": "file",
+      "size_bytes": 11,
+      "extension": ".md",
+      "language": "Markdown",
+      "git_status": "",
+      "prominent": true
+    },
+    {
+      "id": "app/[lang]/invite/[token]/page.tsx",
+      "kind": "file",
+      "size_bytes": 2280,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/admin/create/page.tsx",
+      "kind": "file",
+      "size_bytes": 4638,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/admin/login/page.tsx",
+      "kind": "file",
+      "size_bytes": 1683,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/admin/page.tsx",
+      "kind": "file",
+      "size_bytes": 10448,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/api/admin-auth/route.ts",
+      "kind": "file",
+      "size_bytes": 488,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/api/guests/[token]/route.ts",
+      "kind": "file",
+      "size_bytes": 652,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/api/guests/route.ts",
+      "kind": "file",
+      "size_bytes": 1765,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/api/rsvp/route.ts",
+      "kind": "file",
+      "size_bytes": 1095,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/en/page.tsx",
+      "kind": "file",
+      "size_bytes": 472,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/favicon.ico",
+      "kind": "file",
+      "size_bytes": 25931,
+      "extension": ".ico",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/globals.css",
+      "kind": "file",
+      "size_bytes": 1583,
+      "extension": ".css",
+      "language": "CSS",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/layout.tsx",
+      "kind": "file",
+      "size_bytes": 817,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "app/page.tsx",
+      "kind": "file",
+      "size_bytes": 470,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/ConfettiCelebration.tsx",
+      "kind": "file",
+      "size_bytes": 958,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/CountdownTimer.tsx",
+      "kind": "file",
+      "size_bytes": 1541,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/EnvelopeAnimation.tsx",
+      "kind": "file",
+      "size_bytes": 2085,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/InvitationCard.tsx",
+      "kind": "file",
+      "size_bytes": 799,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/LanguageToggle.tsx",
+      "kind": "file",
+      "size_bytes": 1054,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/MandalaDecor.tsx",
+      "kind": "file",
+      "size_bytes": 3088,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/MusicPlayer.tsx",
+      "kind": "file",
+      "size_bytes": 1824,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/PhotoGallery.tsx",
+      "kind": "file",
+      "size_bytes": 1299,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/RsvpForm.tsx",
+      "kind": "file",
+      "size_bytes": 4162,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "components/ScrollInvitation.tsx",
+      "kind": "file",
+      "size_bytes": 11967,
+      "extension": ".tsx",
+      "language": "TypeScript React",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "docs/WEDDING_INVITATION_PLAN.md",
+      "kind": "file",
+      "size_bytes": 10494,
+      "extension": ".md",
+      "language": "Markdown",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "docs/superpowers/plans/2026-08-15-wedding-invitation.md",
+      "kind": "file",
+      "size_bytes": 62535,
+      "extension": ".md",
+      "language": "Markdown",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "drizzle.config.ts",
+      "kind": "file",
+      "size_bytes": 213,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "eslint.config.mjs",
+      "kind": "file",
+      "size_bytes": 465,
+      "extension": ".mjs",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "lib/db.ts",
+      "kind": "file",
+      "size_bytes": 219,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "lib/i18n.ts",
+      "kind": "file",
+      "size_bytes": 5582,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "lib/schema.ts",
+      "kind": "file",
+      "size_bytes": 922,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "lib/tokens.ts",
+      "kind": "file",
+      "size_bytes": 198,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "middleware.ts",
+      "kind": "file",
+      "size_bytes": 530,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "next-env.d.ts",
+      "kind": "file",
+      "size_bytes": 288,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "next.config.ts",
+      "kind": "file",
+      "size_bytes": 133,
+      "extension": ".ts",
+      "language": "TypeScript",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "package-lock.json",
+      "kind": "file",
+      "size_bytes": 285909,
+      "extension": ".json",
+      "language": "JSON",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "package.json",
+      "kind": "file",
+      "size_bytes": 668,
+      "extension": ".json",
+      "language": "JSON",
+      "git_status": "",
+      "prominent": true
+    },
+    {
+      "id": "postcss.config.mjs",
+      "kind": "file",
+      "size_bytes": 94,
+      "extension": ".mjs",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/.DS_Store",
+      "kind": "file",
+      "size_bytes": 6148,
+      "extension": null,
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/audio/.DS_Store",
+      "kind": "file",
+      "size_bytes": 6148,
+      "extension": null,
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/audio/README.md",
+      "kind": "file",
+      "size_bytes": 62,
+      "extension": ".md",
+      "language": "Markdown",
+      "git_status": "",
+      "prominent": true
+    },
+    {
+      "id": "public/audio/forever-and-always.mp3",
+      "kind": "file",
+      "size_bytes": 7203372,
+      "extension": ".mp3",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/file.svg",
+      "kind": "file",
+      "size_bytes": 391,
+      "extension": ".svg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/globe.svg",
+      "kind": "file",
+      "size_bytes": 1035,
+      "extension": ".svg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/next.svg",
+      "kind": "file",
+      "size_bytes": 1375,
+      "extension": ".svg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/.DS_Store",
+      "kind": "file",
+      "size_bytes": 6148,
+      "extension": null,
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/03d515ce-b636-454a-ba59-8d4fba0a1765.jpeg",
+      "kind": "file",
+      "size_bytes": 338551,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/0a9f1e4a-d8f2-48e3-9839-03bc8b946e65.jpeg",
+      "kind": "file",
+      "size_bytes": 148893,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/2395a9b3-181e-473f-89cb-cf1697ba81bf.jpeg",
+      "kind": "file",
+      "size_bytes": 129412,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/268c0246-3455-4851-92c5-82655d33c38f.jpeg",
+      "kind": "file",
+      "size_bytes": 110903,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/59dd1985-accb-46b5-8732-6c10217c17eb.jpeg",
+      "kind": "file",
+      "size_bytes": 495349,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/8417a217-8478-432a-bf7f-ac3dabf0de3c.jpeg",
+      "kind": "file",
+      "size_bytes": 360125,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/a9f4190d-db3e-48b6-b134-36df43c668c1.jpeg",
+      "kind": "file",
+      "size_bytes": 92765,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/ae20cb46-18bd-4111-9c6e-c5b30ab11745.jpeg",
+      "kind": "file",
+      "size_bytes": 355665,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/b683c955-62f6-49a8-b955-7d3bb53c0581.jpeg",
+      "kind": "file",
+      "size_bytes": 222229,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/b9cfd106-ff78-456a-b472-c6055a3cf3c1.jpeg",
+      "kind": "file",
+      "size_bytes": 322628,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/background.jpeg",
+      "kind": "file",
+      "size_bytes": 145491,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/e323de13-a80d-4624-8a61-8054bdc21ee2.jpeg",
+      "kind": "file",
+      "size_bytes": 162575,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/rose/Dua.jpeg",
+      "kind": "file",
+      "size_bytes": 57184,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/rose/_ (1).jpeg",
+      "kind": "file",
+      "size_bytes": 95763,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/rose/_ (2).jpeg",
+      "kind": "file",
+      "size_bytes": 70434,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/rose/_.jpeg",
+      "kind": "file",
+      "size_bytes": 71506,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/rose/bouquet.jpeg",
+      "kind": "file",
+      "size_bytes": 95763,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/photos/rose/roses.jpeg",
+      "kind": "file",
+      "size_bytes": 71506,
+      "extension": ".jpeg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/vercel.svg",
+      "kind": "file",
+      "size_bytes": 128,
+      "extension": ".svg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "public/window.svg",
+      "kind": "file",
+      "size_bytes": 385,
+      "extension": ".svg",
+      "language": null,
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "tsconfig.json",
+      "kind": "file",
+      "size_bytes": 666,
+      "extension": ".json",
+      "language": "JSON",
+      "git_status": "",
+      "prominent": false
+    },
+    {
+      "id": "vercel.json",
+      "kind": "file",
+      "size_bytes": 129,
+      "extension": ".json",
+      "language": "JSON",
+      "git_status": "",
       "prominent": false
     }
   ],
   "edges": [
+    {
+      "from": ".",
+      "to": "middleware.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": ".DS_Store",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": ".env.local",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "vercel.json",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "postcss.config.mjs",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "next-env.d.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": ".gitignore",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "package-lock.json",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "package.json",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "tsconfig.json",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": ".env.example",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "drizzle.config.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "AGENTS.md",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "eslint.config.mjs",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "CLAUDE.md",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "next.config.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/favicon.ico",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/layout.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/page.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/globals.css",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/admin",
+      "to": "app/admin/page.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/admin/create",
+      "to": "app/admin/create/page.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/admin/login",
+      "to": "app/admin/login/page.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api/admin-auth",
+      "to": "app/api/admin-auth/route.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api/rsvp",
+      "to": "app/api/rsvp/route.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api/guests",
+      "to": "app/api/guests/route.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api/guests/[token]",
+      "to": "app/api/guests/[token]/route.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/en",
+      "to": "app/en/page.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/[lang]/invite/[token]",
+      "to": "app/[lang]/invite/[token]/page.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".claude",
+      "to": ".claude/repo-graph.json",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".claude",
+      "to": ".claude/settings.local.json",
+      "type": "CONTAINS"
+    },
     {
       "from": "docs",
       "to": "docs/WEDDING_INVITATION_PLAN.md",
       "type": "CONTAINS"
     },
     {
+      "from": "docs/superpowers/plans",
+      "to": "docs/superpowers/plans/2026-08-15-wedding-invitation.md",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/ConfettiCelebration.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/LanguageToggle.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/RsvpForm.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/PhotoGallery.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/InvitationCard.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/EnvelopeAnimation.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/MusicPlayer.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/ScrollInvitation.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/CountdownTimer.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "components",
+      "to": "components/MandalaDecor.tsx",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/.DS_Store",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/file.svg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/vercel.svg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/next.svg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/globe.svg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/window.svg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/audio",
+      "to": "public/audio/.DS_Store",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/audio",
+      "to": "public/audio/forever-and-always.mp3",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/audio",
+      "to": "public/audio/README.md",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/e323de13-a80d-4624-8a61-8054bdc21ee2.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/0a9f1e4a-d8f2-48e3-9839-03bc8b946e65.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/8417a217-8478-432a-bf7f-ac3dabf0de3c.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/.DS_Store",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/2395a9b3-181e-473f-89cb-cf1697ba81bf.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/a9f4190d-db3e-48b6-b134-36df43c668c1.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/background.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/b683c955-62f6-49a8-b955-7d3bb53c0581.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/b9cfd106-ff78-456a-b472-c6055a3cf3c1.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/268c0246-3455-4851-92c5-82655d33c38f.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/ae20cb46-18bd-4111-9c6e-c5b30ab11745.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/59dd1985-accb-46b5-8732-6c10217c17eb.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/03d515ce-b636-454a-ba59-8d4fba0a1765.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos/rose",
+      "to": "public/photos/rose/bouquet.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos/rose",
+      "to": "public/photos/rose/Dua.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos/rose",
+      "to": "public/photos/rose/roses.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos/rose",
+      "to": "public/photos/rose/_ (1).jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos/rose",
+      "to": "public/photos/rose/_.jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos/rose",
+      "to": "public/photos/rose/_ (2).jpeg",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".github/workflows",
+      "to": ".github/workflows/keep-alive.yml",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "lib",
+      "to": "lib/schema.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "lib",
+      "to": "lib/i18n.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "lib",
+      "to": "lib/tokens.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "lib",
+      "to": "lib/db.ts",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": ".claude",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": ".github",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".github",
+      "to": ".github/workflows",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "app",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/[lang]",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/[lang]",
+      "to": "app/[lang]/invite",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/[lang]/invite",
+      "to": "app/[lang]/invite/[token]",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/admin",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/admin",
+      "to": "app/admin/create",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/admin",
+      "to": "app/admin/login",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/api",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api",
+      "to": "app/api/admin-auth",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api",
+      "to": "app/api/guests",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api/guests",
+      "to": "app/api/guests/[token]",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app/api",
+      "to": "app/api/rsvp",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "app",
+      "to": "app/en",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "components",
+      "type": "CONTAINS"
+    },
+    {
       "from": ".",
       "to": "docs",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "docs",
+      "to": "docs/superpowers",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "docs/superpowers",
+      "to": "docs/superpowers/plans",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "lib",
+      "type": "CONTAINS"
+    },
+    {
+      "from": ".",
+      "to": "public",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/audio",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public",
+      "to": "public/photos",
+      "type": "CONTAINS"
+    },
+    {
+      "from": "public/photos",
+      "to": "public/photos/rose",
       "type": "CONTAINS"
     }
   ]
