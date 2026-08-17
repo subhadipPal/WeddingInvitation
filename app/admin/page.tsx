@@ -310,85 +310,111 @@ export default function AdminPage() {
               ))}
             </div>
 
-            {/* Table */}
-            <div className="overflow-x-auto rounded-xl border border-white/20 shadow-2xl bg-white/10 backdrop-blur-md">
-              <table className="w-full font-serif text-sm">
-                <thead>
-                  <tr className="bg-black/30 text-[#c9a84c] text-xs uppercase tracking-wider">
-                    <th className="px-4 py-3 text-left">Name</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Contact</th>
-                    <th className="px-4 py-3 text-left">Invited</th>
-                    <th className="px-4 py-3 text-center">RSVP 22</th>
-                    <th className="px-4 py-3 text-center">RSVP 23</th>
-                    <th className="px-4 py-3 text-left hidden sm:table-cell">Note</th>
-                    <th className="px-4 py-3 text-left">Links</th>
-                    <th className="px-4 py-3"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {guests.map((g, i) => {
-                    const base = typeof window !== 'undefined' ? window.location.origin : ''
-                    const linkDe = `${base}/de/invite/${g.token}`
-                    const linkEn = `${base}/en/invite/${g.token}`
-                    const r = g.rsvp
-                    const rsvpColor = (v: boolean | null | undefined) =>
-                      v === true ? 'text-green-400' : v === false ? 'text-red-400' : 'text-[#f5f0e8]/30'
-                    return (
-                      <tr key={g.id}
-                        className={`border-t border-white/10 transition-colors hover:bg-white/10 ${i % 2 === 0 ? 'bg-transparent' : 'bg-white/5'}`}>
-                        <td className="px-4 py-3 text-[#f5f0e8] font-medium">
-                          <span>{g.name}</span>
-                          {g.isMulti && (
-                            <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-[#c9a84c]/10 text-[#c9a84c]/70 border border-[#c9a84c]/20 font-serif align-middle">Group</span>
-                          )}
-                        </td>
-                        <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs hidden sm:table-cell">{g.email ?? g.phone ?? '—'}</td>
-                        <td className="px-4 py-3">
-                          <span className="px-2 py-0.5 rounded-full text-xs bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/30 whitespace-nowrap">
-                            {g.invitedDays === '22+23' ? '22+23 Jan' : '23 Jan'}
-                          </span>
-                        </td>
-                        <td className={`px-4 py-3 text-center text-base ${rsvpColor(r?.attending22)}`}>
-                          {g.invitedDays === '22+23'
-                            ? (r ? (r.attending22 === null ? '?' : r.attending22 ? '✓' : '✗') : '–')
-                            : <span className="text-xs text-[#f5f0e8]/20">—</span>}
-                        </td>
-                        <td className={`px-4 py-3 text-center text-base ${rsvpColor(r?.attending23)}`}>
-                          {r ? (r.attending23 ? '✓' : '✗') : '–'}
-                        </td>
-                        <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs max-w-[140px] truncate hidden sm:table-cell">{r?.note ?? ''}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex gap-1">
-                            <button onClick={() => copyLink(linkDe, `de-${g.id}`)}
-                              className="text-xs bg-black/30 border border-[#c9a84c]/40 px-2 py-1 rounded hover:border-[#c9a84c] transition-colors text-[#c9a84c]">
-                              {copied === `de-${g.id}` ? '✓' : 'DE'}
-                            </button>
-                            <button onClick={() => copyLink(linkEn, `en-${g.id}`)}
-                              className="text-xs bg-black/30 border border-[#c9a84c]/40 px-2 py-1 rounded hover:border-[#c9a84c] transition-colors text-[#c9a84c]">
-                              {copied === `en-${g.id}` ? '✓' : 'EN'}
-                            </button>
+            {/* Guest cards */}
+            {guests.length === 0 ? (
+              <p className="text-center text-[#f5f0e8]/30 font-serif py-12">No guests added yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {guests.map(g => {
+                  const base = typeof window !== 'undefined' ? window.location.origin : ''
+                  const linkDe = `${base}/de/invite/${g.token}`
+                  const linkEn = `${base}/en/invite/${g.token}`
+                  const r = g.rsvp
+                  const rsvp22val = g.invitedDays === '22+23'
+                    ? (r ? (r.attending22 === null ? { label: '?', color: 'text-[#f5f0e8]/40' } : r.attending22 ? { label: 'Yes', color: 'text-green-400' } : { label: 'No', color: 'text-red-400' }) : { label: '–', color: 'text-[#f5f0e8]/30' })
+                    : null
+                  const rsvp23val = r ? (r.attending23 ? { label: 'Yes', color: 'text-green-400' } : { label: 'No', color: 'text-red-400' }) : { label: '–', color: 'text-[#f5f0e8]/30' }
+                  const initials = g.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+                  return (
+                    <div key={g.id} className="relative bg-black/50 backdrop-blur-xl border border-[#c9a84c]/30 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+
+                      {/* Header: avatar + name + delete */}
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-full border-2 border-[#c9a84c]/60 bg-[#4a0a0a]/80 flex items-center justify-center shrink-0">
+                          <span className="font-script text-[#c9a84c] text-lg leading-none">{initials}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-serif text-white font-semibold text-lg leading-tight">{g.name}</span>
+                            {g.isMulti && (
+                              <span className="px-1.5 py-0.5 rounded text-[11px] bg-[#c9a84c]/20 text-[#c9a84c] border border-[#c9a84c]/40 font-serif">Group</span>
+                            )}
                           </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <button onClick={() => deleteGuest(g.id, g.name)}
-                            disabled={deleting === g.id}
-                            className="text-xs text-red-400/50 hover:text-red-400 transition-colors disabled:opacity-30 text-base">
-                            {deleting === g.id ? '…' : '✕'}
+                          <p className="text-white/50 font-serif text-xs mt-0.5">Invitation & Contact Details</p>
+                        </div>
+                        <button
+                          onClick={() => deleteGuest(g.id, g.name)}
+                          disabled={deleting === g.id}
+                          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-400/60 text-red-400 bg-red-400/10 hover:bg-red-400/20 hover:border-red-400 transition-all font-serif text-sm font-medium disabled:opacity-30"
+                        >
+                          {deleting === g.id ? '…' : '✕ Delete'}
+                        </button>
+                      </div>
+
+                      {/* Contact + Invited row */}
+                      <div className="flex gap-3">
+                        <div className="flex-1 bg-white/10 border border-white/20 rounded-xl p-3 flex items-center gap-2 min-w-0">
+                          <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center shrink-0 text-[#c9a84c]">✉</div>
+                          <div className="min-w-0">
+                            <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">Contact</p>
+                            <p className="text-white text-sm font-serif break-all">{g.email ?? g.phone ?? '—'}</p>
+                          </div>
+                        </div>
+                        <div className="bg-white/10 border border-white/20 rounded-xl p-3 flex items-center gap-2 shrink-0">
+                          <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c]">📅</div>
+                          <div>
+                            <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">Invited</p>
+                            <p className="text-white text-sm font-serif whitespace-nowrap">{g.invitedDays === '22+23' ? '22–23 Jan' : '23 Jan'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* RSVP row */}
+                      <div className="bg-white/8 border border-white/20 rounded-xl p-3 flex items-center gap-3">
+                        {g.invitedDays === '22+23' && rsvp22val && (
+                          <>
+                            <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">👥</div>
+                            <div className="flex-1">
+                              <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">RSVP 22</p>
+                              <p className={`text-sm font-serif font-semibold ${rsvp22val.color}`}>{rsvp22val.label === 'Yes' ? '✓ ' : rsvp22val.label === 'No' ? '✕ ' : ''}{rsvp22val.label}</p>
+                            </div>
+                            <div className="w-px h-8 bg-white/20" />
+                          </>
+                        )}
+                        <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${r?.attending23 ? 'bg-green-400/15 border-green-400/40 text-green-400' : 'bg-[#c9a84c]/15 border-[#c9a84c]/30 text-[#c9a84c]'}`}>👥</div>
+                        <div className="flex-1">
+                          <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">RSVP 23</p>
+                          <p className={`text-sm font-serif font-semibold ${rsvp23val.color}`}>{rsvp23val.label === 'Yes' ? '✓ ' : rsvp23val.label === 'No' ? '✕ ' : ''}{rsvp23val.label}</p>
+                        </div>
+                        {r?.note && (
+                          <>
+                            <div className="w-px h-8 bg-white/20" />
+                            <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0" title={r.note}>💬</div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Links row */}
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">🔗</div>
+                        <span className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif">Links</span>
+                        <div className="flex gap-2 ml-1">
+                          <button onClick={() => copyLink(linkDe, `de-${g.id}`)}
+                            className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
+                            {copied === `de-${g.id}` ? '✓' : 'DE'}
                           </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                  {guests.length === 0 && (
-                    <tr>
-                      <td colSpan={8} className="px-4 py-12 text-center text-[#f5f0e8]/30 font-serif">
-                        No guests added yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                          <button onClick={() => copyLink(linkEn, `en-${g.id}`)}
+                            className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
+                            {copied === `en-${g.id}` ? '✓' : 'EN'}
+                          </button>
+                        </div>
+                      </div>
+
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
           </div>
         )}
