@@ -184,7 +184,10 @@ export async function loadTranslations(lang: Lang): Promise<Translations> {
     if (!rows.length) return translations[lang]
     const overrides: Partial<Translations> = {}
     for (const row of rows) {
-      overrides[row.key as keyof Translations] = row.value
+      const key = row.key as keyof Translations
+      if (key in translations[lang]) {
+        overrides[key] = row.value
+      }
     }
     return { ...translations[lang], ...overrides }
   } catch {
