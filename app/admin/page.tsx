@@ -294,7 +294,7 @@ export default function AdminPage() {
         {/* ── Guests tab ── */}
         {tab === 'guests' && (
           <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold pr-2 pb-6" style={{ paddingBottom: "50px"}}>
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold pr-2 pb-6" style={{ paddingBottom: "50px", marginBottom: "30px"}}>
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
