@@ -3,48 +3,16 @@ import { useState } from 'react'
 import type { Lang, Translations } from '@/lib/i18n'
 import ConfettiCelebration from './ConfettiCelebration'
 
-interface Props {
-  token: string
-  invitedDays: '22+23' | '23'
-  lang: Lang
-  translations: Translations
-  existingRsvp?: { attending22: boolean | null; attending23: boolean; note: string | null } | null
-}
-
 type Choice = 'yes' | 'no' | 'maybe' | null
 
-export default function RsvpForm({ token, invitedDays, translations, existingRsvp }: Props) {
-  const [choice22, setChoice22] = useState<Choice>(
-    existingRsvp?.attending22 === true ? 'yes' : existingRsvp?.attending22 === false ? 'no' : null
-  )
-  const [choice23, setChoice23] = useState<Choice>(
-    existingRsvp?.attending23 === true ? 'yes' : existingRsvp?.attending23 === false ? 'no' : null
-  )
-  const [note, setNote] = useState(existingRsvp?.note ?? '')
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
+interface ChoiceButtonsProps {
+  value: Choice
+  onChange: (c: Choice) => void
+  translations: Translations
+}
 
-  const choiceToBoolean = (c: Choice): boolean => c === 'yes' || c === 'maybe'
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!choice23) return
-    setLoading(true)
-    await fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token,
-        attending22: invitedDays === '22+23' ? choiceToBoolean(choice22) : undefined,
-        attending23: choiceToBoolean(choice23),
-        note: note || null,
-      }),
-    })
-    setSubmitted(true)
-    setLoading(false)
-  }
-
-  const ChoiceButtons = ({ value, onChange }: { value: Choice; onChange: (c: Choice) => void }) => (
+function ChoiceButtons({ value, onChange, translations }: ChoiceButtonsProps) {
+  return (
     <div className="flex gap-3">
       {(['yes', 'no', 'maybe'] as const).map(c => (
         <button
@@ -62,6 +30,46 @@ export default function RsvpForm({ token, invitedDays, translations, existingRsv
       ))}
     </div>
   )
+}
+
+interface Props {
+  token: string
+  invitedDays: '22+23' | '23'
+  lang: Lang
+  translations: Translations
+  existingRsvp?: { attending22: boolean | null; attending23: boolean; note: string | null } | null
+}
+
+export default function RsvpForm({ token, invitedDays, translations, existingRsvp }: Props) {
+  const [choice22, setChoice22] = useState<Choice>(
+    existingRsvp?.attending22 === true ? 'yes' : existingRsvp?.attending22 === false ? 'no' : null
+  )
+  const [choice23, setChoice23] = useState<Choice>(
+    existingRsvp?.attending23 === true ? 'yes' : existingRsvp?.attending23 === false ? 'no' : null
+  )
+  const [note, setNote] = useState(existingRsvp?.note ?? '')
+  const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const choiceToBoolean = (c: Choice): boolean => c === 'yes' || c === 'maybe'
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!choice23) return
+    setLoading(true)
+    await fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        attending22: invitedDays === '22+23' ? choiceToBoolean(choice22) : undefined,
+        attending23: choiceToBoolean(choice23),
+        note: note || null,
+      }),
+    })
+    setSubmitted(true)
+    setLoading(false)
+  }
 
   if (submitted) {
     return (
@@ -82,13 +90,13 @@ export default function RsvpForm({ token, invitedDays, translations, existingRsv
       {invitedDays === '22+23' && (
         <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
           <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate22}</p>
-          <ChoiceButtons value={choice22} onChange={setChoice22} />
+          <ChoiceButtons value={choice22} onChange={setChoice22} translations={translations} />
         </div>
       )}
 
       <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
         <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate23}</p>
-        <ChoiceButtons value={choice23} onChange={setChoice23} />
+        <ChoiceButtons value={choice23} onChange={setChoice23} translations={translations} />
       </div>
 
       <div>
