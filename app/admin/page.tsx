@@ -104,10 +104,11 @@ export default function AdminPage() {
 
   // Content tab state
   const [content, setContent] = useState<ContentState>(defaultContent())
-  const [contentLoading, setContentLoading] = useState(false)
   const [savingContent, setSavingContent] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle')
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const contentRef = useRef<ContentState>(defaultContent())
 
   // ── Guests tab logic ────────────────────────────────────────────────────────
 
@@ -177,25 +178,32 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (tab !== 'content') return
-    setContentLoading(true)
-    fetch('/api/content')
+    const controller = new AbortController()
+    fetch('/api/content', { signal: controller.signal })
       .then(r => r.json())
       .then((d: ContentState) => setContent(d))
-      .catch(() => {/* keep defaults */})
-      .finally(() => setContentLoading(false))
+      .catch(() => {/* keep defaults on error */})
+    return () => controller.abort()
   }, [tab])
 
   const handleContentChange = (lang: 'de' | 'en', key: string, value: string) => {
-    setContent(prev => ({ ...prev, [lang]: { ...prev[lang], [key]: value } }))
+    setContent(prev => {
+      const next = { ...prev, [lang]: { ...prev[lang], [key]: value } }
+      contentRef.current = next
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => doSave(contentRef.current), 5000)
+      setSaveStatus('idle')
+      return next
+    })
   }
 
-  const handleSaveContent = async () => {
+  const doSave = async (data: ContentState) => {
     setSavingContent(true)
     try {
       const res = await fetch('/api/content', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(content),
+        body: JSON.stringify(data),
       })
       setSaveStatus(res.ok ? 'saved' : 'error')
     } catch {
@@ -207,17 +215,21 @@ export default function AdminPage() {
   }
 
   const handleResetDefaults = () => {
-    if (!confirm('Reset all text to built-in defaults? This does not save — click Save to persist.')) return
-    setContent(defaultContent())
+    if (!confirm('Reset all text to built-in defaults? Changes will auto-save after 30 seconds.')) return
+    const defaults = defaultContent()
+    contentRef.current = defaults
+    setContent(defaults)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => doSave(contentRef.current), 5000)
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen text-[#f5f0e8] p-6 relative"
+    <div className="h-screen text-[#f5f0e8] p-6 relative flex flex-col overflow-hidden"
       style={{ backgroundImage: 'url(/photos/rose/roses.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }}>
       <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" />
-      <div className="relative z-10 max-w-7xl mx-auto">
+      <div className="relative z-10 w-full max-w-7xl mx-auto flex-1 flex flex-col min-h-0">
 
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -260,7 +272,7 @@ export default function AdminPage() {
 
         {/* ── Guests tab ── */}
         {tab === 'guests' && (
-          <>
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold">
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
@@ -282,11 +294,11 @@ export default function AdminPage() {
                 <thead>
                   <tr className="bg-black/30 text-[#c9a84c] text-xs uppercase tracking-wider">
                     <th className="px-4 py-3 text-left">Name</th>
-                    <th className="px-4 py-3 text-left">Contact</th>
+                    <th className="px-4 py-3 text-left hidden sm:table-cell">Contact</th>
                     <th className="px-4 py-3 text-left">Invited</th>
                     <th className="px-4 py-3 text-center">RSVP 22</th>
                     <th className="px-4 py-3 text-center">RSVP 23</th>
-                    <th className="px-4 py-3 text-left">Note</th>
+                    <th className="px-4 py-3 text-left hidden sm:table-cell">Note</th>
                     <th className="px-4 py-3 text-left">Links</th>
                     <th className="px-4 py-3"></th>
                   </tr>
@@ -303,10 +315,10 @@ export default function AdminPage() {
                       <tr key={g.id}
                         className={`border-t border-white/10 transition-colors hover:bg-white/10 ${i % 2 === 0 ? 'bg-transparent' : 'bg-white/5'}`}>
                         <td className="px-4 py-3 text-[#f5f0e8] font-medium">{g.name}</td>
-                        <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs">{g.email ?? g.phone ?? '—'}</td>
+                        <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs hidden sm:table-cell">{g.email ?? g.phone ?? '—'}</td>
                         <td className="px-4 py-3">
-                          <span className="px-2 py-0.5 rounded-full text-xs bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/30">
-                            {g.invitedDays === '22+23' ? '22 + 23 Jan' : '23 Jan'}
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-[#c9a84c]/15 text-[#c9a84c] border border-[#c9a84c]/30 whitespace-nowrap">
+                            {g.invitedDays === '22+23' ? '22+23 Jan' : '23 Jan'}
                           </span>
                         </td>
                         <td className={`px-4 py-3 text-center text-base ${rsvpColor(r?.attending22)}`}>
@@ -317,7 +329,7 @@ export default function AdminPage() {
                         <td className={`px-4 py-3 text-center text-base ${rsvpColor(r?.attending23)}`}>
                           {r ? (r.attending23 ? '✓' : '✗') : '–'}
                         </td>
-                        <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs max-w-[140px] truncate">{r?.note ?? ''}</td>
+                        <td className="px-4 py-3 text-[#f5f0e8]/60 text-xs max-w-[140px] truncate hidden sm:table-cell">{r?.note ?? ''}</td>
                         <td className="px-4 py-3">
                           <div className="flex gap-1">
                             <button onClick={() => copyLink(linkDe, `de-${g.id}`)}
@@ -350,20 +362,24 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
-          </>
+          </div>
         )}
 
         {/* ── Content tab ── */}
         {tab === 'content' && (
-          <div className="max-w-5xl flex flex-col gap-0">
-            <div className="overflow-y-auto max-h-[calc(100vh-360px)] pr-2 pb-6 scrollbar-gold">
-            {contentLoading ? (
-              <p className="font-serif text-[#f5f0e8]/40 py-12 text-center">Loading…</p>
-            ) : (
-              <>
-                <p className="font-serif text-[#f5f0e8]/50 text-sm mb-6">
-                  Edit guest-facing invitation text in both languages. Changes take effect immediately after saving.
-                </p>
+          <div className="max-w-5xl flex-1 flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-6 scrollbar-gold">
+                <div className="flex items-center justify-between mb-6">
+                  <p className="font-serif text-[#f5f0e8]/50 text-sm">
+                    Edit guest-facing invitation text. Auto-saves 5s after changes.
+                  </p>
+                  <button
+                    onClick={handleResetDefaults}
+                    className="shrink-0 border border-[#c9a84c]/40 text-[#c9a84c] font-serif text-xs px-3 py-1.5 rounded-lg hover:bg-[#c9a84c]/10 transition-colors ml-4"
+                  >
+                    Reset to defaults
+                  </button>
+                </div>
 
                 {CONTENT_GROUPS.map(group => (
                   <div key={group.label} className="mb-8">
@@ -396,44 +412,26 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))}
+            </div>
 
-                {/* Action bar — outside scroll container so it's always reachable */}
-              </>
-            )}
-          </div>
-
-          {/* Action bar */}
-          {!contentLoading && (
-            <div className="flex items-center gap-4 pt-4 pb-6 border-t border-[#c9a84c]/20 mt-2">
-              <button
-                onClick={handleSaveContent}
-                disabled={savingContent}
-                className="bg-[#c9a84c] text-[#1a0a0a] font-serif font-semibold px-6 py-2.5 rounded-xl hover:bg-[#e0bd6e] transition-colors disabled:opacity-40"
-              >
-                {savingContent ? 'Saving…' : 'Save'}
-              </button>
-              <button
-                onClick={handleResetDefaults}
-                className="border border-[#c9a84c]/40 text-[#c9a84c] font-serif text-sm px-4 py-2.5 rounded-xl hover:bg-[#c9a84c]/10 transition-colors"
-              >
-                Reset to defaults
-              </button>
-              {saveStatus === 'saved' && (
-                <span className="font-serif text-green-400 text-sm">Saved ✓</span>
+          {/* Status indicator */}
+            <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
+              {savingContent && (
+                <span className="font-serif text-[#c9a84c]/60 text-xs">Saving…</span>
               )}
-              {saveStatus === 'error' && (
-                <span className="font-serif text-red-400 text-sm">Save failed — try again</span>
+              {!savingContent && saveStatus === 'saved' && (
+                <span className="font-serif text-green-400 text-xs">Saved ✓</span>
+              )}
+              {!savingContent && saveStatus === 'error' && (
+                <span className="font-serif text-red-400 text-xs">Save failed — will retry on next change</span>
               )}
             </div>
-          )}
           </div>
         )}
-        {/* Version footer */}
-        <div className="mt-10 pb-4 text-center">
-          <p className="font-serif text-[#f5f0e8]/20 text-xs tracking-widest">
-            deploy {process.env.NEXT_PUBLIC_COMMIT_SHA ?? 'local'}
-          </p>
-        </div>
+        {/* Version overlay */}
+        <p className="fixed bottom-2 right-3 z-20 font-serif text-[#f5f0e8]/20 text-[10px] tracking-widest pointer-events-none">
+          {process.env.NEXT_PUBLIC_COMMIT_SHA ?? 'local'}
+        </p>
       </div>
     </div>
   )
