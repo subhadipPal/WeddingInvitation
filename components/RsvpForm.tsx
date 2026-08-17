@@ -14,7 +14,7 @@ interface ChoiceButtonsProps {
 function ChoiceButtons({ value, onChange, translations }: ChoiceButtonsProps) {
   return (
     <div className="flex gap-3">
-      {(['yes', 'no', 'maybe'] as const).map(c => (
+      {(['yes', 'no'] as const).map(c => (
         <button
           key={c}
           type="button"
@@ -25,7 +25,7 @@ function ChoiceButtons({ value, onChange, translations }: ChoiceButtonsProps) {
               : 'bg-transparent text-[#f5f0e8] border-[#c9a84c]/40 hover:border-[#c9a84c]'
           }`}
         >
-          {c === 'yes' ? translations.rsvpYes : c === 'no' ? translations.rsvpNo : translations.rsvpMaybe}
+          {c === 'yes' ? translations.rsvpYes : translations.rsvpNo}
         </button>
       ))}
     </div>
@@ -51,7 +51,7 @@ export default function RsvpForm({ token, invitedDays, translations, existingRsv
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const choiceToBoolean = (c: Choice): boolean => c === 'yes' || c === 'maybe'
+  const choiceToBoolean = (c: Choice): boolean => c === 'yes'
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -85,7 +85,6 @@ export default function RsvpForm({ token, invitedDays, translations, existingRsv
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-md mx-auto">
-      <p className="font-serif text-[#f5f0e8]/80 text-center">{translations.rsvpQuestion}</p>
 
       {invitedDays === '22+23' && (
         <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">

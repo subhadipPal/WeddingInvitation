@@ -1,6 +1,6 @@
 import { readdirSync } from 'fs'
 import { join } from 'path'
-import { loadTranslations } from '@/lib/i18n'
+import { loadTranslations } from '@/lib/i18n.server'
 import ScrollInvitation from '@/components/ScrollInvitation'
 
 function getPhotoList(): string[] {

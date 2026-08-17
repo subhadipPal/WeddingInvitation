@@ -1,7 +1,7 @@
 import { readdirSync } from 'fs'
 import { join } from 'path'
 import type { Lang } from '@/lib/i18n'
-import { loadTranslations } from '@/lib/i18n'
+import { loadTranslations } from '@/lib/i18n.server'
 import ScrollInvitation from '@/components/ScrollInvitation'
 import { db } from '@/lib/db'
 import { guests, rsvps } from '@/lib/schema'

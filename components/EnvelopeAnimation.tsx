@@ -3,9 +3,14 @@ import { useState } from 'react'
 import type { Lang, Translations } from '@/lib/i18n'
 import InvitationCard from './InvitationCard'
 
-interface Props { lang: Lang; translations: Translations; onOpen?: () => void }
+interface Props {
+  lang: Lang
+  translations: Translations
+  onOpen?: () => void
+  onScrollToRsvp?: () => void
+}
 
-export default function EnvelopeAnimation({ lang, translations, onOpen }: Props) {
+export default function EnvelopeAnimation({ lang, translations, onOpen, onScrollToRsvp }: Props) {
   const [opened, setOpened] = useState(false)
   const [animating, setAnimating] = useState(false)
 
@@ -15,6 +20,8 @@ export default function EnvelopeAnimation({ lang, translations, onOpen }: Props)
     onOpen?.()
     setTimeout(() => { setOpened(true); setAnimating(false) }, 1200)
   }
+
+  const rsvpLabel = lang === 'de' ? 'Wirst du dabei sein?' : 'Will you be able to attend?'
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -44,7 +51,26 @@ export default function EnvelopeAnimation({ lang, translations, onOpen }: Props)
           </p>
         </div>
       ) : (
-        <InvitationCard lang={lang} translations={translations} />
+        <div className="flex flex-col items-center gap-5">
+          <InvitationCard lang={lang} translations={translations} />
+          {onScrollToRsvp && (
+            <button
+              onClick={onScrollToRsvp}
+              className="group relative mt-2 px-8 py-3 rounded-full font-serif text-[#1a0a0a] text-sm tracking-wide overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #e0bd6e 0%, #c9a84c 50%, #b8943a 100%)',
+                animation: 'rsvp-pulse 2.5s ease-in-out infinite',
+                boxShadow: '0 4px 20px #c9a84c50',
+              }}
+            >
+              <span className="relative z-10 font-semibold">{rsvpLabel}</span>
+              <span
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ background: 'linear-gradient(135deg, #f0d080 0%, #e0bd6e 50%, #c9a84c 100%)' }}
+              />
+            </button>
+          )}
+        </div>
       )}
     </div>
   )

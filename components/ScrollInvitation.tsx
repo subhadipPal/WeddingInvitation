@@ -73,6 +73,7 @@ function FadeIn({ children, inView, delay = 0, className = '' }: {
 }
 
 export default function ScrollInvitation({ lang, translations, photos, guest, existingRsvp }: Props) {
+  const scrollRef = useRef<HTMLDivElement>(null)
   const s1 = useRef<HTMLElement>(null)
   const s2 = useRef<HTMLElement>(null)
   const s3 = useRef<HTMLElement>(null)
@@ -88,13 +89,20 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
   const bgHero     = '/photos/background.jpeg'
   const bgHeart    = photos.find(p => p.includes('8417a217')) ?? photos[0]
   const bgDate     = '/photos/rose/bouquet.jpeg'
-  const bgGallery  = photos.find(p => p.includes('e323de13')) ?? photos[2]
   const bgClosing  = '/photos/background.jpeg'
+
+  // Per-photo face positions for gallery — landscape photos need lower anchor
+  const galleryFacePos: Record<string, string> = {
+    'b683c955': 'center top',    // portrait close-up, faces at top
+    '59dd1985': 'center top',    // portrait selfie, faces at top
+    '0a9f1e4a': 'center 30%',   // portrait standing, faces upper-center
+    '03d515ce': 'center 55%',   // landscape, faces lower-center
+    'ae20cb46': 'center 55%',   // landscape, faces lower-center
+  }
+
   const galleryPhotos = photos.filter(p =>
     ['b683c955','59dd1985','0a9f1e4a','03d515ce','ae20cb46'].some(id => p.includes(id))
   ).slice(0, 5)
-
-  void bgGallery
 
   const [galleryIdx, setGalleryIdx] = useState(0)
   useEffect(() => {
@@ -106,6 +114,7 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
   return (
     <>
       <div
+        ref={scrollRef}
         className="h-[100dvh] overflow-y-scroll"
         style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth' }}
       >
@@ -134,7 +143,11 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
             </FadeIn>
             <div className="w-16 h-px bg-[#c9a84c]/40 my-1" />
             <FadeIn inView={v1} delay={350}>
-              <EnvelopeAnimation lang={lang} translations={translations} />
+              <EnvelopeAnimation
+                lang={lang}
+                translations={translations}
+                onScrollToRsvp={() => s5.current?.scrollIntoView({ behavior: 'smooth' })}
+              />
             </FadeIn>
           </div>
           <div className="absolute bottom-6 left-0 right-0 flex justify-center z-10 animate-bounce">
@@ -146,7 +159,7 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
 
         {/* Section 2: Invitation body */}
         <Section ref={s2} style={{ scrollSnapAlign: 'start' }}>
-          <BgPhoto src={bgHeart} alt="Julia und Ravi" position="center 20%" />
+          <BgPhoto src={bgHeart} alt="Julia und Ravi" position="center 30%" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-5 px-8 text-center">
             <FadeIn inView={v2} delay={0}>
               {guest ? (
@@ -208,7 +221,7 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
                   key={src}
                   className={`absolute inset-0 transition-opacity duration-1000 ${i === galleryIdx ? 'opacity-100' : 'opacity-0'}`}
                 >
-                  <Image src={src} alt={`Julia & Ravi ${i + 1}`} fill className="object-cover" unoptimized />
+                  <Image src={src} alt={`Julia & Ravi ${i + 1}`} fill className="object-cover" style={{ objectPosition: Object.entries(galleryFacePos).find(([id]) => src.includes(id))?.[1] ?? 'center top' }} unoptimized />
                 </div>
               ))}
               <div className="absolute inset-0 bg-black/40" />

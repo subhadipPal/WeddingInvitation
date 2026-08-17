@@ -355,7 +355,7 @@ export default function AdminPage() {
 
         {/* ── Content tab ── */}
         {tab === 'content' && (
-          <div className="max-w-5xl">
+          <div className="max-w-5xl overflow-y-auto max-h-[calc(100vh-220px)] pr-2 scrollbar-gold">
             {contentLoading ? (
               <p className="font-serif text-[#f5f0e8]/40 py-12 text-center">Loading…</p>
             ) : (
@@ -371,7 +371,7 @@ export default function AdminPage() {
                     </h2>
                     <div className="flex flex-col gap-4">
                       {group.keys.map(key => (
-                        <div key={key} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-4">
+                        <div key={key} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
                           <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
                             {KEY_LABELS[key] ?? key}
                           </p>
