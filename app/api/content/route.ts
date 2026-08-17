@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { content } from '@/lib/schema'
 import { translations, GUEST_FACING_KEYS, type Lang } from '@/lib/i18n'
-import { eq, and } from 'drizzle-orm'
 
 function isAdmin(req: NextRequest) {
   return req.cookies.get('admin-auth')?.value === process.env.ADMIN_PASSWORD
@@ -27,7 +26,12 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body: { de: Record<string, string>; en: Record<string, string> } = await req.json()
+  let body: { de: Record<string, string>; en: Record<string, string> }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
 
   const upserts: Promise<unknown>[] = []
   for (const lang of ['de', 'en'] as const) {
