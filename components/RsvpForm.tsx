@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { t, type Lang } from '@/lib/i18n'
+import type { Lang, Translations } from '@/lib/i18n'
 import ConfettiCelebration from './ConfettiCelebration'
 
 interface Props {
@@ -8,12 +8,13 @@ interface Props {
   guestName: string
   invitedDays: '22+23' | '23'
   lang: Lang
+  translations: Translations
   existingRsvp?: { attending22: boolean | null; attending23: boolean; note: string | null } | null
 }
 
 type Choice = 'yes' | 'no' | 'maybe' | null
 
-export default function RsvpForm({ token, guestName, invitedDays, lang, existingRsvp }: Props) {
+export default function RsvpForm({ token, invitedDays, translations, existingRsvp }: Props) {
   const [choice22, setChoice22] = useState<Choice>(
     existingRsvp?.attending22 === true ? 'yes' : existingRsvp?.attending22 === false ? 'no' : null
   )
@@ -57,7 +58,7 @@ export default function RsvpForm({ token, guestName, invitedDays, lang, existing
               : 'bg-transparent text-[#f5f0e8] border-[#c9a84c]/40 hover:border-[#c9a84c]'
           }`}
         >
-          {t(c === 'yes' ? 'rsvpYes' : c === 'no' ? 'rsvpNo' : 'rsvpMaybe', lang)}
+          {c === 'yes' ? translations.rsvpYes : c === 'no' ? translations.rsvpNo : translations.rsvpMaybe}
         </button>
       ))}
     </div>
@@ -69,7 +70,7 @@ export default function RsvpForm({ token, guestName, invitedDays, lang, existing
         <ConfettiCelebration />
         <div className="text-center py-12">
           <p className="font-script text-5xl text-[#c9a84c] mb-4">🎉</p>
-          <p className="font-serif text-xl text-[#f5f0e8]">{t('rsvpConfirmation', lang)}</p>
+          <p className="font-serif text-xl text-[#f5f0e8]">{translations.rsvpConfirmation}</p>
         </div>
       </>
     )
@@ -77,26 +78,26 @@ export default function RsvpForm({ token, guestName, invitedDays, lang, existing
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-md mx-auto">
-      <p className="font-serif text-[#f5f0e8]/80 text-center">{t('rsvpQuestion', lang)}</p>
+      <p className="font-serif text-[#f5f0e8]/80 text-center">{translations.rsvpQuestion}</p>
 
       {invitedDays === '22+23' && (
         <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
-          <p className="font-serif text-[#c9a84c] text-sm mb-3">{t('inviteDate22', lang)}</p>
+          <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate22}</p>
           <ChoiceButtons value={choice22} onChange={setChoice22} />
         </div>
       )}
 
       <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
-        <p className="font-serif text-[#c9a84c] text-sm mb-3">{t('inviteDate23', lang)}</p>
+        <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate23}</p>
         <ChoiceButtons value={choice23} onChange={setChoice23} />
       </div>
 
       <div>
-        <label className="block font-serif text-sm text-[#f5f0e8]/60 mb-2">{t('rsvpNote', lang)}</label>
+        <label className="block font-serif text-sm text-[#f5f0e8]/60 mb-2">{translations.rsvpNote}</label>
         <textarea
           value={note}
           onChange={e => setNote(e.target.value)}
-          placeholder={t('rsvpNotePlaceholder', lang)}
+          placeholder={translations.rsvpNotePlaceholder}
           rows={3}
           className="w-full bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl px-4 py-3 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c] resize-none"
         />
@@ -107,7 +108,7 @@ export default function RsvpForm({ token, guestName, invitedDays, lang, existing
         disabled={loading || !choice23}
         className="bg-[#c9a84c] text-[#1a0a0a] font-serif font-semibold py-3 rounded-xl hover:bg-[#c9a84c]/80 transition-colors disabled:opacity-40"
       >
-        {loading ? '...' : t(existingRsvp ? 'rsvpUpdate' : 'rsvpSubmit', lang)}
+        {loading ? '...' : existingRsvp ? translations.rsvpUpdate : translations.rsvpSubmit}
       </button>
     </form>
   )

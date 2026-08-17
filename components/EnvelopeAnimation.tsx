@@ -1,11 +1,11 @@
 'use client'
 import { useState } from 'react'
-import { t, type Lang } from '@/lib/i18n'
+import type { Lang, Translations } from '@/lib/i18n'
 import InvitationCard from './InvitationCard'
 
-interface Props { lang: Lang; onOpen?: () => void }
+interface Props { lang: Lang; translations: Translations; onOpen?: () => void }
 
-export default function EnvelopeAnimation({ lang, onOpen }: Props) {
+export default function EnvelopeAnimation({ lang, translations, onOpen }: Props) {
   const [opened, setOpened] = useState(false)
   const [animating, setAnimating] = useState(false)
 
@@ -40,11 +40,11 @@ export default function EnvelopeAnimation({ lang, onOpen }: Props) {
             <div className="absolute -bottom-1 -right-3 text-3xl opacity-80">🌸</div>
           </div>
           <p className="font-script text-xl text-[#c9a84c] text-center mt-3 animate-gold-shimmer">
-            {t('tapToOpen', lang)}
+            {translations.tapToOpen}
           </p>
         </div>
       ) : (
-        <InvitationCard lang={lang} />
+        <InvitationCard lang={lang} translations={translations} />
       )}
     </div>
   )

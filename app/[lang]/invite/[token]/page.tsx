@@ -1,6 +1,7 @@
 import { readdirSync } from 'fs'
 import { join } from 'path'
 import type { Lang } from '@/lib/i18n'
+import { loadTranslations } from '@/lib/i18n'
 import ScrollInvitation from '@/components/ScrollInvitation'
 import { db } from '@/lib/db'
 import { guests, rsvps } from '@/lib/schema'
@@ -12,7 +13,8 @@ function getPhotoList(): string[] {
   try {
     const dir = join(process.cwd(), 'public', 'photos')
     return readdirSync(dir)
-      .filter(f => /\.(jpe?g|png|webp)$/i.test(f))
+      .filter(f => /\.(jpe?g|png|webp)$/i.test(f) && f !== 'background.jpeg')
+      .sort()
       .map(f => `/photos/${f}`)
   } catch {
     return []
@@ -29,9 +31,8 @@ async function getGuest(token: string) {
 export default async function InvitePage({ params }: Props) {
   const { lang: langParam, token } = await params
   const lang = (langParam === 'en' ? 'en' : 'de') as Lang
-  const data = await getGuest(token)
+  const [data, translations] = await Promise.all([getGuest(token), loadTranslations(lang)])
 
-  // Invalid / missing token — show friendly error page
   if (!data) {
     return (
       <main className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center"
@@ -53,6 +54,7 @@ export default async function InvitePage({ params }: Props) {
   return (
     <ScrollInvitation
       lang={lang}
+      translations={translations}
       photos={getPhotoList()}
       guest={{
         name: guest.name,

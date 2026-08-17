@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { type Lang, t } from '@/lib/i18n'
+import type { Lang, Translations } from '@/lib/i18n'
 import MandalaDecor from './MandalaDecor'
 import EnvelopeAnimation from './EnvelopeAnimation'
 import CountdownTimer from './CountdownTimer'
@@ -23,6 +23,7 @@ interface RsvpData {
 
 interface Props {
   lang: Lang
+  translations: Translations
   photos: string[]
   guest?: Guest
   existingRsvp?: RsvpData | null
@@ -71,7 +72,7 @@ function FadeIn({ children, inView, delay = 0, className = '' }: {
   )
 }
 
-export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: Props) {
+export default function ScrollInvitation({ lang, translations, photos, guest, existingRsvp }: Props) {
   const s1 = useRef<HTMLElement>(null)
   const s2 = useRef<HTMLElement>(null)
   const s3 = useRef<HTMLElement>(null)
@@ -84,15 +85,16 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
   const v4 = useInView(s4)
   const v5 = useInView(s5)
 
-  // Photo assignments — using specific assets
-  const bgHero     = '/photos/background.jpeg'          // wedding venue rose arches
-  const bgHeart    = photos.find(p => p.includes('8417a217')) ?? photos[0]  // heart hands wide
-  const bgDate     = '/photos/rose/bouquet.jpeg'         // rose bouquet (no spaces)
-  const bgGallery  = photos.find(p => p.includes('e323de13')) ?? photos[2]  // harbor/sea
-  const bgClosing  = '/photos/background.jpeg'           // venue again for closing
+  const bgHero     = '/photos/background.jpeg'
+  const bgHeart    = photos.find(p => p.includes('8417a217')) ?? photos[0]
+  const bgDate     = '/photos/rose/bouquet.jpeg'
+  const bgGallery  = photos.find(p => p.includes('e323de13')) ?? photos[2]
+  const bgClosing  = '/photos/background.jpeg'
   const galleryPhotos = photos.filter(p =>
     ['b683c955','59dd1985','0a9f1e4a','03d515ce','ae20cb46'].some(id => p.includes(id))
   ).slice(0, 5)
+
+  void bgGallery
 
   const [galleryIdx, setGalleryIdx] = useState(0)
   useEffect(() => {
@@ -103,12 +105,11 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
 
   return (
     <>
-      {/* Scroll container */}
       <div
         className="h-[100dvh] overflow-y-scroll"
         style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth' }}
       >
-        {/* ── Section 1: Hero ─────────────────────────────── */}
+        {/* Section 1: Hero */}
         <Section ref={s1} style={{ scrollSnapAlign: 'start' }}>
           <BgPhoto src={bgHero} alt="Wedding venue" position="center top" />
           <MandalaDecor />
@@ -118,12 +119,14 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-3 px-6">
             <FadeIn inView={v1} delay={0}>
               <p className="font-serif text-[#c9a84c]/70 text-[10px] tracking-[0.5em] uppercase text-center">
-                Save the Date
+                {translations.saveTheDate}
               </p>
             </FadeIn>
             <FadeIn inView={v1} delay={150}>
               <h1 className="font-script text-4xl sm:text-6xl text-[#c9a84c] text-center leading-tight">
-                Julia Schulze<br />&amp;<br />Subhadip Pal
+                {translations.coupleNames.replace(' & ', '\n&\n').split('\n').map((part, i) =>
+                  i === 1 ? <React.Fragment key={i}><br />{part}<br /></React.Fragment> : <React.Fragment key={i}>{part}</React.Fragment>
+                )}
               </h1>
             </FadeIn>
             <FadeIn inView={v1} delay={250}>
@@ -131,10 +134,9 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
             </FadeIn>
             <div className="w-16 h-px bg-[#c9a84c]/40 my-1" />
             <FadeIn inView={v1} delay={350}>
-              <EnvelopeAnimation lang={lang} />
+              <EnvelopeAnimation lang={lang} translations={translations} />
             </FadeIn>
           </div>
-          {/* Scroll hint */}
           <div className="absolute bottom-6 left-0 right-0 flex justify-center z-10 animate-bounce">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round"/>
@@ -142,18 +144,18 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
           </div>
         </Section>
 
-        {/* ── Section 2: Wir sagen Ja ─────────────────────── */}
+        {/* Section 2: Invitation body */}
         <Section ref={s2} style={{ scrollSnapAlign: 'start' }}>
           <BgPhoto src={bgHeart} alt="Julia und Ravi" position="center 20%" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-5 px-8 text-center">
             <FadeIn inView={v2} delay={0}>
               {guest ? (
                 <p className="font-script text-4xl sm:text-5xl text-[#f5f0e8]">
-                  {t('rsvpGreeting', lang)} {guest.name}!
+                  {translations.rsvpGreeting} {guest.name}!
                 </p>
               ) : (
                 <p className="font-script text-5xl sm:text-7xl text-[#f5f0e8]">
-                  {t('inviteHeading', lang)}
+                  {translations.inviteHeading}
                 </p>
               )}
             </FadeIn>
@@ -163,41 +165,41 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
             <FadeIn inView={v2} delay={350}>
               <p className="font-serif text-[#f5f0e8]/90 text-sm sm:text-base leading-relaxed max-w-sm">
                 {guest
-                  ? t(guest.invitedDays === '22+23' ? 'inviteBody22and23' : 'inviteBody23only', lang)
-                  : t('inviteBody23only', lang)}
+                  ? (guest.invitedDays === '22+23' ? translations.inviteBody22and23 : translations.inviteBody23only)
+                  : translations.inviteBody23only}
               </p>
             </FadeIn>
             <FadeIn inView={v2} delay={500}>
-              <p className="font-script text-2xl text-[#c9a84c]">{t('inviteClosing', lang)}</p>
+              <p className="font-script text-2xl text-[#c9a84c]">{translations.inviteClosing}</p>
             </FadeIn>
           </div>
         </Section>
 
-        {/* ── Section 3: Date ──────────────────────────────── */}
+        {/* Section 3: Date */}
         <Section ref={s3} style={{ scrollSnapAlign: 'start' }}>
           <BgPhoto src={bgDate} alt="Roses" position="center center" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-6 px-8 text-center">
             <FadeIn inView={v3} delay={0}>
               <p className="font-serif text-[#c9a84c] text-xs tracking-[0.4em] uppercase">
-                {lang === 'de' ? 'Haltet den Termin frei' : 'Mark your calendar'}
+                {translations.calendarLabel}
               </p>
             </FadeIn>
             <FadeIn inView={v3} delay={200}>
               <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/40 rounded-2xl px-8 py-6 flex flex-col gap-3">
-                <p className="font-script text-3xl sm:text-4xl text-[#c9a84c]">{t('inviteDate22', lang)}</p>
+                <p className="font-script text-3xl sm:text-4xl text-[#c9a84c]">{translations.inviteDate22}</p>
                 <div className="w-full h-px bg-[#c9a84c]/30" />
-                <p className="font-script text-3xl sm:text-4xl text-[#c9a84c]">{t('inviteDate23', lang)}</p>
+                <p className="font-script text-3xl sm:text-4xl text-[#c9a84c]">{translations.inviteDate23}</p>
                 <div className="w-full h-px bg-[#c9a84c]/30" />
                 <p className="font-serif text-[#f5f0e8]/70 text-sm tracking-widest uppercase">Berlin</p>
               </div>
             </FadeIn>
             <FadeIn inView={v3} delay={400}>
-              <CountdownTimer lang={lang} />
+              <CountdownTimer lang={lang} translations={translations} />
             </FadeIn>
           </div>
         </Section>
 
-        {/* ── Section 4: Gallery ───────────────────────────── */}
+        {/* Section 4: Gallery */}
         <Section ref={s4} style={{ scrollSnapAlign: 'start' }}>
           {galleryPhotos.length > 0 && (
             <>
@@ -217,7 +219,6 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
               <p className="font-script text-4xl sm:text-5xl text-[#f5f0e8]">Julia & Ravi</p>
               <p className="font-serif text-[#c9a84c] text-sm tracking-widest uppercase mt-1">2027</p>
             </FadeIn>
-            {/* Dot indicators */}
             <div className="flex gap-2 mt-4">
               {galleryPhotos.map((_, i) => (
                 <button
@@ -230,14 +231,14 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
           </div>
         </Section>
 
-        {/* ── Section 5: Closing / RSVP ────────────────────── */}
+        {/* Section 5: Closing / RSVP */}
         <Section ref={s5} style={{ scrollSnapAlign: 'start' }}>
           <BgPhoto src={bgClosing} alt="Julia und Ravi" position="center top" />
           <div className="relative z-10 h-full flex flex-col items-center justify-center gap-4 px-6 text-center overflow-y-auto py-12">
             {guest ? (
               <>
                 <FadeIn inView={v5} delay={0}>
-                  <p className="font-script text-3xl text-[#c9a84c]">{t('rsvpQuestion', lang)}</p>
+                  <p className="font-script text-3xl text-[#c9a84c]">{translations.rsvpQuestion}</p>
                 </FadeIn>
                 <FadeIn inView={v5} delay={150} className="w-full max-w-sm">
                   <RsvpForm
@@ -245,6 +246,7 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
                     guestName={guest.name}
                     invitedDays={guest.invitedDays}
                     lang={lang}
+                    translations={translations}
                     existingRsvp={existingRsvp}
                   />
                 </FadeIn>
@@ -259,14 +261,12 @@ export default function ScrollInvitation({ lang, photos, guest, existingRsvp }: 
                 </FadeIn>
                 <FadeIn inView={v5} delay={350}>
                   <p className="font-serif text-[#f5f0e8]/80 text-base max-w-sm leading-relaxed">
-                    {lang === 'de'
-                      ? 'Die Einladung & nähere Informationen folgen.'
-                      : 'Full invitation and details to follow.'}
+                    {translations.noGuestClosingBody}
                   </p>
                 </FadeIn>
                 <FadeIn inView={v5} delay={500}>
                   <p className="font-script text-2xl text-[#c9a84c]">
-                    {lang === 'de' ? 'Liebe Grüße' : 'With love'} ♥
+                    {translations.noGuestClosingSign} ♥
                   </p>
                 </FadeIn>
               </>
