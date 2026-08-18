@@ -8,10 +8,9 @@ export const contentType = 'image/png'
 export const dynamic = 'force-dynamic'
 
 export default async function OgImage() {
-  const [bgBuf, bouquetBuf, rosesBuf] = await Promise.all([
+  const [bgBuf, bouquetBuf] = await Promise.all([
     readFile(join(process.cwd(), 'public/photos/og-small.jpg')),
     readFile(join(process.cwd(), 'public/photos/bouquet-icon-small.jpg')),
-    readFile(join(process.cwd(), 'public/photos/roses-icon-small.jpg')),
   ])
 
   return new ImageResponse(
@@ -38,8 +37,7 @@ export default async function OgImage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`data:image/jpeg;base64,${rosesBuf.toString('base64')}`} style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#c9a84c' }} />
             <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
           </div>
           <div style={{ fontSize: 100, color: '#f5e8c0', fontStyle: 'italic', fontFamily: 'serif', lineHeight: 1.05, marginBottom: 20, textAlign: 'center', textShadow: '0 2px 24px rgba(0,0,0,0.9)', letterSpacing: '-0.01em' }}>
@@ -47,8 +45,7 @@ export default async function OgImage() {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`data:image/jpeg;base64,${rosesBuf.toString('base64')}`} style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: '#c9a84c' }} />
             <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
           </div>
           <div style={{ fontSize: 44, color: '#c9a84c', letterSpacing: '0.18em', fontFamily: 'serif', textShadow: '0 1px 8px rgba(0,0,0,0.8)', marginBottom: 10 }}>
