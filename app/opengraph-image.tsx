@@ -19,9 +19,12 @@ async function getOgContent() {
 export default async function OgImage() {
   const { ogTitle, ogSubtitle, ogDate, ogLocation } = await getOgContent()
 
-  const bouquetUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}/photos/rose/bouquet.jpeg`
-    : 'http://localhost:3000/photos/rose/bouquet.jpeg'
+  const base = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000'
+  const bouquetUrl = `${base}/photos/og.png`
+  const bouquetIconUrl = `${base}/photos/bouquet-icon.png`
+  const rosesIconUrl = `${base}/photos/flowers-heart-roses-icon.png`
 
   return new ImageResponse(
     (
@@ -78,11 +81,11 @@ export default async function OgImage() {
           }}
         />
 
-        {/* Corner roses */}
-        <div style={{ position: 'absolute', top: 44, left: 56, fontSize: 56 }}>🌹</div>
-        <div style={{ position: 'absolute', top: 44, right: 56, fontSize: 56 }}>🌹</div>
-        <div style={{ position: 'absolute', bottom: 44, left: 56, fontSize: 56 }}>🌹</div>
-        <div style={{ position: 'absolute', bottom: 44, right: 56, fontSize: 56 }}>🌹</div>
+        {/* Corner icons — tulip bouquet all corners */}
+        <img src={bouquetIconUrl} style={{ position: 'absolute', top: 36, left: 44, width: 72, height: 72, objectFit: 'contain' }} />
+        <img src={bouquetIconUrl} style={{ position: 'absolute', top: 36, right: 44, width: 72, height: 72, objectFit: 'contain' }} />
+        <img src={bouquetIconUrl} style={{ position: 'absolute', bottom: 36, left: 44, width: 72, height: 72, objectFit: 'contain' }} />
+        <img src={bouquetIconUrl} style={{ position: 'absolute', bottom: 36, right: 44, width: 72, height: 72, objectFit: 'contain' }} />
 
         {/* Content */}
         <div
@@ -98,7 +101,7 @@ export default async function OgImage() {
           {/* Subtitle */}
           <div
             style={{
-              fontSize: 24,
+              fontSize: 36,
               color: '#c9a84c',
               letterSpacing: '0.35em',
               textTransform: 'uppercase',
@@ -112,15 +115,15 @@ export default async function OgImage() {
 
           {/* Divider top */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-            <div style={{ width: 80, height: 1, background: 'rgba(201,168,76,0.6)' }} />
-            <div style={{ fontSize: 22, color: '#c9a84c' }}>✦</div>
-            <div style={{ width: 80, height: 1, background: 'rgba(201,168,76,0.6)' }} />
+            <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
+            <img src={rosesIconUrl} style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
           </div>
 
           {/* Names */}
           <div
             style={{
-              fontSize: 88,
+              fontSize: 100,
               color: '#f5e8c0',
               fontStyle: 'italic',
               fontFamily: 'serif',
@@ -136,15 +139,15 @@ export default async function OgImage() {
 
           {/* Divider bottom */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-            <div style={{ width: 80, height: 1, background: 'rgba(201,168,76,0.6)' }} />
-            <div style={{ fontSize: 22, color: '#c9a84c' }}>✦</div>
-            <div style={{ width: 80, height: 1, background: 'rgba(201,168,76,0.6)' }} />
+            <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
+            <img src={rosesIconUrl} style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <div style={{ width: 120, height: 1, background: 'rgba(201,168,76,0.6)' }} />
           </div>
 
           {/* Date */}
           <div
             style={{
-              fontSize: 32,
+              fontSize: 44,
               color: '#c9a84c',
               letterSpacing: '0.18em',
               fontFamily: 'serif',
@@ -158,7 +161,7 @@ export default async function OgImage() {
           {/* Location */}
           <div
             style={{
-              fontSize: 22,
+              fontSize: 32,
               color: 'rgba(245,232,192,0.65)',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
