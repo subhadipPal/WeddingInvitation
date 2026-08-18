@@ -6,8 +6,23 @@ import ScrollInvitation from '@/components/ScrollInvitation'
 import { db } from '@/lib/db'
 import { guests, rsvps } from '@/lib/schema'
 import { eq } from 'drizzle-orm'
+import type { Metadata } from 'next'
 
 interface Props { params: Promise<{ lang: string; token: string }> }
+
+const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
+    description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
+    openGraph: {
+      title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
+      description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
+      images: [{ url: `${base}/opengraph-image`, width: 1200, height: 630 }],
+    },
+  }
+}
 
 function getPhotoList(): string[] {
   try {

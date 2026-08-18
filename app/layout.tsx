@@ -15,10 +15,19 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'Julia & Ravi — Save the Date · 22 & 23 January 2027',
+  title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
   description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
   icons: {
     icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌹</text></svg>",
+  },
+  openGraph: {
+    title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
+    description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
+    images: [{
+      url: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'}/opengraph-image`,
+      width: 1200,
+      height: 630,
+    }],
   },
 }
 
