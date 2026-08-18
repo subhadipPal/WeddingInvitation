@@ -119,6 +119,7 @@ export default function AdminPage() {
   const [guests, setGuests] = useState<Guest[]>([])
   const [copied, setCopied] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [activeNote, setActiveNote] = useState<string | null>(null)
 
   // Content tab state
   const [content, setContent] = useState<ContentState>(defaultContent())
@@ -389,7 +390,17 @@ export default function AdminPage() {
                         {r?.note && (
                           <>
                             <div className="w-px h-8 bg-white/20" />
-                            <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0" title={r.note}>💬</div>
+                            <div className="relative">
+                              <button
+                                onClick={() => setActiveNote(activeNote === r.note ? null : r.note ?? null)}
+                                className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0"
+                              >💬</button>
+                              {activeNote === r.note && (
+                                <div className="absolute right-0 bottom-full mb-2 z-50 w-64 bg-[#1a0a0a] border border-[#c9a84c]/40 rounded-xl p-3 shadow-xl text-sm text-[#f5f0e8] font-serif break-words">
+                                  {r.note}
+                                </div>
+                              )}
+                            </div>
                           </>
                         )}
                       </div>
