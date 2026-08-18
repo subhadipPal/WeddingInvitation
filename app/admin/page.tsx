@@ -34,6 +34,10 @@ const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[]; deOnly?: bo
     keys: ['coupleNames', 'saveTheDate', 'tapToOpen'],
   },
   {
+    label: 'Social share preview (WhatsApp / OG)',
+    keys: ['ogTitle', 'ogSubtitle', 'ogDate', 'ogLocation'],
+  },
+  {
     label: 'Countdown labels',
     keys: ['countdownDays', 'countdownHours', 'countdownMinutes', 'countdownSeconds'],
   },
@@ -62,6 +66,10 @@ const KEY_LABELS: Partial<Record<keyof Translations, string>> = {
   coupleNames: 'Couple names',
   saveTheDate: '"Save the Date" label',
   tapToOpen: '"Tap to open" envelope text',
+  ogTitle: 'OG — Couple names (shown in WhatsApp preview)',
+  ogSubtitle: 'OG — Subtitle (e.g. "Save the Date")',
+  ogDate: 'OG — Date line (e.g. "22 & 23 January 2027")',
+  ogLocation: 'OG — Location (e.g. "Berlin")',
   countdownDays: 'Days label',
   countdownHours: 'Hours label',
   countdownMinutes: 'Minutes label',

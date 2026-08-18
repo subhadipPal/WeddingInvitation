@@ -4,6 +4,10 @@ export interface Translations {
   coupleNames: string
   tapToOpen: string
   saveTheDate: string
+  ogTitle: string
+  ogSubtitle: string
+  ogDate: string
+  ogLocation: string
   countdownDays: string
   countdownHours: string
   countdownMinutes: string
@@ -66,6 +70,7 @@ export interface Translations {
 
 export const GUEST_FACING_KEYS: (keyof Translations)[] = [
   'coupleNames', 'tapToOpen', 'saveTheDate',
+  'ogTitle', 'ogSubtitle', 'ogDate', 'ogLocation',
   'countdownDays', 'countdownHours', 'countdownMinutes', 'countdownSeconds',
   'inviteHeading', 'inviteBody22and23', 'inviteBody23only',
   'inviteBody22and23Multi', 'inviteBody23onlyMulti',
@@ -87,6 +92,10 @@ export const translations: Record<Lang, Translations> = {
     coupleNames: 'Julia Schulze & Subhadip Pal',
     tapToOpen: 'Tippe hier zum Öffnen',
     saveTheDate: 'Save the Date',
+    ogTitle: 'Julia & Subhadip',
+    ogSubtitle: 'Save the Date',
+    ogDate: '22 & 23 January 2027',
+    ogLocation: 'Berlin',
     countdownDays: 'Tage',
     countdownHours: 'Stunden',
     countdownMinutes: 'Minuten',
@@ -157,6 +166,10 @@ export const translations: Record<Lang, Translations> = {
     coupleNames: 'Julia Schulze & Subhadip Pal',
     tapToOpen: 'Tap here to open',
     saveTheDate: 'Save the Date',
+    ogTitle: 'Julia & Subhadip',
+    ogSubtitle: 'Save the Date',
+    ogDate: '22 & 23 January 2027',
+    ogLocation: 'Berlin',
     countdownDays: 'Days',
     countdownHours: 'Hours',
     countdownMinutes: 'Minutes',
