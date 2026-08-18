@@ -17,6 +17,9 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: 'Julia & Ravi — Save the Date · 22 & 23 January 2027',
   description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
+  icons: {
+    icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌹</text></svg>",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
