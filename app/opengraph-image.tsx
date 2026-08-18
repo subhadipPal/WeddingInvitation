@@ -8,10 +8,7 @@ export const contentType = 'image/png'
 export const dynamic = 'force-dynamic'
 
 export default async function OgImage() {
-  const [bgBuf, bouquetBuf] = await Promise.all([
-    readFile(join(process.cwd(), 'public/photos/og-small.jpg')),
-    readFile(join(process.cwd(), 'public/photos/bouquet-icon-small.jpg')),
-  ])
+  const bgBuf = await readFile(join(process.cwd(), 'public/photos/og-small.jpg'))
 
   return new ImageResponse(
     (
@@ -21,15 +18,6 @@ export default async function OgImage() {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(10,4,4,0.72) 0%, rgba(26,10,10,0.60) 50%, rgba(10,4,4,0.75) 100%)' }} />
         <div style={{ position: 'absolute', inset: 28, border: '1.5px solid rgba(201,168,76,0.55)', borderRadius: 20 }} />
         <div style={{ position: 'absolute', inset: 36, border: '1px solid rgba(201,168,76,0.25)', borderRadius: 14 }} />
-
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`data:image/jpeg;base64,${bouquetBuf.toString('base64')}`} style={{ position: 'absolute', top: 36, left: 44, width: 72, height: 72, objectFit: 'contain' }} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`data:image/jpeg;base64,${bouquetBuf.toString('base64')}`} style={{ position: 'absolute', top: 36, right: 44, width: 72, height: 72, objectFit: 'contain' }} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`data:image/jpeg;base64,${bouquetBuf.toString('base64')}`} style={{ position: 'absolute', bottom: 36, left: 44, width: 72, height: 72, objectFit: 'contain' }} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={`data:image/jpeg;base64,${bouquetBuf.toString('base64')}`} style={{ position: 'absolute', bottom: 36, right: 44, width: 72, height: 72, objectFit: 'contain' }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, zIndex: 10, padding: '0 80px' }}>
           <div style={{ fontSize: 36, color: '#c9a84c', letterSpacing: '0.35em', textTransform: 'uppercase', fontFamily: 'serif', marginBottom: 18, textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>
