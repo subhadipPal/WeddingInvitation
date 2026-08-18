@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000'
+const baseUrl = 'https://www.juliaundsubhadip.xyz'
 
 export const metadata: Metadata = {
   title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',

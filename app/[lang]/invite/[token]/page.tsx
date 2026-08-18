@@ -10,7 +10,7 @@ import type { Metadata } from 'next'
 
 interface Props { params: Promise<{ lang: string; token: string }> }
 
-const base = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
+const base = 'https://www.juliaundsubhadip.xyz'
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

@@ -7,9 +7,9 @@ export const contentType = 'image/png'
 
 async function getOgContent() {
   try {
-    const base = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000'
+    const base = process.env.NODE_ENV === 'development'
+      ? 'http://localhost:3000'
+      : 'https://www.juliaundsubhadip.xyz'
     const res = await fetch(`${base}/api/og-content`, { next: { revalidate: 60 } })
     if (res.ok) return res.json()
   } catch {}
@@ -19,9 +19,9 @@ async function getOgContent() {
 export default async function OgImage() {
   const { ogTitle, ogSubtitle, ogDate, ogLocation } = await getOgContent()
 
-  const base = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000'
+  const base = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000'
+    : 'https://www.juliaundsubhadip.xyz'
   const bouquetUrl = `${base}/photos/og.png`
   const bouquetIconUrl = `${base}/photos/bouquet-icon.png`
   const rosesIconUrl = `${base}/photos/flowers-heart-roses-icon.png`
