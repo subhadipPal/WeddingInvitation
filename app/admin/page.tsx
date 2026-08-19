@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { translations as defaults, GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
+import { triggerRedeploy } from './actions'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -123,6 +124,10 @@ function defaultContent(): ContentState {
 export default function AdminPage() {
   const [tab, setTab] = useState<Tab>('guests')
 
+  // Deploy state
+  const [deploying, setDeploying] = useState(false)
+  const [deployStatus, setDeployStatus] = useState<'idle' | 'triggered' | 'error'>('idle')
+
   // Guests tab state
   const [guests, setGuests] = useState<Guest[]>([])
   const [copied, setCopied] = useState<string | null>(null)
@@ -136,6 +141,17 @@ export default function AdminPage() {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const contentRef = useRef<ContentState>(defaultContent())
+
+  // ── Deploy logic ─────────────────────────────────────────────────────────────
+
+  const handleRedeploy = async () => {
+    setDeploying(true)
+    setDeployStatus('idle')
+    const { ok } = await triggerRedeploy()
+    setDeploying(false)
+    setDeployStatus(ok ? 'triggered' : 'error')
+    if (ok) setTimeout(() => setDeployStatus('idle'), 4000)
+  }
 
   // ── Guests tab logic ────────────────────────────────────────────────────────
 
@@ -275,6 +291,10 @@ export default function AdminPage() {
             <button onClick={printPdf}
               className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-xs hover:bg-[#c9a84c]/10 transition-colors">
               Print PDF
+            </button>
+            <button onClick={handleRedeploy} disabled={deploying}
+              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-xs hover:bg-[#c9a84c]/10 transition-colors disabled:opacity-50">
+              {deploying ? 'Deploying…' : deployStatus === 'triggered' ? 'Triggered ✓' : deployStatus === 'error' ? 'Failed ✗' : 'Redeploy'}
             </button>
             <Link href="/admin/create"
               className="bg-[#c9a84c] text-[#1a0a0a] px-4 py-2 rounded-lg font-serif text-sm font-semibold hover:bg-[#e0bd6e] transition-colors">
