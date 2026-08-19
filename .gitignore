@@ -40,3 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env.local
+
+# playwright / debug screenshots
+.playwright-mcp/
+localhost-*.png
+staging-*.png
+*-accelerators.png
+*-installation-log*.png
