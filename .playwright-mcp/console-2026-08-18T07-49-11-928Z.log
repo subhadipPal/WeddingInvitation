@@ -1,0 +1,352 @@
+[    7369ms] [WARNING] Unsatisfied version 18.2.0 from value-accelerator-client of shared singleton module react (required ^16.13.0 || ^18.3.1 || ^19.0.0) @ http://localhost:3006/main.js:15560
+[    7390ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ http://localhost:3006/main.js:3095
+[    7391ms] [WARNING] [webpack-dev-server] WARNING
+DefinePlugin
+Conflicting values for 'process.env' @ http://localhost:3006/main.js:3095
+[    7391ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useDownloadCsv.ts
+  46:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  57:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useEditPublishPackage.ts
+  100:25  warning  Unexpected string concatenation of literals  no-useless-concat
+  100:50  warning  Unexpected string concatenation of literals  no-useless-concat
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetImportedPackage.ts
+   30:9  warning  'client' is assigned a value but never used                                                                                                               @typescript-eslint/no-unused-vars
+  220:6  warning  React Hook useEffect has missing dependencies: 'error', 'id', 'newImport?.name', and 'toastMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetIsExportAllowed.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetUserWorkspaces.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/store/selectedTreeTableStore.ts
+  5:10  warning  'ContentOverviewItem' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/types/importTypes.ts
+  95:13  warning  'DictionaryContent' is already defined  @typescript-eslint/no-redeclare
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/DependencyGraph/DependencyGraph.tsx
+  133:6  warning  React Hook useMemo has an unnecessary dependency: 'checkedNodes'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/CustomizationsSection.tsx
+  211:5  warning  'selectedName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/useCustomizationSectionHelpers.ts
+  429:6  warning  React Hook useEffect has a missing dependency: 'setShowTable'. Either include it or remove the dependency array. If 'setShowTable' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/SelectiveImportTreeTable.tsx
+  995:33  warning  'subType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/TreeSearchBar.tsx
+  46:6  warning  React Hook useCallback has a missing dependency: 'trackSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/helpers/useWorkspaceSelection.ts
+  55:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  56:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportedPackagesTable/ImportedPackagesTable.tsx
+  236:9  warning  The 'ActionsCellRow' function makes the dependencies of useMemo Hook (at line 349) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'ActionsCellRow' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogHelpers.tsx
+  172:6  warning  React Hook useMemo has a missing dependency: 'publishedPackage?.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogInit.tsx
+  76:6  warning  React Hook useMemo has an unnecessary dependency: 'publishedPackage.imageUrl'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/helpers/useDetailsStepHandler.ts
+  4:3  warning  'ExportPackageSchema' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/index.tsx
+  14:3  warning  'FioriInput' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 22 problems (0 errors, 22 warnings)
+ @ http://localhost:3006/main.js:3095
+[    7398ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ http://localhost:3006/static/js/remoteEntry.js:2087
+[    7398ms] [WARNING] [webpack-dev-server] WARNING
+DefinePlugin
+Conflicting values for 'process.env' @ http://localhost:3006/static/js/remoteEntry.js:2087
+[    7398ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useDownloadCsv.ts
+  46:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  57:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useEditPublishPackage.ts
+  100:25  warning  Unexpected string concatenation of literals  no-useless-concat
+  100:50  warning  Unexpected string concatenation of literals  no-useless-concat
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetImportedPackage.ts
+   30:9  warning  'client' is assigned a value but never used                                                                                                               @typescript-eslint/no-unused-vars
+  220:6  warning  React Hook useEffect has missing dependencies: 'error', 'id', 'newImport?.name', and 'toastMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetIsExportAllowed.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetUserWorkspaces.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/store/selectedTreeTableStore.ts
+  5:10  warning  'ContentOverviewItem' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/types/importTypes.ts
+  95:13  warning  'DictionaryContent' is already defined  @typescript-eslint/no-redeclare
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/DependencyGraph/DependencyGraph.tsx
+  133:6  warning  React Hook useMemo has an unnecessary dependency: 'checkedNodes'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/CustomizationsSection.tsx
+  211:5  warning  'selectedName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/useCustomizationSectionHelpers.ts
+  429:6  warning  React Hook useEffect has a missing dependency: 'setShowTable'. Either include it or remove the dependency array. If 'setShowTable' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/SelectiveImportTreeTable.tsx
+  995:33  warning  'subType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/TreeSearchBar.tsx
+  46:6  warning  React Hook useCallback has a missing dependency: 'trackSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/helpers/useWorkspaceSelection.ts
+  55:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  56:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportedPackagesTable/ImportedPackagesTable.tsx
+  236:9  warning  The 'ActionsCellRow' function makes the dependencies of useMemo Hook (at line 349) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'ActionsCellRow' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogHelpers.tsx
+  172:6  warning  React Hook useMemo has a missing dependency: 'publishedPackage?.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogInit.tsx
+  76:6  warning  React Hook useMemo has an unnecessary dependency: 'publishedPackage.imageUrl'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/helpers/useDetailsStepHandler.ts
+  4:3  warning  'ExportPackageSchema' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/index.tsx
+  14:3  warning  'FioriInput' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 22 problems (0 errors, 22 warnings)
+ @ http://localhost:3006/static/js/remoteEntry.js:2087
+[    7605ms] [WARNING] Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information. @ http://localhost:3006/vendors-node_modules_sentry_react_build_cjs_index_js-node_modules_signavio_i18n_lib-es6_index-eb8f2a.chunk.js:230400
+[    7717ms] [ERROR] Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot @ http://localhost:3006/vendors-node_modules_react-dom_index_js.chunk.js:82
+[    7736ms] [WARNING] [LocaleData] Supported locale "en_GB" not configured, import the "Assets.js" module from the webcomponents package you are using. @ http://localhost:3006/vendors-node_modules_react-table_index_js-node_modules_ui5_webcomponents-base_dist_Keys_js-no-5f8522.chunk.js:694
+[    7736ms] [WARNING] [LocaleData] Falling back to loading "en" locale data from CDN. For production usage, please configure locale data loading via the "Assets.js" module of the webcomponents package you are using. @ http://localhost:3006/vendors-node_modules_react-table_index_js-node_modules_ui5_webcomponents-base_dist_Keys_js-no-5f8522.chunk.js:799
+[   24846ms] [WARNING] Unsatisfied version 18.2.0 from value-accelerator-client of shared singleton module react (required ^16.13.0 || ^18.3.1 || ^19.0.0) @ http://localhost:3006/main.js:15560
+[   24848ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ http://localhost:3006/main.js:3095
+[   24848ms] [WARNING] [webpack-dev-server] WARNING
+DefinePlugin
+Conflicting values for 'process.env' @ http://localhost:3006/main.js:3095
+[   24848ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useDownloadCsv.ts
+  46:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  57:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useEditPublishPackage.ts
+  100:25  warning  Unexpected string concatenation of literals  no-useless-concat
+  100:50  warning  Unexpected string concatenation of literals  no-useless-concat
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetImportedPackage.ts
+   30:9  warning  'client' is assigned a value but never used                                                                                                               @typescript-eslint/no-unused-vars
+  220:6  warning  React Hook useEffect has missing dependencies: 'error', 'id', 'newImport?.name', and 'toastMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetIsExportAllowed.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetUserWorkspaces.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/store/selectedTreeTableStore.ts
+  5:10  warning  'ContentOverviewItem' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/types/importTypes.ts
+  95:13  warning  'DictionaryContent' is already defined  @typescript-eslint/no-redeclare
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/DependencyGraph/DependencyGraph.tsx
+  133:6  warning  React Hook useMemo has an unnecessary dependency: 'checkedNodes'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/CustomizationsSection.tsx
+  211:5  warning  'selectedName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/useCustomizationSectionHelpers.ts
+  429:6  warning  React Hook useEffect has a missing dependency: 'setShowTable'. Either include it or remove the dependency array. If 'setShowTable' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/SelectiveImportTreeTable.tsx
+  995:33  warning  'subType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/TreeSearchBar.tsx
+  46:6  warning  React Hook useCallback has a missing dependency: 'trackSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/helpers/useWorkspaceSelection.ts
+  55:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  56:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportedPackagesTable/ImportedPackagesTable.tsx
+  236:9  warning  The 'ActionsCellRow' function makes the dependencies of useMemo Hook (at line 349) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'ActionsCellRow' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogHelpers.tsx
+  172:6  warning  React Hook useMemo has a missing dependency: 'publishedPackage?.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogInit.tsx
+  76:6  warning  React Hook useMemo has an unnecessary dependency: 'publishedPackage.imageUrl'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/helpers/useDetailsStepHandler.ts
+  4:3  warning  'ExportPackageSchema' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/index.tsx
+  14:3  warning  'FioriInput' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 22 problems (0 errors, 22 warnings)
+ @ http://localhost:3006/main.js:3095
+[   24858ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ http://localhost:3006/static/js/remoteEntry.js:2087
+[   24859ms] [WARNING] [webpack-dev-server] WARNING
+DefinePlugin
+Conflicting values for 'process.env' @ http://localhost:3006/static/js/remoteEntry.js:2087
+[   24859ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useDownloadCsv.ts
+  46:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  57:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useEditPublishPackage.ts
+  100:25  warning  Unexpected string concatenation of literals  no-useless-concat
+  100:50  warning  Unexpected string concatenation of literals  no-useless-concat
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetImportedPackage.ts
+   30:9  warning  'client' is assigned a value but never used                                                                                                               @typescript-eslint/no-unused-vars
+  220:6  warning  React Hook useEffect has missing dependencies: 'error', 'id', 'newImport?.name', and 'toastMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetIsExportAllowed.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetUserWorkspaces.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/store/selectedTreeTableStore.ts
+  5:10  warning  'ContentOverviewItem' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/types/importTypes.ts
+  95:13  warning  'DictionaryContent' is already defined  @typescript-eslint/no-redeclare
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/DependencyGraph/DependencyGraph.tsx
+  133:6  warning  React Hook useMemo has an unnecessary dependency: 'checkedNodes'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/CustomizationsSection.tsx
+  211:5  warning  'selectedName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/useCustomizationSectionHelpers.ts
+  429:6  warning  React Hook useEffect has a missing dependency: 'setShowTable'. Either include it or remove the dependency array. If 'setShowTable' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/SelectiveImportTreeTable.tsx
+  995:33  warning  'subType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/TreeSearchBar.tsx
+  46:6  warning  React Hook useCallback has a missing dependency: 'trackSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/helpers/useWorkspaceSelection.ts
+  55:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  56:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportedPackagesTable/ImportedPackagesTable.tsx
+  236:9  warning  The 'ActionsCellRow' function makes the dependencies of useMemo Hook (at line 349) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'ActionsCellRow' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogHelpers.tsx
+  172:6  warning  React Hook useMemo has a missing dependency: 'publishedPackage?.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogInit.tsx
+  76:6  warning  React Hook useMemo has an unnecessary dependency: 'publishedPackage.imageUrl'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/helpers/useDetailsStepHandler.ts
+  4:3  warning  'ExportPackageSchema' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/index.tsx
+  14:3  warning  'FioriInput' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 22 problems (0 errors, 22 warnings)
+ @ http://localhost:3006/static/js/remoteEntry.js:2087
+[   25040ms] [WARNING] Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information. @ http://localhost:3006/vendors-node_modules_sentry_react_build_cjs_index_js-node_modules_signavio_i18n_lib-es6_index-eb8f2a.chunk.js:230400
+[   25081ms] [ERROR] Warning: ReactDOM.render is no longer supported in React 18. Use createRoot instead. Until you switch to the new API, your app will behave as if it's running React 17. Learn more: https://reactjs.org/link/switch-to-createroot @ http://localhost:3006/vendors-node_modules_react-dom_index_js.chunk.js:82
+[   25087ms] [WARNING] [LocaleData] Supported locale "en_GB" not configured, import the "Assets.js" module from the webcomponents package you are using. @ http://localhost:3006/vendors-node_modules_react-table_index_js-node_modules_ui5_webcomponents-base_dist_Keys_js-no-5f8522.chunk.js:694
+[   25087ms] [WARNING] [LocaleData] Falling back to loading "en" locale data from CDN. For production usage, please configure locale data loading via the "Assets.js" module of the webcomponents package you are using. @ http://localhost:3006/vendors-node_modules_react-table_index_js-node_modules_ui5_webcomponents-base_dist_Keys_js-no-5f8522.chunk.js:799
+[   42678ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3006/ruxitagentjs_ICA7NVfqrux_10339260603164134.js:0
+[   42678ms] [ERROR] Refused to execute script from 'http://localhost:3006/ruxitagentjs_ICA7NVfqrux_10339260603164134.js' because its MIME type ('text/html') is not executable, and strict MIME type checking is enabled. @ http://localhost:3006/p/hub/val:0
+[   44641ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3006/spg/api/v1/fe6185009b4b4a718e88b5c22b766bc9/me:0
+[   44774ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3006/g/api/tenant-service/v1/tenants/fe6185009b4b4a718e88b5c22b766bc9/mappings?type=signavio_to_btp_sub_account_id_process_analysis_and_mining:0
+[   46589ms] [ERROR] Invalid Sentry Dsn: YOUR_SENTRY_DSN @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46600ms] [WARNING] [LaunchDarkly] The waitForInitialization function was called without a timeout specified. In a future version a default timeout will be applied. @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46639ms] [WARNING] Unsatisfied version 18.3.1 from shell of shared singleton module react-dom (required =18.2.0) @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46639ms] [WARNING] Unsatisfied version 18.3.1 from shell of shared singleton module react (required =18.2.0) @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46640ms] [WARNING] Unsatisfied version 7.18.2 from shell of shared singleton module react-router-dom (required ^6.16.0) @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46643ms] [WARNING] [webpack-dev-server] Warnings while compiling. @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46644ms] [WARNING] [webpack-dev-server] WARNING
+DefinePlugin
+Conflicting values for 'process.env' @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   46644ms] [WARNING] [webpack-dev-server] WARNING
+[eslint] 
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useDownloadCsv.ts
+  46:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  57:5  warning  React Hook useCallback has a missing dependency: 'containerPage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useEditPublishPackage.ts
+  100:25  warning  Unexpected string concatenation of literals  no-useless-concat
+  100:50  warning  Unexpected string concatenation of literals  no-useless-concat
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetImportedPackage.ts
+   30:9  warning  'client' is assigned a value but never used                                                                                                               @typescript-eslint/no-unused-vars
+  220:6  warning  React Hook useEffect has missing dependencies: 'error', 'id', 'newImport?.name', and 'toastMutation'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetIsExportAllowed.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/hooks/useGetUserWorkspaces.ts
+  7:10  warning  'logger' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/store/selectedTreeTableStore.ts
+  5:10  warning  'ContentOverviewItem' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/types/importTypes.ts
+  95:13  warning  'DictionaryContent' is already defined  @typescript-eslint/no-redeclare
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/DependencyGraph/DependencyGraph.tsx
+  133:6  warning  React Hook useMemo has an unnecessary dependency: 'checkedNodes'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/CustomizationsSection.tsx
+  211:5  warning  'selectedName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportDetailsPanel/components/useCustomizationSectionHelpers.ts
+  429:6  warning  React Hook useEffect has a missing dependency: 'setShowTable'. Either include it or remove the dependency array. If 'setShowTable' changes too often, find the parent component that defines it and wrap that definition in useCallback  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/SelectiveImportTreeTable.tsx
+  995:33  warning  'subType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/components/SelectiveImport/TreeSearchBar.tsx
+  46:6  warning  React Hook useCallback has a missing dependency: 'trackSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportModal/helpers/useWorkspaceSelection.ts
+  55:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  56:7  warning  React Hook useMemo has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/ImportedPackagesTable/ImportedPackagesTable.tsx
+  236:9  warning  The 'ActionsCellRow' function makes the dependencies of useMemo Hook (at line 349) change on every render. Move it inside the useMemo callback. Alternatively, wrap the definition of 'ActionsCellRow' in its own useCallback() Hook  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogHelpers.tsx
+  172:6  warning  React Hook useMemo has a missing dependency: 'publishedPackage?.id'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/PublishDialog/usePublishDialogInit.tsx
+  76:6  warning  React Hook useMemo has an unnecessary dependency: 'publishedPackage.imageUrl'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/helpers/useDetailsStepHandler.ts
+  4:3  warning  'ExportPackageSchema' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/I584745/CODE/tools.sap.com/value-accelerator-client/client/src/valueAccelerator/Components/WizardContents/ExportSteps/AcceleratorDetailsForm/index.tsx
+  14:3  warning  'FioriInput' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 22 problems (0 errors, 22 warnings)
+ @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   47165ms] [WARNING] Lit is in dev mode. Not recommended for production! See https://lit.dev/msg/dev-mode for more information. @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   47165ms] [WARNING] Multiple versions of Lit loaded. Loading multiple versions is not recommended. See https://lit.dev/msg/multiple-versions for more information. @ http://localhost:3006/g/statics/suite-shell/static/js/7778.10f94e2f.js:478
+[   54444ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3006/g/api/tenant-service/v1/tenants//configurations?type=walkme_settings:0

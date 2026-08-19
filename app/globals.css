@@ -61,3 +61,8 @@ html, body { height: 100%; overflow: hidden; }
   0%, 100% { box-shadow: 0 0 0 0 #c9a84c40, 0 0 12px 2px #c9a84c20; }
   50%       { box-shadow: 0 0 0 6px #c9a84c00, 0 0 20px 6px #c9a84c40; }
 }
+
+@keyframes address-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.0); }
+  50%       { box-shadow: 0 0 0 4px rgba(201,168,76,0.18), 0 0 20px 4px rgba(201,168,76,0.12); }
+}
