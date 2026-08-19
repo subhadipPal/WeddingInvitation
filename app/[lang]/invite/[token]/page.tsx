@@ -19,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
       description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
-      images: [{ url: `${base}/photos/og.jpg`, width: 1200, height: 630, type: 'image/jpeg' }],
+      images: [{ url: `${base}/opengraph-image`, width: 1200, height: 630 }],
     },
   }
 }
