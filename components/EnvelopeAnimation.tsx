@@ -73,12 +73,12 @@ export default function EnvelopeAnimation({ lang, translations, invitedDays, isM
           </p>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-5">
+        <div className="flex flex-col items-center gap-2 sm:gap-5">
           <InvitationCard lang={lang} translations={translations} invitedDays={invitedDays} isMulti={isMulti} />
           {onScrollToRsvp && (
             <button
               onClick={onScrollToRsvp}
-              className="group relative mt-2 px-8 py-3 rounded-full font-serif text-[#1a0a0a] text-sm tracking-wide overflow-hidden"
+              className="group relative px-5 py-1.5 sm:px-8 sm:py-3 rounded-full font-serif text-[#1a0a0a] text-xs sm:text-sm tracking-wide overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, #e0bd6e 0%, #c9a84c 50%, #b8943a 100%)',
                 animation: 'rsvp-pulse 2.5s ease-in-out infinite',
