@@ -9,6 +9,7 @@ import { triggerRedeploy } from './actions'
 interface Rsvp {
   attending22: boolean | null
   attending23: boolean
+  address: string | null
   note: string | null
 }
 
@@ -175,11 +176,11 @@ export default function AdminPage() {
   }
 
   const exportCsv = () => {
-    const header = 'Name,Email,Phone,Invited Days,RSVP 22,RSVP 23,Note,Token,Link DE,Link EN'
+    const header = 'Name,Email,Phone,Invited Days,RSVP 22,RSVP 23,Address,Note,Token,Link DE,Link EN'
     const rows = guests.map(g => {
       const base = window.location.origin
       const r = g.rsvp
-      return `"${g.name}","${g.email ?? ''}","${g.phone ?? ''}","${g.invitedDays}","${r ? (r.attending22 === null ? '?' : r.attending22 ? 'Yes' : 'No') : ''}","${r ? (r.attending23 ? 'Yes' : 'No') : ''}","${r?.note ?? ''}","${g.token}","${base}/de/invite/${g.token}","${base}/en/invite/${g.token}"`
+      return `"${g.name}","${g.email ?? ''}","${g.phone ?? ''}","${g.invitedDays}","${r ? (r.attending22 === null ? '?' : r.attending22 ? 'Yes' : 'No') : ''}","${r ? (r.attending23 ? 'Yes' : 'No') : ''}","${(r?.address ?? '').replace(/"/g, '""')}","${r?.note ?? ''}","${g.token}","${base}/de/invite/${g.token}","${base}/en/invite/${g.token}"`
     })
     const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'guests.csv'; a.click()
@@ -197,6 +198,7 @@ export default function AdminPage() {
         <td>${g.invitedDays === '22+23' ? '22 + 23 Jan' : '23 Jan'}</td>
         <td style="text-align:center">${rsvp22}</td>
         <td style="text-align:center">${rsvp23}</td>
+        <td style="font-size:10px;white-space:pre-wrap">${r?.address ?? ''}</td>
         <td>${r?.note ?? ''}</td>
         <td style="font-size:10px">${base}/de/invite/${g.token}</td>
       </tr>`
@@ -207,7 +209,7 @@ export default function AdminPage() {
     td{padding:5px 8px;border-bottom:1px solid #ddd}tr:nth-child(even) td{background:#fdf8f0}
     @media print{button{display:none}}</style></head>
     <body><h1>Julia & Ravi — Guest List</h1><p>Wedding 22 Jan & Celebration 23 Jan 2027 · Berlin · ${guests.length} guests</p>
-    <table><thead><tr><th>Name</th><th>Contact</th><th>Invited</th><th>RSVP 22</th><th>RSVP 23</th><th>Note</th><th>Link</th></tr></thead>
+    <table><thead><tr><th>Name</th><th>Contact</th><th>Invited</th><th>RSVP 22</th><th>RSVP 23</th><th>Address</th><th>Note</th><th>Link</th></tr></thead>
     <tbody>${rows}</tbody></table></body></html>`
     const w = window.open('', '_blank')!
     w.document.write(html); w.document.close(); w.print()
@@ -433,6 +435,17 @@ export default function AdminPage() {
                         )}
                       </div>
 
+                      {/* Address row */}
+                      {r?.address && (
+                        <div className="bg-white/8 border border-white/20 rounded-xl p-3 flex items-start gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0 mt-0.5">✉️</div>
+                          <div className="min-w-0">
+                            <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">Address</p>
+                            <p className="text-white text-sm font-serif whitespace-pre-wrap break-words">{r.address}</p>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Links row */}
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">🔗</div>
@@ -468,7 +481,8 @@ export default function AdminPage() {
                   </p>
                   <button
                     onClick={handleResetDefaults}
-                    className="shrink-0 border border-[#c9a84c]/40 text-[#c9a84c] font-serif text-xs px-3 py-1.5 rounded-lg hover:bg-[#c9a84c]/10 transition-colors ml-4"
+                    disabled
+                    className="shrink-0 border border-[#c9a84c]/20 text-[#c9a84c]/30 font-serif text-xs px-3 py-1.5 rounded-lg cursor-not-allowed ml-4"
                   >
                     Reset to defaults
                   </button>

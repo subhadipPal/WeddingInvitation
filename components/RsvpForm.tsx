@@ -53,14 +53,17 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const addressMissing = addressTouched && !address.trim()
+  const isAttending = choice23 === 'yes' || (invitedDays === '22+23' && choice22 === 'yes')
+  const addressRequired = isAttending
+  const addressMissing = addressTouched && addressRequired && !address.trim()
 
   const choiceToBoolean = (c: Choice): boolean => c === 'yes'
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setAddressTouched(true)
-    if (!choice23 || !address.trim()) return
+    if (!choice23) return
+    if (addressRequired && !address.trim()) return
     setLoading(true)
     await fetch('/api/rsvp', {
       method: 'POST',
@@ -104,7 +107,8 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
         <ChoiceButtons value={choice23} onChange={setChoice23} translations={translations} />
       </div>
 
-      {/* Address — mandatory, animated request */}
+      {/* Address — mandatory only if attending */}
+      {addressRequired && (
       <div
         className="rounded-xl p-4 flex flex-col gap-3"
         style={{
@@ -130,7 +134,6 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
           onBlur={() => setAddressTouched(true)}
           placeholder={translations.rsvpAddressPlaceholder}
           rows={3}
-          required
           className={`w-full bg-[#1a0a0a]/60 rounded-lg px-4 py-3 text-[#f5f0e8] font-serif text-sm focus:outline-none resize-none transition-all placeholder:text-[#f5f0e8]/30 ${
             addressMissing
               ? 'border-2 border-[#e05555]'
@@ -143,6 +146,7 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
           </p>
         )}
       </div>
+      )}
 
       <div>
         <label className="block font-serif text-sm text-[#f5f0e8]/60 mb-2">{translations.rsvpNote}</label>
