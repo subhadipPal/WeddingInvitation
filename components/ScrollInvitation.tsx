@@ -132,14 +132,14 @@ export default function ScrollInvitation({ lang, translations, photos, guest, ex
           <div className="absolute top-4 right-4 z-20">
             <LanguageToggle lang={lang} token={guest?.token} />
           </div>
-          <div className="relative z-10 h-full flex flex-col items-center justify-center gap-3 px-6">
+          <div className="relative z-10 h-full flex flex-col items-center justify-center gap-3 px-6 overflow-y-auto py-16 sm:py-8">
             <FadeIn inView={v1} delay={0}>
               <p className="font-serif text-[#c9a84c]/70 text-[10px] tracking-[0.5em] uppercase text-center">
                 {translations.saveTheDate}
               </p>
             </FadeIn>
             <FadeIn inView={v1} delay={150}>
-              <h1 className="font-script text-4xl sm:text-6xl text-[#c9a84c] text-center leading-tight">
+              <h1 className="font-script text-[2rem] sm:text-4xl md:text-6xl text-[#c9a84c] text-center leading-tight">
                 {translations.coupleNames.replace(' & ', '\n&\n').split('\n').map((part, i) =>
                   i === 1 ? <React.Fragment key={i}><br />{part}<br /></React.Fragment> : <React.Fragment key={i}>{part}</React.Fragment>
                 )}

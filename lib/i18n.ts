@@ -39,6 +39,9 @@ export interface Translations {
   rsvpYesMulti: string
   rsvpNo: string
   rsvpMaybe: string
+  rsvpAddressLabel: string
+  rsvpAddressPlaceholder: string
+  rsvpAddressRequired: string
   rsvpNote: string
   rsvpNotePlaceholder: string
   rsvpSubmit: string
@@ -83,6 +86,7 @@ export const GUEST_FACING_KEYS: (keyof Translations)[] = [
   'rsvpInvited23only', 'rsvpInvited23onlyMulti',
   'rsvpQuestion', 'rsvpQuestionMulti',
   'rsvpYes', 'rsvpYesMulti', 'rsvpNo', 'rsvpMaybe',
+  'rsvpAddressLabel', 'rsvpAddressPlaceholder', 'rsvpAddressRequired',
   'rsvpNote', 'rsvpNotePlaceholder', 'rsvpSubmit', 'rsvpUpdate',
   'rsvpConfirmation', 'rsvpConfirmationMulti',
 ]
@@ -137,6 +141,9 @@ export const translations: Record<Lang, Translations> = {
     rsvpMaybe: 'Vielleicht',
     rsvpNote: 'Nachricht an das Brautpaar (optional)',
     rsvpNotePlaceholder: 'Herzliche Glückwünsche und...',
+    rsvpAddressLabel: 'Deine Postanschrift',
+    rsvpAddressPlaceholder: 'Straße, Hausnummer\nPLZ Ort\nLand',
+    rsvpAddressRequired: 'Wir möchten dir die Einladung gerne persönlich zusenden — bitte hinterlasse uns deine Adresse. 💌',
     rsvpSubmit: 'Antwort senden',
     rsvpUpdate: 'Antwort aktualisieren',
     rsvpConfirmation: 'Vielen Dank! Wir freuen uns auf dich.',
@@ -211,6 +218,9 @@ export const translations: Record<Lang, Translations> = {
     rsvpMaybe: 'Maybe',
     rsvpNote: 'Message to the couple (optional)',
     rsvpNotePlaceholder: 'Congratulations and...',
+    rsvpAddressLabel: 'Your postal address',
+    rsvpAddressPlaceholder: 'Street, house number\nPostcode City\nCountry',
+    rsvpAddressRequired: "We'd love to send you the formal invitation — please share your address with us. 💌",
     rsvpSubmit: 'Send RSVP',
     rsvpUpdate: 'Update RSVP',
     rsvpConfirmation: 'Thank you! We look forward to seeing you.',
