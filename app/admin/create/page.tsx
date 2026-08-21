@@ -29,8 +29,8 @@ export default function CreateGuestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1a0a0a] text-[#f5f0e8] p-8 pb-24">
-      <div className="max-w-xl mx-auto">
+    <div className="h-screen overflow-y-auto bg-[#1a0a0a] text-[#f5f0e8]">
+      <div className="max-w-xl mx-auto p-8 pb-24">
         <Link href="/admin" className="text-[#c9a84c] text-sm font-serif hover:underline mb-6 block">
           ← Zurück zur Übersicht
         </Link>
