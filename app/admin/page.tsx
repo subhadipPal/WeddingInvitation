@@ -117,6 +117,10 @@ const KEY_LABELS: Partial<Record<keyof Translations, string>> = {
   rsvpConfirmationMulti: '[Multi] Confirmation message after submit (DE)',
   rsvpYesMulti: '[Multi] Yes button (DE)',
   // Hindu Wedding — India (28 Jan)
+  hindu_ogTitle: 'Hindu OG — Couple names (WhatsApp preview)',
+  hindu_ogSubtitle: 'Hindu OG — Subtitle (e.g. "Hindu Wedding")',
+  hindu_ogDate: 'Hindu OG — Date line (e.g. "28 January 2027")',
+  hindu_ogLocation: 'Hindu OG — Location (e.g. "Kolkata, India")',
   hindu_saveTheDate: 'Hindu — "Save the Date" label',
   hindu_tapToOpen: 'Hindu — "Tap to open" envelope text',
   hindu_inviteHeading: 'Hindu — Main heading',

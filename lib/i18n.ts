@@ -49,6 +49,10 @@ export interface Translations {
   rsvpConfirmation: string
   rsvpConfirmationMulti: string
   // ── Hindu Wedding (India, 28 Jan) — EN + BN shown; DE mirrors EN (never displayed) ──
+  hindu_ogTitle: string
+  hindu_ogSubtitle: string
+  hindu_ogDate: string
+  hindu_ogLocation: string
   hindu_saveTheDate: string
   hindu_tapToOpen: string
   hindu_inviteHeading: string
@@ -117,6 +121,7 @@ export const GUEST_FACING_KEYS: (keyof Translations)[] = [
 ]
 
 export const HINDU_GUEST_FACING_KEYS: (keyof Translations)[] = [
+  'hindu_ogTitle', 'hindu_ogSubtitle', 'hindu_ogDate', 'hindu_ogLocation',
   'hindu_saveTheDate', 'hindu_tapToOpen',
   'hindu_inviteHeading', 'hindu_inviteBody', 'hindu_inviteBodyMulti',
   'hindu_inviteDate', 'hindu_inviteClosing', 'hindu_calendarLabel',
@@ -187,6 +192,10 @@ export const translations: Record<Lang, Translations> = {
     rsvpConfirmation: 'Vielen Dank! Wir freuen uns auf dich.',
     rsvpConfirmationMulti: 'Vielen Dank! Wir freuen uns auf euch.',
     // Hindu Wedding — DE mirrors EN (never displayed to Berlin guests)
+    hindu_ogTitle: 'Julia & Subhadip',
+    hindu_ogSubtitle: 'Hindu Wedding',
+    hindu_ogDate: '28 January 2027',
+    hindu_ogLocation: 'Kolkata, India',
     hindu_saveTheDate: 'Save the Date',
     hindu_tapToOpen: 'Tap here to open',
     hindu_inviteHeading: "We're getting married!",
@@ -291,6 +300,10 @@ export const translations: Record<Lang, Translations> = {
     rsvpConfirmation: 'Thank you! We look forward to seeing you.',
     rsvpConfirmationMulti: 'Thank you! We look forward to seeing you.',
     // Hindu Wedding — India (28 Jan)
+    hindu_ogTitle: 'Julia & Subhadip',
+    hindu_ogSubtitle: 'Hindu Wedding',
+    hindu_ogDate: '28 January 2027',
+    hindu_ogLocation: 'Kolkata, India',
     hindu_saveTheDate: 'Save the Date',
     hindu_tapToOpen: 'Tap here to open',
     hindu_inviteHeading: "We're getting married!",
@@ -388,6 +401,10 @@ export const translations: Record<Lang, Translations> = {
     rsvpConfirmation: 'Thank you! We look forward to seeing you.',
     rsvpConfirmationMulti: 'Thank you! We look forward to seeing you.',
     // ── Hindu Wedding — Bengali ──
+    hindu_ogTitle: 'Julia & Subhadip',
+    hindu_ogSubtitle: 'Hindu Wedding',
+    hindu_ogDate: '28 January 2027',
+    hindu_ogLocation: 'Kolkata, India',
     hindu_saveTheDate: 'তারিখটি মনে রাখবেন',
     hindu_tapToOpen: 'খুলতে এখানে চাপ দিন',
     hindu_inviteHeading: 'আমরা বিবাহবন্ধনে আবদ্ধ হচ্ছি!',

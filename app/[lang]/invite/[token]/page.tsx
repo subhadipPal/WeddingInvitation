@@ -13,7 +13,30 @@ interface Props { params: Promise<{ lang: string; token: string }> }
 
 const base = 'https://www.juliaundsubhadip.xyz'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { token } = await params
+  let isHindu = false
+  try {
+    const rows = await db.select({ invitedDays: guests.invitedDays }).from(guests).where(eq(guests.token, token)).limit(1)
+    isHindu = rows[0]?.invitedDays === '28'
+  } catch {
+    // fall through to Berlin defaults
+  }
+
+  if (isHindu) {
+    const title = 'Julia & Subhadip — Hindu Wedding · 28 January 2027'
+    const description = 'Hindu Wedding — Julia Schulze & Subhadip Pal, Sri Sri Karunamoyee Kali Temple, Kolkata'
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [{ url: `${base}/hindu-opengraph-image`, width: 1200, height: 630 }],
+      },
+    }
+  }
+
   return {
     title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
     description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
