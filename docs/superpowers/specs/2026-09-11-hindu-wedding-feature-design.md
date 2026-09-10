@@ -79,6 +79,7 @@ Same scroll-snap structure and dark-red/gold color palette as `ScrollInvitation`
 - **Embed URL:** `https://www.google.com/maps/embed/v1/place?key=...` or frameless embed via coordinates
 - **Directions button URL:** `https://www.google.com/maps/dir/?api=1&destination=22.4859647%2C88.3396868` — Google Maps prompts the user for their current location automatically on any device
 - **CSP pre-check:** Before writing the component, check `next.config.ts` for `frame-src` CSP directives. Add `https://www.google.com` if needed.
+- **CountdownTimer:** Add optional `targetDate?: Date` prop. Default stays `new Date('2027-01-22T00:00:00')` so Berlin invite is unaffected. Hindu invite passes `new Date('2027-01-28T17:30:00+05:30')` (5:30 PM IST).
 
 ---
 
@@ -181,7 +182,8 @@ New collapsible section **"Hindu Wedding — India (28 Jan)"** added below exist
 4. `lib/i18n.server.ts`: handle `'bn'` in `loadTranslations`
 5. Extract shared helpers → `components/invitation-helpers.tsx`
 6. `components/LanguageToggle.tsx`: add `langs` prop
-7. `components/HinduScrollInvitation.tsx`: build new component
+7. `components/CountdownTimer.tsx`: add optional `targetDate` prop (default keeps Berlin unaffected)
+8. `components/HinduScrollInvitation.tsx`: build new component
 8. `app/[lang]/invite/[token]/page.tsx`: add `invitedDays === '28'` branch
 9. `components/RsvpForm.tsx`: widen `invitedDays` type, add day-28 rendering path
 10. `app/api/rsvp/route.ts`: fix validation, handle `attending28`
