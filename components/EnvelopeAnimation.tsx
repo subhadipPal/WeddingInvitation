@@ -6,7 +6,7 @@ import InvitationCard from './InvitationCard'
 interface Props {
   lang: Lang
   translations: Translations
-  invitedDays?: '22+23' | '23'
+  invitedDays?: '22+23' | '23' | '28'
   isMulti?: boolean
   onOpen?: () => void
   onScrollToRsvp?: () => void

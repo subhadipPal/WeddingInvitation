@@ -34,18 +34,22 @@ function ChoiceButtons({ value, onChange, translations }: ChoiceButtonsProps) {
 
 interface Props {
   token: string
-  invitedDays: '22+23' | '23'
+  invitedDays: '22+23' | '23' | '28'
   lang: Lang
   translations: Translations
-  existingRsvp?: { attending22: boolean | null; attending23: boolean; note: string | null; address?: string | null } | null
+  existingRsvp?: { attending22: boolean | null; attending23: boolean | null; attending28?: boolean | null; note: string | null; address?: string | null } | null
 }
 
 export default function RsvpForm({ token, invitedDays, lang, translations, existingRsvp }: Props) {
+  const isHindu = invitedDays === '28'
   const [choice22, setChoice22] = useState<Choice>(
     existingRsvp?.attending22 === true ? 'yes' : existingRsvp?.attending22 === false ? 'no' : null
   )
   const [choice23, setChoice23] = useState<Choice>(
     existingRsvp?.attending23 === true ? 'yes' : existingRsvp?.attending23 === false ? 'no' : null
+  )
+  const [choice28, setChoice28] = useState<Choice>(
+    existingRsvp?.attending28 === true ? 'yes' : existingRsvp?.attending28 === false ? 'no' : null
   )
   const [address, setAddress] = useState(existingRsvp?.address ?? '')
   const [addressTouched, setAddressTouched] = useState(false)
@@ -53,8 +57,9 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  // Hindu invite: no postal address needed. Berlin: address required when attending.
   const isAttending = choice23 === 'yes' || (invitedDays === '22+23' && choice22 === 'yes')
-  const addressRequired = isAttending
+  const addressRequired = !isHindu && isAttending
   const addressMissing = addressTouched && addressRequired && !address.trim()
 
   const choiceToBoolean = (c: Choice): boolean => c === 'yes'
@@ -62,19 +67,27 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setAddressTouched(true)
-    if (!choice23) return
-    if (addressRequired && !address.trim()) return
+    if (isHindu) {
+      if (!choice28) return
+    } else {
+      if (!choice23) return
+      if (addressRequired && !address.trim()) return
+    }
     setLoading(true)
     await fetch('/api/rsvp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token,
-        attending22: invitedDays === '22+23' ? choiceToBoolean(choice22) : undefined,
-        attending23: choiceToBoolean(choice23),
-        address: address.trim(),
-        note: note || null,
-      }),
+      body: JSON.stringify(
+        isHindu
+          ? { token, attending28: choiceToBoolean(choice28), note: note || null }
+          : {
+              token,
+              attending22: invitedDays === '22+23' ? choiceToBoolean(choice22) : undefined,
+              attending23: choiceToBoolean(choice23),
+              address: address.trim(),
+              note: note || null,
+            }
+      ),
     })
     setSubmitted(true)
     setLoading(false)
@@ -95,19 +108,28 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6 max-w-md mx-auto">
 
-      {invitedDays === '22+23' && (
+      {isHindu ? (
         <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
-          <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate22}</p>
-          <ChoiceButtons value={choice22} onChange={setChoice22} translations={translations} />
+          <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.hindu_inviteDate}</p>
+          <ChoiceButtons value={choice28} onChange={setChoice28} translations={translations} />
         </div>
+      ) : (
+        <>
+          {invitedDays === '22+23' && (
+            <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
+              <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate22}</p>
+              <ChoiceButtons value={choice22} onChange={setChoice22} translations={translations} />
+            </div>
+          )}
+
+          <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
+            <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate23}</p>
+            <ChoiceButtons value={choice23} onChange={setChoice23} translations={translations} />
+          </div>
+        </>
       )}
 
-      <div className="bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-xl p-4">
-        <p className="font-serif text-[#c9a84c] text-sm mb-3">{translations.inviteDate23}</p>
-        <ChoiceButtons value={choice23} onChange={setChoice23} translations={translations} />
-      </div>
-
-      {/* Address — mandatory only if attending */}
+      {/* Address — mandatory only if attending (Berlin only) */}
       {addressRequired && (
       <div
         className="rounded-xl p-4 flex flex-col gap-3"
@@ -161,7 +183,7 @@ export default function RsvpForm({ token, invitedDays, lang, translations, exist
 
       <button
         type="submit"
-        disabled={loading || !choice23}
+        disabled={loading || (isHindu ? !choice28 : !choice23)}
         className="bg-[#c9a84c] text-[#1a0a0a] font-serif font-semibold py-3 rounded-xl hover:bg-[#c9a84c]/80 transition-colors disabled:opacity-40"
       >
         {loading ? '...' : existingRsvp ? translations.rsvpUpdate : translations.rsvpSubmit}

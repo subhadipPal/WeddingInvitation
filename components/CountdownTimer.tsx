@@ -2,16 +2,16 @@
 import { useEffect, useState } from 'react'
 import type { Lang, Translations } from '@/lib/i18n'
 
-interface Props { lang: Lang; translations: Translations }
+interface Props { lang: Lang; translations: Translations; targetDate?: Date }
 
-const WEDDING_DATE = new Date('2027-01-22T00:00:00')
+const DEFAULT_WEDDING_DATE = new Date('2027-01-22T00:00:00')
 
-export default function CountdownTimer({ translations }: Props) {
+export default function CountdownTimer({ translations, targetDate = DEFAULT_WEDDING_DATE }: Props) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 
   useEffect(() => {
     const tick = () => {
-      const diff = WEDDING_DATE.getTime() - Date.now()
+      const diff = targetDate.getTime() - Date.now()
       if (diff <= 0) return
       setTimeLeft({
         days: Math.floor(diff / 86400000),
@@ -23,7 +23,7 @@ export default function CountdownTimer({ translations }: Props) {
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [targetDate])
 
   return (
     <div className="flex gap-6 justify-center">
