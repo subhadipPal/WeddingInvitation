@@ -18,17 +18,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { name, email, phone, invitedDays, isMulti } = await req.json()
+  const { name, email, phone, invitedDays, isMulti, isBengali } = await req.json()
   if (!name || !invitedDays) {
     return NextResponse.json({ error: 'name and invitedDays required' }, { status: 400 })
   }
   const token = generateToken()
-  await db.insert(guests).values({ token, name, email, phone, invitedDays, isMulti: !!isMulti })
+  await db.insert(guests).values({ token, name, email, phone, invitedDays, isMulti: !!isMulti, isBengali: !!isBengali })
   const base = req.headers.get('origin') ?? ''
   return NextResponse.json({
     token,
     linkDe: `${base}/de/invite/${token}`,
     linkEn: `${base}/en/invite/${token}`,
+    linkBn: `${base}/bn/invite/${token}`,
   })
 }
 

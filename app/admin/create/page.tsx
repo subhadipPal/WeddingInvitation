@@ -3,10 +3,12 @@ import { useState } from 'react'
 import Link from 'next/link'
 
 export default function CreateGuestPage() {
-  const [form, setForm] = useState({ name: '', email: '', phone: '', invitedDays: '23', isMulti: false })
-  const [links, setLinks] = useState<{ linkDe: string; linkEn: string } | null>(null)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', invitedDays: '23', isMulti: false, isBengali: false })
+  const [links, setLinks] = useState<{ linkDe: string; linkEn: string; linkBn: string; isHindu: boolean; isBengali: boolean } | null>(null)
   const [copied, setCopied] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  const isHindu = form.invitedDays === '28'
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -17,8 +19,8 @@ export default function CreateGuestPage() {
       body: JSON.stringify(form),
     })
     const data = await res.json()
-    setLinks({ linkDe: data.linkDe, linkEn: data.linkEn })
-    setForm({ name: '', email: '', phone: '', invitedDays: '23', isMulti: false })
+    setLinks({ linkDe: data.linkDe, linkEn: data.linkEn, linkBn: data.linkBn, isHindu: form.invitedDays === '28', isBengali: form.isBengali })
+    setForm({ name: '', email: '', phone: '', invitedDays: '23', isMulti: false, isBengali: false })
     setLoading(false)
   }
 
@@ -63,8 +65,24 @@ export default function CreateGuestPage() {
             >
               <option value="23">23. Januar (Hochzeit)</option>
               <option value="22+23">22. + 23. Januar (beide Tage)</option>
+              <option value="28">28. Januar (Hindu-Hochzeit, Kolkata)</option>
             </select>
           </div>
+
+          {isHindu && (
+            <div className="flex items-center gap-3">
+              <input
+                id="isBengali"
+                type="checkbox"
+                checked={form.isBengali}
+                onChange={e => setForm(f => ({ ...f, isBengali: e.target.checked }))}
+                className="w-4 h-4 accent-[#c9a84c] cursor-pointer"
+              />
+              <label htmlFor="isBengali" className="text-[#c9a84c] text-sm font-serif cursor-pointer">
+                Bengali language support — adds a BN invite link
+              </label>
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <input
@@ -91,10 +109,16 @@ export default function CreateGuestPage() {
         {links && (
           <div className="mt-6 bg-[#4a0a0a]/40 border border-[#c9a84c]/30 rounded-2xl p-6 space-y-4">
             <h2 className="text-[#c9a84c] font-serif font-semibold">Links generiert!</h2>
-            {[
-              { label: 'Deutsch-Link', value: links.linkDe, key: 'de' },
-              { label: 'English Link', value: links.linkEn, key: 'en' },
-            ].map(({ label, value, key }) => (
+            {(links.isHindu
+              ? [
+                  { label: 'English Link', value: links.linkEn, key: 'en' },
+                  ...(links.isBengali ? [{ label: 'Bengali Link', value: links.linkBn, key: 'bn' }] : []),
+                ]
+              : [
+                  { label: 'Deutsch-Link', value: links.linkDe, key: 'de' },
+                  { label: 'English Link', value: links.linkEn, key: 'en' },
+                ]
+            ).map(({ label, value, key }) => (
               <div key={key}>
                 <p className="text-xs text-[#f5f0e8]/50 font-serif mb-1">{label}</p>
                 <div className="flex gap-2">

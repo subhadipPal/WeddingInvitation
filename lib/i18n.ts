@@ -1,4 +1,4 @@
-export type Lang = 'de' | 'en'
+export type Lang = 'de' | 'en' | 'bn'
 
 export interface Translations {
   coupleNames: string
@@ -48,6 +48,35 @@ export interface Translations {
   rsvpUpdate: string
   rsvpConfirmation: string
   rsvpConfirmationMulti: string
+  // ── Hindu Wedding (India, 28 Jan) — EN + BN shown; DE mirrors EN (never displayed) ──
+  hindu_ogTitle: string
+  hindu_ogSubtitle: string
+  hindu_ogDate: string
+  hindu_ogLocation: string
+  hindu_saveTheDate: string
+  hindu_tapToOpen: string
+  hindu_inviteHeading: string
+  hindu_inviteBody: string
+  hindu_inviteBodyMulti: string
+  hindu_inviteDate: string
+  hindu_inviteClosing: string
+  hindu_calendarLabel: string
+  hindu_venueName: string
+  hindu_venueAddress: string
+  hindu_venueDirections: string
+  hindu_rsvpGreeting: string
+  hindu_rsvpGreetingMulti: string
+  hindu_rsvpQuestion: string
+  hindu_rsvpQuestionMulti: string
+  hindu_rsvpYes: string
+  hindu_rsvpYesMulti: string
+  hindu_rsvpNo: string
+  hindu_rsvpNote: string
+  hindu_rsvpNotePlaceholder: string
+  hindu_rsvpSubmit: string
+  hindu_rsvpUpdate: string
+  hindu_rsvpConfirmation: string
+  hindu_rsvpConfirmationMulti: string
   // admin-internal labels (not editable via content editor)
   adminTitle: string
   adminPassword: string
@@ -89,6 +118,20 @@ export const GUEST_FACING_KEYS: (keyof Translations)[] = [
   'rsvpAddressLabel', 'rsvpAddressPlaceholder', 'rsvpAddressRequired',
   'rsvpNote', 'rsvpNotePlaceholder', 'rsvpSubmit', 'rsvpUpdate',
   'rsvpConfirmation', 'rsvpConfirmationMulti',
+]
+
+export const HINDU_GUEST_FACING_KEYS: (keyof Translations)[] = [
+  'hindu_ogTitle', 'hindu_ogSubtitle', 'hindu_ogDate', 'hindu_ogLocation',
+  'hindu_saveTheDate', 'hindu_tapToOpen',
+  'hindu_inviteHeading', 'hindu_inviteBody', 'hindu_inviteBodyMulti',
+  'hindu_inviteDate', 'hindu_inviteClosing', 'hindu_calendarLabel',
+  'hindu_venueName', 'hindu_venueAddress', 'hindu_venueDirections',
+  'hindu_rsvpGreeting', 'hindu_rsvpGreetingMulti',
+  'hindu_rsvpQuestion', 'hindu_rsvpQuestionMulti',
+  'hindu_rsvpYes', 'hindu_rsvpYesMulti', 'hindu_rsvpNo',
+  'hindu_rsvpNote', 'hindu_rsvpNotePlaceholder',
+  'hindu_rsvpSubmit', 'hindu_rsvpUpdate',
+  'hindu_rsvpConfirmation', 'hindu_rsvpConfirmationMulti',
 ]
 
 export const translations: Record<Lang, Translations> = {
@@ -148,6 +191,37 @@ export const translations: Record<Lang, Translations> = {
     rsvpUpdate: 'Antwort aktualisieren',
     rsvpConfirmation: 'Vielen Dank! Wir freuen uns auf dich.',
     rsvpConfirmationMulti: 'Vielen Dank! Wir freuen uns auf euch.',
+    // Hindu Wedding — DE mirrors EN (never displayed to Berlin guests)
+    hindu_ogTitle: 'Julia & Subhadip',
+    hindu_ogSubtitle: 'Hindu Wedding',
+    hindu_ogDate: '28 January 2027',
+    hindu_ogLocation: 'Kolkata, India',
+    hindu_saveTheDate: 'Save the Date',
+    hindu_tapToOpen: 'Tap here to open',
+    hindu_inviteHeading: "We're getting married!",
+    hindu_inviteBody:
+      'We joyfully invite you to our Hindu wedding ceremony. Having registered our marriage in Berlin on 22nd January 2027, we now celebrate our union in the sacred traditions at Sri Sri Karunamoyee Kali Temple, Kolkata. Your presence and blessings would mean the world to us.',
+    hindu_inviteBodyMulti:
+      'We joyfully invite you to our Hindu wedding ceremony. Having registered our marriage in Berlin on 22nd January 2027, we now celebrate our union in the sacred traditions at Sri Sri Karunamoyee Kali Temple, Kolkata. Your presence and blessings would mean the world to us.',
+    hindu_inviteDate: '28th January 2027 — 5:30 PM',
+    hindu_inviteClosing: 'With love — Julia & Subhadip',
+    hindu_calendarLabel: 'Mark your calendar',
+    hindu_venueName: 'Sri Sri Karunamoyee Kali Temple',
+    hindu_venueAddress: 'Kolkata, West Bengal, India',
+    hindu_venueDirections: 'Get Directions',
+    hindu_rsvpGreeting: 'Dear',
+    hindu_rsvpGreetingMulti: 'Dear',
+    hindu_rsvpQuestion: 'Will you be joining us?',
+    hindu_rsvpQuestionMulti: 'Will you be joining us?',
+    hindu_rsvpYes: "I'll be there!",
+    hindu_rsvpYesMulti: "We'll be there!",
+    hindu_rsvpNo: "Unfortunately can't make it",
+    hindu_rsvpNote: 'Message to the couple (optional)',
+    hindu_rsvpNotePlaceholder: 'Congratulations and...',
+    hindu_rsvpSubmit: 'Send RSVP',
+    hindu_rsvpUpdate: 'Update RSVP',
+    hindu_rsvpConfirmation: 'Thank you! We look forward to seeing you.',
+    hindu_rsvpConfirmationMulti: 'Thank you! We look forward to seeing you.',
     adminTitle: 'Guest Management — Julia & Subhadip',
     adminPassword: 'Password',
     adminLogin: 'Login',
@@ -225,6 +299,138 @@ export const translations: Record<Lang, Translations> = {
     rsvpUpdate: 'Update RSVP',
     rsvpConfirmation: 'Thank you! We look forward to seeing you.',
     rsvpConfirmationMulti: 'Thank you! We look forward to seeing you.',
+    // Hindu Wedding — India (28 Jan)
+    hindu_ogTitle: 'Julia & Subhadip',
+    hindu_ogSubtitle: 'Hindu Wedding',
+    hindu_ogDate: '28 January 2027',
+    hindu_ogLocation: 'Kolkata, India',
+    hindu_saveTheDate: 'Save the Date',
+    hindu_tapToOpen: 'Tap here to open',
+    hindu_inviteHeading: "We're getting married!",
+    hindu_inviteBody:
+      'We joyfully invite you to our Hindu wedding ceremony. Having registered our marriage in Berlin on 22nd January 2027, we now celebrate our union in the sacred traditions at Sri Sri Karunamoyee Kali Temple, Kolkata. Your presence and blessings would mean the world to us.',
+    hindu_inviteBodyMulti:
+      'We joyfully invite you to our Hindu wedding ceremony. Having registered our marriage in Berlin on 22nd January 2027, we now celebrate our union in the sacred traditions at Sri Sri Karunamoyee Kali Temple, Kolkata. Your presence and blessings would mean the world to us.',
+    hindu_inviteDate: '28th January 2027 — 5:30 PM',
+    hindu_inviteClosing: 'With love — Julia & Subhadip',
+    hindu_calendarLabel: 'Mark your calendar',
+    hindu_venueName: 'Sri Sri Karunamoyee Kali Temple',
+    hindu_venueAddress: 'Kolkata, West Bengal, India',
+    hindu_venueDirections: 'Get Directions',
+    hindu_rsvpGreeting: 'Dear',
+    hindu_rsvpGreetingMulti: 'Dear',
+    hindu_rsvpQuestion: 'Will you be joining us?',
+    hindu_rsvpQuestionMulti: 'Will you be joining us?',
+    hindu_rsvpYes: "I'll be there!",
+    hindu_rsvpYesMulti: "We'll be there!",
+    hindu_rsvpNo: "Unfortunately can't make it",
+    hindu_rsvpNote: 'Message to the couple (optional)',
+    hindu_rsvpNotePlaceholder: 'Congratulations and...',
+    hindu_rsvpSubmit: 'Send RSVP',
+    hindu_rsvpUpdate: 'Update RSVP',
+    hindu_rsvpConfirmation: 'Thank you! We look forward to seeing you.',
+    hindu_rsvpConfirmationMulti: 'Thank you! We look forward to seeing you.',
+    adminTitle: 'Guest Management — Julia & Subhadip',
+    adminPassword: 'Password',
+    adminLogin: 'Login',
+    adminGuestName: 'Name',
+    adminEmail: 'Email (optional)',
+    adminPhone: 'Phone/WhatsApp (optional)',
+    adminDays: 'Invited to',
+    adminDays22and23: '22nd + 23rd January',
+    adminDays23only: '23rd January only',
+    adminDefaultLang: 'Default language',
+    adminCreate: 'Add guest & generate links',
+    adminLinkDe: 'German link',
+    adminLinkEn: 'English link',
+    adminCopy: 'Copy',
+    adminCopied: 'Copied!',
+    adminExportCsv: 'Export as CSV',
+    adminTotal: 'Total invited',
+    adminConfirmed: 'Confirmed',
+    adminDeclined: 'Declined',
+    adminPending: 'Pending',
+  },
+  bn: {
+    // Berlin/admin keys mirror EN — never shown to Bengali (India) guests, but required by the type
+    coupleNames: 'Julia Schulze & Subhadip Pal',
+    tapToOpen: 'Tap here to open',
+    saveTheDate: 'Save the Date',
+    ogTitle: 'Julia & Subhadip',
+    ogSubtitle: 'Save the Date',
+    ogDate: '28 January 2027',
+    ogLocation: 'Kolkata',
+    countdownDays: 'দিন',
+    countdownHours: 'ঘণ্টা',
+    countdownMinutes: 'মিনিট',
+    countdownSeconds: 'সেকেন্ড',
+    inviteHeading: "We're saying yes!",
+    inviteBody22and23: '',
+    inviteBody23only: '',
+    inviteBody22and23Multi: '',
+    inviteBody23onlyMulti: '',
+    section2Body22and23: '',
+    section2Body23only: '',
+    section2Body22and23Multi: '',
+    section2Body23onlyMulti: '',
+    inviteDate22: '',
+    inviteDate23: '',
+    inviteClosing: 'With love — Julia & Subhadip',
+    calendarLabel: 'Mark your calendar',
+    noGuestClosingBody: '',
+    noGuestClosingSign: 'With love',
+    rsvpGreeting: 'Dear',
+    rsvpGreetingMulti: 'Dear',
+    rsvpInvited22and23: '',
+    rsvpInvited22and23Multi: '',
+    rsvpInvited23only: '',
+    rsvpInvited23onlyMulti: '',
+    rsvpQuestion: 'Will you be joining us?',
+    rsvpQuestionMulti: 'Will you be joining us?',
+    rsvpYes: "I'll be there!",
+    rsvpYesMulti: "We'll be there!",
+    rsvpNo: "Unfortunately can't make it",
+    rsvpMaybe: 'Maybe',
+    rsvpNote: 'Message to the couple (optional)',
+    rsvpNotePlaceholder: 'Congratulations and...',
+    rsvpAddressLabel: 'Your postal address',
+    rsvpAddressPlaceholder: '',
+    rsvpAddressRequired: '',
+    rsvpSubmit: 'Send RSVP',
+    rsvpUpdate: 'Update RSVP',
+    rsvpConfirmation: 'Thank you! We look forward to seeing you.',
+    rsvpConfirmationMulti: 'Thank you! We look forward to seeing you.',
+    // ── Hindu Wedding — Bengali ──
+    hindu_ogTitle: 'Julia & Subhadip',
+    hindu_ogSubtitle: 'Hindu Wedding',
+    hindu_ogDate: '28 January 2027',
+    hindu_ogLocation: 'Kolkata, India',
+    hindu_saveTheDate: 'তারিখটি মনে রাখবেন',
+    hindu_tapToOpen: 'খুলতে এখানে চাপ দিন',
+    hindu_inviteHeading: 'আমরা বিবাহবন্ধনে আবদ্ধ হচ্ছি!',
+    hindu_inviteBody:
+      'আমাদের হিন্দু বিবাহ অনুষ্ঠানে আপনাকে সাদরে আমন্ত্রণ জানাই। ২২শে জানুয়ারি ২০২৭ বার্লিনে আইনি বিবাহ সম্পন্ন করে, আমরা এখন কলকাতার শ্রী শ্রী করুণাময়ী কালী মন্দিরে পবিত্র রীতি অনুযায়ী আমাদের মিলন উদযাপন করছি। আপনার উপস্থিতি ও আশীর্বাদ আমাদের কাছে অত্যন্ত মূল্যবান।',
+    hindu_inviteBodyMulti:
+      'আমাদের হিন্দু বিবাহ অনুষ্ঠানে আপনাদের সাদরে আমন্ত্রণ জানাই। ২২শে জানুয়ারি ২০২৭ বার্লিনে আইনি বিবাহ সম্পন্ন করে, আমরা এখন কলকাতার শ্রী শ্রী করুণাময়ী কালী মন্দিরে পবিত্র রীতি অনুযায়ী আমাদের মিলন উদযাপন করছি। আপনাদের উপস্থিতি ও আশীর্বাদ আমাদের কাছে অত্যন্ত মূল্যবান।',
+    hindu_inviteDate: '২৮শে জানুয়ারি ২০২৭ — সন্ধ্যা ৫:৩০',
+    hindu_inviteClosing: 'ভালোবাসা সহ — Julia ও Subhadip',
+    hindu_calendarLabel: 'তারিখটি মনে রাখবেন',
+    hindu_venueName: 'শ্রী শ্রী করুণাময়ী কালী মন্দির',
+    hindu_venueAddress: 'কলকাতা, পশ্চিমবঙ্গ, ভারত',
+    hindu_venueDirections: 'পথনির্দেশ দেখুন',
+    hindu_rsvpGreeting: 'প্রিয়',
+    hindu_rsvpGreetingMulti: 'প্রিয়',
+    hindu_rsvpQuestion: 'আপনি কি আমাদের সঙ্গে থাকবেন?',
+    hindu_rsvpQuestionMulti: 'আপনারা কি আমাদের সঙ্গে থাকবেন?',
+    hindu_rsvpYes: 'আমি আসব!',
+    hindu_rsvpYesMulti: 'আমরা আসব!',
+    hindu_rsvpNo: 'দুঃখিত, আসতে পারব না',
+    hindu_rsvpNote: 'দম্পতির জন্য বার্তা (ঐচ্ছিক)',
+    hindu_rsvpNotePlaceholder: 'শুভেচ্ছা এবং...',
+    hindu_rsvpSubmit: 'উত্তর পাঠান',
+    hindu_rsvpUpdate: 'উত্তর আপডেট করুন',
+    hindu_rsvpConfirmation: 'ধন্যবাদ! আপনার সঙ্গে দেখা হওয়ার অপেক্ষায় রইলাম।',
+    hindu_rsvpConfirmationMulti: 'ধন্যবাদ! আপনাদের সঙ্গে দেখা হওয়ার অপেক্ষায় রইলাম।',
     adminTitle: 'Guest Management — Julia & Subhadip',
     adminPassword: 'Password',
     adminLogin: 'Login',

@@ -1,14 +1,15 @@
 'use client'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import { translations as defaults, GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
+import { translations as defaults, GUEST_FACING_KEYS, HINDU_GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
 import { triggerRedeploy } from './actions'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface Rsvp {
   attending22: boolean | null
-  attending23: boolean
+  attending23: boolean | null
+  attending28: boolean | null
   address: string | null
   note: string | null
 }
@@ -21,16 +22,17 @@ interface Guest {
   phone: string | null
   invitedDays: string
   isMulti: boolean
+  isBengali: boolean
   createdAt: string
   rsvp: Rsvp | null
 }
 
 type Tab = 'guests' | 'content'
-type ContentState = { de: Record<string, string>; en: Record<string, string> }
+type ContentState = { de: Record<string, string>; en: Record<string, string>; bn: Record<string, string> }
 
 // ── Content key groups for the editor UI ───────────────────────────────────────
 
-const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[]; deOnly?: boolean }[] = [
+const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[]; deOnly?: boolean; enBn?: boolean }[] = [
   {
     label: 'General',
     keys: ['coupleNames', 'saveTheDate', 'tapToOpen'],
@@ -59,6 +61,11 @@ const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[]; deOnly?: bo
     label: 'Multi-person invite — DE only (Ihr/Euch forms)',
     keys: ['inviteBody22and23Multi', 'inviteBody23onlyMulti', 'section2Body22and23Multi', 'section2Body23onlyMulti', 'rsvpGreetingMulti', 'rsvpInvited22and23Multi', 'rsvpInvited23onlyMulti', 'rsvpQuestionMulti', 'rsvpYesMulti', 'rsvpConfirmationMulti'],
     deOnly: true,
+  },
+  {
+    label: 'Hindu Wedding — India (28 Jan) · English + Bengali',
+    keys: HINDU_GUEST_FACING_KEYS,
+    enBn: true,
   },
 ]
 
@@ -109,14 +116,45 @@ const KEY_LABELS: Partial<Record<keyof Translations, string>> = {
   rsvpConfirmation: 'Confirmation message after submit',
   rsvpConfirmationMulti: '[Multi] Confirmation message after submit (DE)',
   rsvpYesMulti: '[Multi] Yes button (DE)',
+  // Hindu Wedding — India (28 Jan)
+  hindu_ogTitle: 'Hindu OG — Couple names (WhatsApp preview)',
+  hindu_ogSubtitle: 'Hindu OG — Subtitle (e.g. "Hindu Wedding")',
+  hindu_ogDate: 'Hindu OG — Date line (e.g. "28 January 2027")',
+  hindu_ogLocation: 'Hindu OG — Location (e.g. "Kolkata, India")',
+  hindu_saveTheDate: 'Hindu — "Save the Date" label',
+  hindu_tapToOpen: 'Hindu — "Tap to open" envelope text',
+  hindu_inviteHeading: 'Hindu — Main heading',
+  hindu_inviteBody: 'Hindu — Invitation body',
+  hindu_inviteBodyMulti: 'Hindu — Invitation body (multi-person)',
+  hindu_inviteDate: 'Hindu — Date + time line',
+  hindu_inviteClosing: 'Hindu — Closing sign-off',
+  hindu_calendarLabel: 'Hindu — Calendar section header',
+  hindu_venueName: 'Hindu — Venue / temple name',
+  hindu_venueAddress: 'Hindu — Venue address',
+  hindu_venueDirections: 'Hindu — "Get Directions" button label',
+  hindu_rsvpGreeting: 'Hindu — RSVP greeting prefix ("Dear")',
+  hindu_rsvpGreetingMulti: 'Hindu — RSVP greeting (multi-person)',
+  hindu_rsvpQuestion: 'Hindu — RSVP question',
+  hindu_rsvpQuestionMulti: 'Hindu — RSVP question (multi-person)',
+  hindu_rsvpYes: 'Hindu — RSVP Yes button',
+  hindu_rsvpYesMulti: 'Hindu — RSVP Yes button (multi-person)',
+  hindu_rsvpNo: 'Hindu — RSVP No button',
+  hindu_rsvpNote: 'Hindu — Note field label',
+  hindu_rsvpNotePlaceholder: 'Hindu — Note field placeholder',
+  hindu_rsvpSubmit: 'Hindu — Submit button',
+  hindu_rsvpUpdate: 'Hindu — Update button',
+  hindu_rsvpConfirmation: 'Hindu — Confirmation message',
+  hindu_rsvpConfirmationMulti: 'Hindu — Confirmation message (multi-person)',
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function defaultContent(): ContentState {
+  const ALL_KEYS = [...GUEST_FACING_KEYS, ...HINDU_GUEST_FACING_KEYS]
   return {
-    de: Object.fromEntries(GUEST_FACING_KEYS.map(k => [k, defaults.de[k]])),
-    en: Object.fromEntries(GUEST_FACING_KEYS.map(k => [k, defaults.en[k]])),
+    de: Object.fromEntries(ALL_KEYS.map(k => [k, defaults.de[k]])),
+    en: Object.fromEntries(ALL_KEYS.map(k => [k, defaults.en[k]])),
+    bn: Object.fromEntries(ALL_KEYS.map(k => [k, defaults.bn[k]])),
   }
 }
 
@@ -176,11 +214,12 @@ export default function AdminPage() {
   }
 
   const exportCsv = () => {
-    const header = 'Name,Email,Phone,Invited Days,RSVP 22,RSVP 23,Address,Note,Token,Link DE,Link EN'
+    const header = 'Name,Email,Phone,Invited Days,RSVP 22,RSVP 23,RSVP 28,Address,Note,Token,Link DE,Link EN,Link BN'
     const rows = guests.map(g => {
       const base = window.location.origin
       const r = g.rsvp
-      return `"${g.name}","${g.email ?? ''}","${g.phone ?? ''}","${g.invitedDays}","${r ? (r.attending22 === null ? '?' : r.attending22 ? 'Yes' : 'No') : ''}","${r ? (r.attending23 ? 'Yes' : 'No') : ''}","${(r?.address ?? '').replace(/"/g, '""')}","${r?.note ?? ''}","${g.token}","${base}/de/invite/${g.token}","${base}/en/invite/${g.token}"`
+      const cell = (v: boolean | null | undefined) => (v === null || v === undefined ? '' : v ? 'Yes' : 'No')
+      return `"${g.name}","${g.email ?? ''}","${g.phone ?? ''}","${g.invitedDays}","${r ? (r.attending22 === null ? '?' : r.attending22 ? 'Yes' : 'No') : ''}","${cell(r?.attending23)}","${cell(r?.attending28)}","${(r?.address ?? '').replace(/"/g, '""')}","${r?.note ?? ''}","${g.token}","${base}/de/invite/${g.token}","${base}/en/invite/${g.token}","${base}/bn/invite/${g.token}"`
     })
     const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'guests.csv'; a.click()
@@ -190,14 +229,17 @@ export default function AdminPage() {
     const base = window.location.origin
     const rows = guests.map(g => {
       const r = g.rsvp
+      const mark = (v: boolean | null | undefined) => (v === null || v === undefined ? '–' : v ? '✓' : '✗')
       const rsvp22 = g.invitedDays === '22+23' ? (r ? (r.attending22 === null ? '?' : r.attending22 ? '✓' : '✗') : '–') : '—'
-      const rsvp23 = r ? (r.attending23 ? '✓' : '✗') : '–'
+      const rsvp23 = g.invitedDays === '28' ? '—' : (r ? mark(r.attending23) : '–')
+      const rsvp28 = g.invitedDays === '28' ? (r ? mark(r.attending28) : '–') : '—'
       return `<tr>
         <td>${g.name}</td>
         <td>${g.email ?? g.phone ?? '—'}</td>
-        <td>${g.invitedDays === '22+23' ? '22 + 23 Jan' : '23 Jan'}</td>
+        <td>${g.invitedDays === '28' ? '28 Jan (India)' : g.invitedDays === '22+23' ? '22 + 23 Jan' : '23 Jan'}</td>
         <td style="text-align:center">${rsvp22}</td>
         <td style="text-align:center">${rsvp23}</td>
+        <td style="text-align:center">${rsvp28}</td>
         <td style="font-size:10px;white-space:pre-wrap">${r?.address ?? ''}</td>
         <td>${r?.note ?? ''}</td>
         <td style="font-size:10px">${base}/de/invite/${g.token}</td>
@@ -208,15 +250,23 @@ export default function AdminPage() {
     table{width:100%;border-collapse:collapse;font-size:12px}th{background:#3a0808;color:#c9a84c;padding:6px 8px;text-align:left}
     td{padding:5px 8px;border-bottom:1px solid #ddd}tr:nth-child(even) td{background:#fdf8f0}
     @media print{button{display:none}}</style></head>
-    <body><h1>Julia & Ravi — Guest List</h1><p>Wedding 22 Jan & Celebration 23 Jan 2027 · Berlin · ${guests.length} guests</p>
-    <table><thead><tr><th>Name</th><th>Contact</th><th>Invited</th><th>RSVP 22</th><th>RSVP 23</th><th>Address</th><th>Note</th><th>Link</th></tr></thead>
+    <body><h1>Julia & Ravi — Guest List</h1><p>Wedding 22 Jan & Celebration 23 Jan 2027 · Berlin · Hindu Wedding 28 Jan · Kolkata · ${guests.length} guests</p>
+    <table><thead><tr><th>Name</th><th>Contact</th><th>Invited</th><th>RSVP 22</th><th>RSVP 23</th><th>RSVP 28</th><th>Address</th><th>Note</th><th>Link</th></tr></thead>
     <tbody>${rows}</tbody></table></body></html>`
     const w = window.open('', '_blank')!
     w.document.write(html); w.document.close(); w.print()
   }
 
-  const confirmed = guests.filter(g => g.rsvp?.attending23).length
-  const declined = guests.filter(g => g.rsvp && !g.rsvp.attending23).length
+  // A guest counts as confirmed if they said yes to any day they were invited to
+  const isConfirmed = (g: Guest) => !!(g.rsvp && (g.rsvp.attending23 || g.rsvp.attending22 || g.rsvp.attending28))
+  const isDeclined = (g: Guest) => {
+    const r = g.rsvp
+    if (!r) return false
+    if (g.invitedDays === '28') return r.attending28 === false
+    return r.attending23 === false && r.attending22 !== true
+  }
+  const confirmed = guests.filter(isConfirmed).length
+  const declined = guests.filter(isDeclined).length
   const pending = guests.filter(g => !g.rsvp).length
 
   // ── Content tab logic ───────────────────────────────────────────────────────
@@ -231,7 +281,7 @@ export default function AdminPage() {
     return () => controller.abort()
   }, [tab])
 
-  const handleContentChange = (lang: 'de' | 'en', key: string, value: string) => {
+  const handleContentChange = (lang: 'de' | 'en' | 'bn', key: string, value: string) => {
     setContent(prev => {
       const next = { ...prev, [lang]: { ...prev[lang], [key]: value } }
       contentRef.current = next
@@ -350,11 +400,16 @@ export default function AdminPage() {
                   const base = typeof window !== 'undefined' ? window.location.origin : ''
                   const linkDe = `${base}/de/invite/${g.token}`
                   const linkEn = `${base}/en/invite/${g.token}`
+                  const linkBn = `${base}/bn/invite/${g.token}`
+                  const isHindu = g.invitedDays === '28'
                   const r = g.rsvp
                   const rsvp22val = g.invitedDays === '22+23'
                     ? (r ? (r.attending22 === null ? { label: '?', color: 'text-[#f5f0e8]/40' } : r.attending22 ? { label: 'Yes', color: 'text-green-400' } : { label: 'No', color: 'text-red-400' }) : { label: '–', color: 'text-[#f5f0e8]/30' })
                     : null
-                  const rsvp23val = r ? (r.attending23 ? { label: 'Yes', color: 'text-green-400' } : { label: 'No', color: 'text-red-400' }) : { label: '–', color: 'text-[#f5f0e8]/30' }
+                  const boolToVal = (v: boolean | null | undefined) =>
+                    v === true ? { label: 'Yes', color: 'text-green-400' } : v === false ? { label: 'No', color: 'text-red-400' } : { label: '–', color: 'text-[#f5f0e8]/30' }
+                  const rsvp23val = r ? boolToVal(r.attending23) : { label: '–', color: 'text-[#f5f0e8]/30' }
+                  const rsvp28val = r ? boolToVal(r.attending28) : { label: '–', color: 'text-[#f5f0e8]/30' }
                   const initials = g.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
                   return (
                     <div key={g.id} className="relative bg-black/50 backdrop-blur-xl border border-[#c9a84c]/30 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
@@ -369,6 +424,12 @@ export default function AdminPage() {
                             <span className="font-serif text-white font-semibold text-lg leading-tight">{g.name}</span>
                             {g.isMulti && (
                               <span className="px-1.5 py-0.5 rounded text-[11px] bg-[#c9a84c]/20 text-[#c9a84c] border border-[#c9a84c]/40 font-serif">Group</span>
+                            )}
+                            {isHindu && (
+                              <span className="px-1.5 py-0.5 rounded text-[11px] bg-orange-400/20 text-orange-300 border border-orange-400/40 font-serif">India</span>
+                            )}
+                            {g.isBengali && (
+                              <span className="px-1.5 py-0.5 rounded text-[11px] bg-[#c9a84c]/20 text-[#c9a84c] border border-[#c9a84c]/40 font-serif">বাং</span>
                             )}
                           </div>
                           <p className="text-white/50 font-serif text-xs mt-0.5">Invitation & Contact Details</p>
@@ -395,13 +456,23 @@ export default function AdminPage() {
                           <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c]">📅</div>
                           <div>
                             <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">Invited</p>
-                            <p className="text-white text-sm font-serif whitespace-nowrap">{g.invitedDays === '22+23' ? '22–23 Jan' : '23 Jan'}</p>
+                            <p className="text-white text-sm font-serif whitespace-nowrap">{isHindu ? '28 Jan (India)' : g.invitedDays === '22+23' ? '22–23 Jan' : '23 Jan'}</p>
                           </div>
                         </div>
                       </div>
 
                       {/* RSVP row */}
                       <div className="bg-white/8 border border-white/20 rounded-xl p-3 flex items-center gap-3">
+                        {isHindu ? (
+                          <>
+                            <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${r?.attending28 ? 'bg-green-400/15 border-green-400/40 text-green-400' : 'bg-[#c9a84c]/15 border-[#c9a84c]/30 text-[#c9a84c]'}`}>👥</div>
+                            <div className="flex-1">
+                              <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">RSVP 28</p>
+                              <p className={`text-sm font-serif font-semibold ${rsvp28val.color}`}>{rsvp28val.label === 'Yes' ? '✓ ' : rsvp28val.label === 'No' ? '✕ ' : ''}{rsvp28val.label}</p>
+                            </div>
+                          </>
+                        ) : (
+                          <>
                         {g.invitedDays === '22+23' && rsvp22val && (
                           <>
                             <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">👥</div>
@@ -417,6 +488,8 @@ export default function AdminPage() {
                           <p className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif mb-0.5">RSVP 23</p>
                           <p className={`text-sm font-serif font-semibold ${rsvp23val.color}`}>{rsvp23val.label === 'Yes' ? '✓ ' : rsvp23val.label === 'No' ? '✕ ' : ''}{rsvp23val.label}</p>
                         </div>
+                          </>
+                        )}
                         {r?.note && (
                           <>
                             <div className="w-px h-8 bg-white/20" />
@@ -451,14 +524,31 @@ export default function AdminPage() {
                         <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">🔗</div>
                         <span className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif">Links</span>
                         <div className="flex gap-2 ml-1">
-                          <button onClick={() => copyLink(linkDe, `de-${g.id}`)}
-                            className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
-                            {copied === `de-${g.id}` ? '✓' : 'DE'}
-                          </button>
-                          <button onClick={() => copyLink(linkEn, `en-${g.id}`)}
-                            className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
-                            {copied === `en-${g.id}` ? '✓' : 'EN'}
-                          </button>
+                          {isHindu ? (
+                            <>
+                              <button onClick={() => copyLink(linkEn, `en-${g.id}`)}
+                                className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
+                                {copied === `en-${g.id}` ? '✓' : 'EN'}
+                              </button>
+                              {g.isBengali && (
+                                <button onClick={() => copyLink(linkBn, `bn-${g.id}`)}
+                                  className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
+                                  {copied === `bn-${g.id}` ? '✓' : 'বাং'}
+                                </button>
+                              )}
+                            </>
+                          ) : (
+                            <>
+                              <button onClick={() => copyLink(linkDe, `de-${g.id}`)}
+                                className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
+                                {copied === `de-${g.id}` ? '✓' : 'DE'}
+                              </button>
+                              <button onClick={() => copyLink(linkEn, `en-${g.id}`)}
+                                className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all">
+                                {copied === `en-${g.id}` ? '✓' : 'EN'}
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -494,17 +584,20 @@ export default function AdminPage() {
                       {group.label}
                     </h2>
                     <div className="flex flex-col gap-4">
-                      {group.keys.map(key => (
+                      {group.keys.map(key => {
+                        const editLangs: ('de' | 'en' | 'bn')[] = group.deOnly ? ['de'] : group.enBn ? ['en', 'bn'] : ['de', 'en']
+                        const langLabel: Record<'de' | 'en' | 'bn', string> = { de: 'German', en: 'English', bn: 'Bengali' }
+                        return (
                         <div key={key} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
                           <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
                             {KEY_LABELS[key] ?? key}
                           </p>
-                          <div className={`grid gap-3 ${group.deOnly ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-                            {(group.deOnly ? ['de'] as const : ['de', 'en'] as const).map(lang => (
+                          <div className={`grid gap-3 ${editLangs.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+                            {editLangs.map(lang => (
                               <div key={lang}>
-                                {!group.deOnly && (
+                                {editLangs.length > 1 && (
                                   <label className="block text-[#c9a84c]/70 text-xs font-serif mb-1 uppercase tracking-wider">
-                                    {lang === 'de' ? 'German' : 'English'}
+                                    {langLabel[lang]}
                                   </label>
                                 )}
                                 <textarea
@@ -517,7 +610,8 @@ export default function AdminPage() {
                             ))}
                           </div>
                         </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 ))}

@@ -8,6 +8,7 @@ export const guests = pgTable('guests', {
   phone: varchar('phone', { length: 30 }),
   invitedDays: varchar('invited_days', { length: 10 }).notNull(),
   isMulti: boolean('is_multi').notNull().default(false),
+  isBengali: boolean('is_bengali').notNull().default(false),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 })
 
@@ -15,7 +16,8 @@ export const rsvps = pgTable('rsvps', {
   id: uuid('id').primaryKey().defaultRandom(),
   guestId: uuid('guest_id').notNull().references(() => guests.id),
   attending22: boolean('attending_22'),
-  attending23: boolean('attending_23').notNull(),
+  attending23: boolean('attending_23'),
+  attending28: boolean('attending_28'),
   address: text('address'),
   note: text('note'),
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),

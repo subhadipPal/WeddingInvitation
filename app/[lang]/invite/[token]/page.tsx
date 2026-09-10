@@ -3,6 +3,7 @@ import { join } from 'path'
 import type { Lang } from '@/lib/i18n'
 import { loadTranslations } from '@/lib/i18n.server'
 import ScrollInvitation from '@/components/ScrollInvitation'
+import HinduScrollInvitation from '@/components/HinduScrollInvitation'
 import { db } from '@/lib/db'
 import { guests, rsvps } from '@/lib/schema'
 import { eq } from 'drizzle-orm'
@@ -12,7 +13,30 @@ interface Props { params: Promise<{ lang: string; token: string }> }
 
 const base = 'https://www.juliaundsubhadip.xyz'
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { token } = await params
+  let isHindu = false
+  try {
+    const rows = await db.select({ invitedDays: guests.invitedDays }).from(guests).where(eq(guests.token, token)).limit(1)
+    isHindu = rows[0]?.invitedDays === '28'
+  } catch {
+    // fall through to Berlin defaults
+  }
+
+  if (isHindu) {
+    const title = 'Julia & Subhadip — Hindu Wedding · 28 January 2027'
+    const description = 'Hindu Wedding — Julia Schulze & Subhadip Pal, Sri Sri Karunamoyee Kali Temple, Kolkata'
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        images: [{ url: `${base}/hindu-opengraph-image`, width: 1200, height: 630 }],
+      },
+    }
+  }
+
   return {
     title: 'Julia & Subhadip — Save the Date · 22 & 23 January 2027',
     description: 'Save the Date — Julia Schulze & Subhadip Pal, Berlin, January 2027',
@@ -45,7 +69,7 @@ async function getGuest(token: string) {
 
 export default async function InvitePage({ params }: Props) {
   const { lang: langParam, token } = await params
-  const lang = (langParam === 'en' ? 'en' : 'de') as Lang
+  const lang = (langParam === 'en' ? 'en' : langParam === 'bn' ? 'bn' : 'de') as Lang
   const [data, translations] = await Promise.all([getGuest(token), loadTranslations(lang)])
 
   if (!data) {
@@ -66,6 +90,24 @@ export default async function InvitePage({ params }: Props) {
 
   const { guest, rsvp } = data
 
+  // India / Hindu wedding guests (28 Jan) get the dedicated invite
+  if (guest.invitedDays === '28') {
+    return (
+      <HinduScrollInvitation
+        lang={lang}
+        translations={translations}
+        photos={getPhotoList()}
+        guest={{
+          name: guest.name,
+          token,
+          isMulti: guest.isMulti,
+          isBengali: guest.isBengali,
+        }}
+        existingRsvp={rsvp ? { attending28: rsvp.attending28, note: rsvp.note } : null}
+      />
+    )
+  }
+
   return (
     <ScrollInvitation
       lang={lang}
@@ -77,7 +119,7 @@ export default async function InvitePage({ params }: Props) {
         token,
         isMulti: guest.isMulti,
       }}
-      existingRsvp={rsvp}
+      existingRsvp={rsvp ? { attending22: rsvp.attending22, attending23: rsvp.attending23 ?? false, note: rsvp.note } : null}
     />
   )
 }
