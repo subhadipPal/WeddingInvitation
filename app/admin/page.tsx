@@ -14,6 +14,13 @@ interface Rsvp {
   note: string | null
 }
 
+interface MicRsvp {
+  attending22: boolean | null
+  attending23: boolean | null
+  address: string | null
+  note: string | null
+}
+
 interface Guest {
   id: string
   token: string
@@ -23,8 +30,10 @@ interface Guest {
   invitedDays: string
   isMulti: boolean
   isBengali: boolean
+  micToken: string | null
   createdAt: string
   rsvp: Rsvp | null
+  micRsvp: MicRsvp | null
 }
 
 type Tab = 'guests' | 'content'
@@ -172,6 +181,7 @@ export default function AdminPage() {
   const [copied, setCopied] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [activeNote, setActiveNote] = useState<string | null>(null)
+  const [generatingMic, setGeneratingMic] = useState<string | null>(null)
 
   // Content tab state
   const [content, setContent] = useState<ContentState>(defaultContent())
@@ -211,6 +221,16 @@ export default function AdminPage() {
     await fetch('/api/guests', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) })
     await loadGuests()
     setDeleting(null)
+  }
+
+  const generateMicToken = async (id: string) => {
+    setGeneratingMic(id)
+    try {
+      const res = await fetch(`/api/guests/${id}/generate-mic-token`, { method: 'POST' })
+      if (res.ok) await loadGuests()
+    } finally {
+      setGeneratingMic(null)
+    }
   }
 
   const exportCsv = () => {
@@ -522,7 +542,7 @@ export default function AdminPage() {
                       {/* Links row */}
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">🔗</div>
-                        <span className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif">Links</span>
+                        <span className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif">{isHindu ? 'Links' : 'STD'}</span>
                         <div className="flex gap-2 ml-1">
                           {isHindu ? (
                             <>
@@ -551,6 +571,33 @@ export default function AdminPage() {
                           )}
                         </div>
                       </div>
+
+                      {/* MIC Link row — Berlin guests only */}
+                      {!isHindu && (
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center text-[#c9a84c] shrink-0">💍</div>
+                          <span className="text-[#c9a84c] text-[10px] uppercase tracking-wider font-serif">MIC</span>
+                          <div className="flex gap-2 ml-1">
+                            {g.micToken ? (
+                              <button
+                                onClick={() => copyLink(`${base}/hochzeit-einladung/${g.micToken}`, `mic-${g.id}`)}
+                                className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-white font-serif text-sm font-semibold hover:bg-[#c9a84c]/20 hover:border-[#c9a84c] transition-all"
+                                title={`${base}/hochzeit-einladung/${g.micToken}`}
+                              >
+                                {copied === `mic-${g.id}` ? '✓ Kopiert' : 'Link kopieren'}
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => generateMicToken(g.id)}
+                                disabled={generatingMic === g.id}
+                                className="px-4 py-2 rounded-lg border border-[#c9a84c]/40 bg-transparent text-[#c9a84c] font-serif text-sm hover:bg-[#c9a84c]/10 hover:border-[#c9a84c] transition-all disabled:opacity-30"
+                              >
+                                {generatingMic === g.id ? '…' : 'Generieren'}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
 
                     </div>
                   )

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { guests, rsvps } from '@/lib/schema'
+import { guests, rsvps, micRsvps } from '@/lib/schema'
 import { generateToken } from '@/lib/tokens'
 import { eq } from 'drizzle-orm'
 
@@ -11,9 +11,19 @@ function isAdmin(req: NextRequest) {
 export async function GET(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const all = await db.select().from(guests).orderBy(guests.createdAt)
-  const rsvpRows = await db.select().from(rsvps)
+  const [rsvpRows, micRsvpRows] = await Promise.all([
+    db.select().from(rsvps),
+    db.select().from(micRsvps),
+  ])
   const rsvpMap = Object.fromEntries(rsvpRows.map(r => [r.guestId, r]))
-  return NextResponse.json({ guests: all.map(g => ({ ...g, rsvp: rsvpMap[g.id] ?? null })) })
+  const micRsvpMap = Object.fromEntries(micRsvpRows.map(r => [r.guestId, r]))
+  return NextResponse.json({
+    guests: all.map(g => ({
+      ...g,
+      rsvp: rsvpMap[g.id] ?? null,
+      micRsvp: micRsvpMap[g.id] ?? null,
+    })),
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -38,6 +48,7 @@ export async function DELETE(req: NextRequest) {
   const { id } = await req.json()
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
   await db.delete(rsvps).where(eq(rsvps.guestId, id))
+  await db.delete(micRsvps).where(eq(micRsvps.guestId, id))
   await db.delete(guests).where(eq(guests.id, id))
   return NextResponse.json({ ok: true })
 }
