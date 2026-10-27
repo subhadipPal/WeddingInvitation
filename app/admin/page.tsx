@@ -975,20 +975,18 @@ export default function AdminPage() {
                                 {micContent[key] === 'true' ? 'Aktiviert' : 'Deaktiviert'}
                               </span>
                             </label>
+                          ) : isTimetable ? (
+                            <TimetableEditor
+                              value={micContent[key] ?? ''}
+                              onChange={v => handleMicChange(key, v)}
+                            />
                           ) : (
-                            <>
-                              <textarea
-                                value={micContent[key] ?? ''}
-                                onChange={e => handleMicChange(key, e.target.value)}
-                                rows={isTimetable ? 8 : key.includes('Body') || key.includes('body') ? 4 : 2}
-                                className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-y"
-                              />
-                              {isTimetable && (
-                                <p className="font-serif text-[#f5f0e8]/30 text-[11px] mt-1.5">
-                                  Format: <code className="text-[#c9a84c]/60">14:00 Uhr{'   '}Herzlich willkommen</code> — eine Zeile pro Eintrag, min. 2 Leerzeichen als Trenner
-                                </p>
-                              )}
-                            </>
+                            <textarea
+                              value={micContent[key] ?? ''}
+                              onChange={e => handleMicChange(key, e.target.value)}
+                              rows={key.includes('Body') || key.includes('body') ? 4 : 2}
+                              className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-y"
+                            />
                           )}
                         </div>
                       )
@@ -1030,6 +1028,98 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── TimetableEditor ────────────────────────────────────────────────────────────
+// Parses the multiline "HH:MM Uhr   Label" string into structured rows,
+// lets the admin edit each row with individual inputs, and serialises back.
+
+interface TimetableRow { time: string; label: string }
+
+function parseTimetable(raw: string): TimetableRow[] {
+  return raw
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .map(line => {
+      const m = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
+      return m ? { time: m[1].trim(), label: m[2].trim() } : { time: '', label: line }
+    })
+}
+
+function serialiseTimetable(rows: TimetableRow[]): string {
+  return rows
+    .filter(r => r.time || r.label)
+    .map(r => `${r.time}   ${r.label}`)
+    .join('\n')
+}
+
+function TimetableEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [rows, setRows] = useState<TimetableRow[]>(() => {
+    const parsed = parseTimetable(value)
+    return parsed.length ? parsed : [{ time: '', label: '' }]
+  })
+
+  // Resync when the parent loads DB content (value changes from default → DB value)
+  const prevValueRef = useRef(value)
+  useEffect(() => {
+    if (value !== prevValueRef.current) {
+      prevValueRef.current = value
+      const parsed = parseTimetable(value)
+      setRows(parsed.length ? parsed : [{ time: '', label: '' }])
+    }
+  }, [value])
+
+  const update = (next: TimetableRow[]) => {
+    setRows(next)
+    onChange(serialiseTimetable(next))
+  }
+
+  const setRow = (i: number, field: 'time' | 'label', v: string) => {
+    const next = rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r)
+    update(next)
+  }
+
+  const addRow = () => update([...rows, { time: '', label: '' }])
+
+  const removeRow = (i: number) => {
+    const next = rows.filter((_, idx) => idx !== i)
+    update(next.length ? next : [{ time: '', label: '' }])
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {rows.map((row, i) => (
+        <div key={i} className="flex gap-2 items-center">
+          <input
+            type="text"
+            value={row.time}
+            onChange={e => setRow(i, 'time', e.target.value)}
+            placeholder="14:00 Uhr"
+            className="w-28 shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60"
+          />
+          <input
+            type="text"
+            value={row.label}
+            onChange={e => setRow(i, 'label', e.target.value)}
+            placeholder="Beschreibung"
+            className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60"
+          />
+          <button
+            onClick={() => removeRow(i)}
+            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-sm"
+            title="Eintrag entfernen"
+          >✕</button>
+        </div>
+      ))}
+      <button
+        onClick={addRow}
+        className="self-start mt-1 px-3 py-1.5 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/70 font-serif text-xs hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors"
+      >
+        + Eintrag hinzufügen
+      </button>
     </div>
   )
 }
