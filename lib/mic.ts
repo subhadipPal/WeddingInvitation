@@ -129,7 +129,7 @@ export const MIC_DEFAULTS: Record<MicContentKey, string> = {
   mic22VenueVillaName: 'HOCHZEITSVILLA ZEHLENDORF',
   mic22VenueVillaAddress: 'Teltower Damm 10, 14169 Berlin',
   mic22VenueHofName: 'ZEHLENDORFER HOF',
-  mic22VenueHofAddress: 'Adresse — folgt',
+  mic22VenueHofAddress: 'Clayallee 203, 14195 Berlin',
   mic22RouteButton: 'Route planen →',
 
   // 23 Jan — reception at Esszimmer Mahlsdorf
@@ -152,7 +152,7 @@ export const MIC_DEFAULTS: Record<MicContentKey, string> = {
     'danach      Familientanz & Partynacht',
   ].join('\n'),
   mic23VenueName: 'ESSZIMMER MAHLSDORF',
-  mic23VenueAddress: 'Adresse — folgt',
+  mic23VenueAddress: 'Hönower Str. 37, 12623 Berlin',
 
   // FAQ
   micFaqHeading: 'HÄUFIGE FRAGEN',
