@@ -4,7 +4,7 @@ import styles from './MicPetalOverlay.module.css'
 
 // Theme colours: deep rose red, white, gold
 const PETAL_COLORS = ['#8a1538', '#f5f0e8', '#c9a84c']
-const PETAL_COUNT = 30
+const PETAL_COUNT = 15
 
 function rnd(min: number, max: number) { return min + Math.random() * (max - min) }
 function randInt(min: number, max: number) { return Math.floor(rnd(min, max + 1)) }
