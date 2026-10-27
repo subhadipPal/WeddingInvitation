@@ -395,23 +395,32 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
   )
 }
 
-function VenueCard({ name, address, routeLabel }: { name: string; address: string; routeLabel: string }) {
-  // Only render the map when we have a real address (not the "folgt" placeholder)
-  const hasAddress = address && !address.toLowerCase().includes('folgt')
-  const mapSrc = hasAddress
-    ? `https://www.openstreetmap.org/export/embed.html?bbox=&layer=mapnik&marker=&mlat=&mlon=&query=${encodeURIComponent(address)}`
-    : null
+// Known venue coordinates — OSM embed requires lat/lon, not text search.
+// Add new entries here when addresses are confirmed.
+const VENUE_COORDS: Record<string, { lat: number; lon: number }> = {
+  'Teltower Damm 10, 14169 Berlin': { lat: 52.4342129, lon: 13.2590442 },
+  'Clayallee 203, 14195 Berlin':    { lat: 52.4341308, lon: 13.246931  },
+  'Hönower Str. 37, 12623 Berlin':  { lat: 52.5053471, lon: 13.6210425 },
+}
+const OSM_DELTA = 0.003 // ~300 m bbox half-width
 
-  // OSM embed via search query — simpler than lat/lon, no API key needed
-  const osmSearchSrc = hasAddress
-    ? `https://www.openstreetmap.org/export/embed.html?layer=mapnik&query=${encodeURIComponent(address)}`
-    : null
+function venueMapSrc(address: string): string | null {
+  const coords = VENUE_COORDS[address.trim()]
+  if (!coords) return null
+  const { lat, lon } = coords
+  const bbox = `${lon - OSM_DELTA},${lat - OSM_DELTA},${lon + OSM_DELTA},${lat + OSM_DELTA}`
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`
+}
+
+function VenueCard({ name, address, routeLabel }: { name: string; address: string; routeLabel: string }) {
+  const hasAddress = address && !address.toLowerCase().includes('folgt')
+  const osmSrc = hasAddress ? venueMapSrc(address) : null
 
   return (
     <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col">
-      {osmSearchSrc && (
+      {osmSrc && (
         <iframe
-          src={osmSearchSrc}
+          src={osmSrc}
           width="100%"
           height="140"
           loading="lazy"
