@@ -124,7 +124,7 @@ export default function MicInvitation({
             <div className="relative z-10 h-full overflow-y-auto px-6 py-12">
               <div className="max-w-md mx-auto flex flex-col gap-6">
                 <FadeIn inView={v2}>
-                  <p className="font-serif text-[#c9a84c] text-xs tracking-[0.4em] uppercase text-center">
+                  <p className="font-serif text-[#c9a84c] text-sm tracking-[0.4em] uppercase text-center">
                     {content.mic22Eyebrow}
                   </p>
                   <p className="font-script text-4xl text-[#c9a84c] text-center mt-2">
@@ -133,7 +133,7 @@ export default function MicInvitation({
                   <div className="w-16 h-px bg-[#c9a84c]/40 mx-auto my-4" />
                 </FadeIn>
                 <FadeIn inView={v2} delay={200}>
-                  <p className="font-serif text-[#f5f0e8]/90 text-sm leading-relaxed whitespace-pre-wrap">
+                  <p className="font-serif text-[#f5f0e8]/90 text-base leading-relaxed whitespace-pre-wrap">
                     {bodyFor22}
                   </p>
                 </FadeIn>
@@ -165,7 +165,7 @@ export default function MicInvitation({
           <div className="relative z-10 h-full overflow-y-auto px-6 py-12">
             <div className="max-w-md mx-auto flex flex-col gap-6">
               <FadeIn inView={v3}>
-                <p className="font-serif text-[#c9a84c] text-xs tracking-[0.4em] uppercase text-center">
+                <p className="font-serif text-[#c9a84c] text-sm tracking-[0.4em] uppercase text-center">
                   {content.mic23Eyebrow}
                 </p>
                 <p className="font-script text-4xl text-[#c9a84c] text-center mt-2">
@@ -177,7 +177,7 @@ export default function MicInvitation({
                 <div className="w-16 h-px bg-[#c9a84c]/40 mx-auto my-4" />
               </FadeIn>
               <FadeIn inView={v3} delay={200}>
-                <p className="font-serif text-[#f5f0e8]/90 text-sm leading-relaxed whitespace-pre-wrap">
+                <p className="font-serif text-[#f5f0e8]/90 text-base leading-relaxed whitespace-pre-wrap">
                   {bodyFor23}
                 </p>
               </FadeIn>
@@ -366,9 +366,9 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
                 <div className={`w-[calc(50%-16px)] ${isLeft ? 'flex flex-col items-end pr-3' : ''}`}>
                   {isLeft && (
                     <>
-                      <span className="text-xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-[10px] tracking-wider mt-0.5">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-xs text-right mt-0.5 leading-snug">{row.label}</span>
+                      <span className="text-2xl leading-none">{icon}</span>
+                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5">{row.time}</span>
+                      <span className="font-serif text-[#f5f0e8] text-sm text-right mt-0.5 leading-snug">{row.label}</span>
                     </>
                   )}
                 </div>
@@ -380,9 +380,9 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
                 <div className={`w-[calc(50%-16px)] ml-auto ${!isLeft ? 'flex flex-col items-start pl-3' : ''}`}>
                   {!isLeft && (
                     <>
-                      <span className="text-xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-[10px] tracking-wider mt-0.5">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-xs mt-0.5 leading-snug">{row.label}</span>
+                      <span className="text-2xl leading-none">{icon}</span>
+                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5">{row.time}</span>
+                      <span className="font-serif text-[#f5f0e8] text-sm mt-0.5 leading-snug">{row.label}</span>
                     </>
                   )}
                 </div>
@@ -422,8 +422,8 @@ function VenueCard({ name, address, routeLabel }: { name: string; address: strin
       )}
       <div className="p-4 flex flex-col gap-3">
         <div>
-          <p className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-1">📍 {name}</p>
-          <p className="font-serif text-[#f5f0e8] text-sm whitespace-pre-wrap">{address}</p>
+          <p className="font-serif text-[#c9a84c] text-sm uppercase tracking-widest mb-1">📍 {name}</p>
+          <p className="font-serif text-[#f5f0e8] text-base whitespace-pre-wrap">{address}</p>
         </div>
         {hasAddress && (
           <a
@@ -450,7 +450,7 @@ function FaqCard({ title, body, accent }: { title: string; body: string; accent?
       }`}
     >
       <p className="font-script text-xl text-[#c9a84c] mb-2">{title}</p>
-      <p className="font-serif text-[#f5f0e8] text-sm leading-relaxed whitespace-pre-wrap">
+      <p className="font-serif text-[#f5f0e8] text-base leading-relaxed whitespace-pre-wrap">
         {body}
       </p>
     </div>
