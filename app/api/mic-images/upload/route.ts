@@ -60,8 +60,12 @@ export async function POST(req: NextRequest) {
     })
     blobUrl = result.url
   } catch (err) {
-    console.error('Blob upload error:', err)
-    return NextResponse.json({ error: 'Blob upload failed' }, { status: 502 })
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('Blob upload error:', msg)
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      return NextResponse.json({ error: 'BLOB_READ_WRITE_TOKEN not configured in this environment' }, { status: 502 })
+    }
+    return NextResponse.json({ error: `Blob upload failed: ${msg}` }, { status: 502 })
   }
 
   // Upsert mic_images row
