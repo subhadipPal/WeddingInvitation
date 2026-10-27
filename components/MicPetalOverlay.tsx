@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import styles from './MicPetalOverlay.module.css'
 
 // Theme colours: deep rose red, white, gold
 const PETAL_COLORS = ['#8a1538', '#f5f0e8', '#c9a84c']
