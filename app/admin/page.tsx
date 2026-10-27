@@ -1084,6 +1084,20 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
 
   const addRow = () => update([...rows, { time: '', label: '' }])
 
+  const insertAfter = (i: number) => {
+    const next = [...rows]
+    next.splice(i + 1, 0, { time: '', label: '' })
+    update(next)
+  }
+
+  const moveRow = (i: number, dir: -1 | 1) => {
+    const j = i + dir
+    if (j < 0 || j >= rows.length) return
+    const next = [...rows]
+    ;[next[i], next[j]] = [next[j], next[i]]
+    update(next)
+  }
+
   const removeRow = (i: number) => {
     const next = rows.filter((_, idx) => idx !== i)
     update(next.length ? next : [{ time: '', label: '' }])
@@ -1093,6 +1107,21 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     <div className="flex flex-col gap-2">
       {rows.map((row, i) => (
         <div key={i} className="flex gap-2 items-center">
+          {/* Move up/down */}
+          <div className="flex flex-col gap-0.5 shrink-0">
+            <button
+              onClick={() => moveRow(i, -1)}
+              disabled={i === 0}
+              className="w-6 h-6 flex items-center justify-center rounded border border-[#c9a84c]/20 text-[#c9a84c]/50 hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors disabled:opacity-20 text-xs leading-none"
+              title="Nach oben"
+            >▲</button>
+            <button
+              onClick={() => moveRow(i, 1)}
+              disabled={i === rows.length - 1}
+              className="w-6 h-6 flex items-center justify-center rounded border border-[#c9a84c]/20 text-[#c9a84c]/50 hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors disabled:opacity-20 text-xs leading-none"
+              title="Nach unten"
+            >▼</button>
+          </div>
           <input
             type="text"
             value={row.time}
@@ -1107,6 +1136,12 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
             placeholder="Beschreibung"
             className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
           />
+          {/* Insert after this row */}
+          <button
+            onClick={() => insertAfter(i)}
+            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/60 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors text-base"
+            title="Zeile danach einfügen"
+          >+</button>
           <button
             onClick={() => removeRow(i)}
             className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"
