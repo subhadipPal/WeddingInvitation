@@ -352,7 +352,7 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
       <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-5 text-center">
         {heading}
       </p>
-      <div className="relative">
+      <div className="relative max-h-[60vh] overflow-y-auto">
         {/* Centre vertical line */}
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2" />
 
