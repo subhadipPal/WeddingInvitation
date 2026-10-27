@@ -2,79 +2,191 @@
 import { useEffect, useState } from 'react'
 
 /**
- * Theatrical curtain that covers the viewport on first load and slides open.
- * Two fabric panels sweep left and right over ~1.6 s, revealing the page.
- * Unmounts itself after the animation completes to leave zero DOM overhead.
+ * Permanent proscenium curtain — Wireframes.md §F.
+ *
+ * - Covers full viewport on load; opens over 3 s to fringe stop-points.
+ * - Fringes stay for the lifetime of the page (component never unmounts).
+ * - 10 slats per panel, alternating #4a0a0a / #3a0808, opacity 0.82.
+ * - Gold inner edge 3 px, cream outer highlight 2 px, pleated hem radius 40 px.
+ * - prefers-reduced-motion → jump straight to fringe position, no animation.
+ *
+ * Fringe widths (per side) & translate stop-points:
+ *   ≤480 px mobile  : 6 vw  → panels stop at ±88% of own width
+ *   481–1024 px iPad: 10 vw → panels stop at ±80%
+ *   >1024 px desktop: 15 vw → panels stop at ±70%
  */
+
+const SLAT_COUNT = 10
+const SLAT_COLORS = ['#4a0a0a', '#3a0808']
+
 export default function MicCurtainFrame() {
-  const [phase, setPhase] = useState<'closed' | 'opening' | 'done'>('closed')
+  const [opened, setOpened] = useState(false)
 
   useEffect(() => {
-    // Brief pause so the page paint is complete before the curtain starts moving
-    const t1 = setTimeout(() => setPhase('opening'), 400)
-    const t2 = setTimeout(() => setPhase('done'), 2200)
-    return () => { clearTimeout(t1); clearTimeout(t2) }
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduced) { setOpened(true); return }
+    const t = setTimeout(() => setOpened(true), 200)
+    return () => clearTimeout(t)
   }, [])
 
-  if (phase === 'done') return null
-
-  const isOpening = phase === 'opening'
-
-  const panelBase =
-    'absolute inset-y-0 w-1/2 transition-transform duration-[1600ms] ease-in-out will-change-transform'
-  const fabricStyle: React.CSSProperties = {
-    background:
-      'linear-gradient(180deg, #2a0404 0%, #4a0808 15%, #3a0606 40%, #5a0a0a 65%, #3a0606 85%, #2a0404 100%)',
-    boxShadow: 'inset -8px 0 24px rgba(0,0,0,0.5), inset 8px 0 24px rgba(0,0,0,0.5)',
-  }
+  const slats = Array.from({ length: SLAT_COUNT })
 
   return (
-    <div className="fixed inset-0 z-[9999] overflow-hidden pointer-events-none">
-      {/* Left curtain panel */}
-      <div
-        className={`${panelBase} left-0`}
-        style={{
-          ...fabricStyle,
-          transform: isOpening ? 'translateX(-102%)' : 'translateX(0)',
-          boxShadow: 'inset -12px 0 30px rgba(0,0,0,0.6)',
-        }}
-      >
-        {/* Vertical fold lines — give fabric texture */}
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.4) 28px, rgba(0,0,0,0.4) 30px)',
-        }} />
-        {/* Gold trim on the inner edge */}
-        <div className="absolute right-0 inset-y-0 w-[3px] bg-gradient-to-b from-[#c9a84c]/0 via-[#c9a84c]/60 to-[#c9a84c]/0" />
-        {/* Monogram at curtain centre */}
-        <div className={`absolute right-6 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${isOpening ? 'opacity-0' : 'opacity-100'}`}>
-          <p className="font-script text-3xl text-[#c9a84c]/70 select-none">J</p>
-        </div>
+    <>
+      <style>{`
+        /* ── Panel base ─────────────────────────────────────────────── */
+        .mcp {
+          position: fixed;
+          inset-block: 0;
+          width: 50vw;
+          z-index: 9999;
+          pointer-events: none;
+          display: flex;
+          transition: transform 3s linear;
+          will-change: transform;
+        }
+        .mcp-l {
+          left: 0;
+          flex-direction: row;
+          transform: translateX(0);
+        }
+        .mcp-r {
+          right: 0;
+          flex-direction: row-reverse;
+          transform: translateX(0);
+        }
+
+        /* ── Opened stop-points (mobile default 6 vw fringe → 88%) ── */
+        .mcp-l.opened { transform: translateX(-88%); }
+        .mcp-r.opened { transform: translateX(88%); }
+        @media (min-width: 481px) {
+          .mcp-l.opened { transform: translateX(-80%); }
+          .mcp-r.opened { transform: translateX(80%); }
+        }
+        @media (min-width: 1025px) {
+          .mcp-l.opened { transform: translateX(-70%); }
+          .mcp-r.opened { transform: translateX(70%); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mcp { transition: none; }
+        }
+
+        /* ── Slat base ──────────────────────────────────────────────── */
+        .mcp-s {
+          flex: 1;
+          position: relative;
+          opacity: 0.82;
+          /* Fold-line shadow via ::before */
+        }
+
+        /* Fold-line texture — every slat */
+        .mcp-s::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: repeating-linear-gradient(
+            90deg,
+            transparent 0%,
+            transparent 85%,
+            rgba(0,0,0,0.16) 85%,
+            rgba(0,0,0,0.16) 100%
+          );
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        /* Pleated hem on outermost slat */
+        .mcp-l .mcp-s:first-child { border-bottom-left-radius: 40px; }
+        .mcp-r .mcp-s:first-child { border-bottom-right-radius: 40px; }
+
+        /* Cream outer highlight on outermost slat */
+        .mcp-l .mcp-s:first-child::after,
+        .mcp-r .mcp-s:first-child::after {
+          content: '';
+          position: absolute;
+          inset-block: 0;
+          width: 2px;
+          background: rgba(245,240,232,0.15);
+          z-index: 2;
+        }
+        .mcp-l .mcp-s:first-child::after { left: 0; }
+        .mcp-r .mcp-s:first-child::after { right: 0; }
+
+        /* Gold inner edge on innermost slat */
+        .mcp-l .mcp-s:last-child::after,
+        .mcp-r .mcp-s:last-child::after {
+          content: '';
+          position: absolute;
+          inset-block: 0;
+          width: 3px;
+          background: linear-gradient(
+            to bottom,
+            rgba(201,168,76,0) 0%,
+            #c9a84c 25%,
+            #c9a84c 75%,
+            rgba(201,168,76,0) 100%
+          );
+          z-index: 2;
+        }
+        .mcp-l .mcp-s:last-child::after  { right: 0; }
+        .mcp-r .mcp-s:last-child::after  { left: 0; }
+
+        /* ── Monogram ───────────────────────────────────────────────── */
+        .mcp-mono {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          font-family: var(--font-script, cursive);
+          font-size: 2.25rem;
+          color: rgba(201,168,76,0.6);
+          user-select: none;
+          pointer-events: none;
+          z-index: 3;
+          transition: opacity 0.6s ease 0.3s;
+        }
+        .mcp-l .mcp-mono { right: 12%; }
+        .mcp-r .mcp-mono { left: 12%; }
+        .opened .mcp-mono { opacity: 0; }
+
+        /* ── Centre seam ────────────────────────────────────────────── */
+        .mcp-seam {
+          position: fixed;
+          inset-block: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 1px;
+          z-index: 10000;
+          pointer-events: none;
+          background: linear-gradient(
+            to bottom,
+            rgba(201,168,76,0) 0%,
+            #c9a84c 20%,
+            #c9a84c 80%,
+            rgba(201,168,76,0) 100%
+          );
+          transition: opacity 0.5s ease 0.25s;
+        }
+        .mcp-seam.opened { opacity: 0; }
+      `}</style>
+
+      {/* Centre seam */}
+      <div className={`mcp-seam${opened ? ' opened' : ''}`} aria-hidden="true" />
+
+      {/* Left panel */}
+      <div className={`mcp mcp-l${opened ? ' opened' : ''}`} aria-hidden="true">
+        {slats.map((_, i) => (
+          <div key={i} className="mcp-s" style={{ background: SLAT_COLORS[i % 2] }} />
+        ))}
+        <span className="mcp-mono">J</span>
       </div>
 
-      {/* Right curtain panel */}
-      <div
-        className={`${panelBase} right-0`}
-        style={{
-          ...fabricStyle,
-          transform: isOpening ? 'translateX(102%)' : 'translateX(0)',
-          boxShadow: 'inset 12px 0 30px rgba(0,0,0,0.6)',
-        }}
-      >
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(0,0,0,0.4) 28px, rgba(0,0,0,0.4) 30px)',
-        }} />
-        {/* Gold trim on the inner edge */}
-        <div className="absolute left-0 inset-y-0 w-[3px] bg-gradient-to-b from-[#c9a84c]/0 via-[#c9a84c]/60 to-[#c9a84c]/0" />
-        <div className={`absolute left-6 top-1/2 -translate-y-1/2 transition-opacity duration-300 ${isOpening ? 'opacity-0' : 'opacity-100'}`}>
-          <p className="font-script text-3xl text-[#c9a84c]/70 select-none">S</p>
-        </div>
+      {/* Right panel */}
+      <div className={`mcp mcp-r${opened ? ' opened' : ''}`} aria-hidden="true">
+        {slats.map((_, i) => (
+          <div key={i} className="mcp-s" style={{ background: SLAT_COLORS[i % 2] }} />
+        ))}
+        <span className="mcp-mono">S</span>
       </div>
-
-      {/* Centre seam — gold line that splits as panels open */}
-      <div
-        className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-[#c9a84c]/0 via-[#c9a84c]/80 to-[#c9a84c]/0 transition-opacity duration-500"
-        style={{ opacity: isOpening ? 0 : 1 }}
-      />
-    </div>
+    </>
   )
 }

@@ -1,61 +1,11 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-// Petal colors: deep crimson + warm golden-marigold + dusty rose — Indian wedding palette
-const COLORS = [
-  '#8B0000', // deep crimson
-  '#C41E3A', // rose crimson
-  '#B22222', // firebrick red
-  '#D4872A', // marigold gold
-  '#C17817', // deep gold
-  '#A0522D', // sienna marigold
-  '#CD5C5C', // indian red
-  '#E8956D', // coral rose
-]
+const PETAL_COLOR = '#8a1538' // deep rose red — Wireframes.md §F.5
+const PETAL_COUNT = 20
 
-// sway keyframes: 9 variants matching reference site approach
-const SWAY_COUNT = 9
-
-function rnd(min: number, max: number) {
-  return min + Math.random() * (max - min)
-}
-
-function randInt(min: number, max: number) {
-  return Math.floor(rnd(min, max + 1))
-}
-
-type PetalConfig = {
-  id: number
-  left: number        // vw position
-  size: number        // px
-  color: string
-  fallDuration: number  // s
-  blowAnim: string
-  blowDuration: number
-  swayAnim: number    // 0–8
-  swayDuration: number
-  delay: number       // s
-  borderRadius: string
-}
-
-function makePetal(id: number): PetalConfig {
-  const size = rnd(8, 18)
-  const fallDuration = rnd(8, 16)
-  const blowTypes = ['blow-soft-left', 'blow-medium-left', 'blow-soft-right', 'blow-medium-right']
-  return {
-    id,
-    left: rnd(0, 100),
-    size,
-    color: COLORS[randInt(0, COLORS.length - 1)],
-    fallDuration,
-    blowAnim: blowTypes[randInt(0, blowTypes.length - 1)],
-    blowDuration: rnd(25, 40),
-    swayAnim: randInt(0, SWAY_COUNT - 1),
-    swayDuration: rnd(2, 5),
-    delay: rnd(0, fallDuration),
-    borderRadius: `${randInt(10, 22)}px ${randInt(1, 4)}px`,
-  }
-}
+function rnd(min: number, max: number) { return min + Math.random() * (max - min) }
+function randInt(min: number, max: number) { return Math.floor(rnd(min, max + 1)) }
 
 export default function MicPetalOverlay() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -64,71 +14,65 @@ export default function MicPetalOverlay() {
     const container = containerRef.current
     if (!container) return
 
-    const PETAL_COUNT = 55
-    const petals: PetalConfig[] = Array.from({ length: PETAL_COUNT }, (_, i) => makePetal(i))
-
-    // Inject keyframes into a style tag once
     const style = document.createElement('style')
     style.textContent = `
-      @keyframes mic-fall {
-        0%   { opacity: 0.9; top: 0px; }
-        100% { opacity: 0.15; top: 100%; }
+      @media (prefers-reduced-motion: no-preference) {
+        @keyframes mic-petal-fall {
+          0%   { top: -5%; opacity: 0.9; }
+          100% { top: 105%; opacity: 0.1; }
+        }
+        @keyframes mic-petal-sway-a {
+          0%   { transform: rotate(0deg)   translateX(0); }
+          30%  { transform: rotate(25deg)  translateX(30px); }
+          60%  { transform: rotate(-10deg) translateX(-15px); }
+          100% { transform: rotate(20deg)  translateX(20px); }
+        }
+        @keyframes mic-petal-sway-b {
+          0%   { transform: rotate(15deg)  translateX(0); }
+          40%  { transform: rotate(-20deg) translateX(-25px); }
+          80%  { transform: rotate(30deg)  translateX(25px); }
+          100% { transform: rotate(5deg)   translateX(-10px); }
+        }
+        @keyframes mic-petal-sway-c {
+          0%   { transform: rotate(-5deg)  translateX(0); }
+          50%  { transform: rotate(30deg)  translateX(35px); }
+          100% { transform: rotate(-15deg) translateX(-20px); }
+        }
       }
-      @keyframes mic-blow-soft-left {
-        0%   { margin-left: 0; }
-        100% { margin-left: -40vw; }
-      }
-      @keyframes mic-blow-medium-left {
-        0%   { margin-left: 0; }
-        100% { margin-left: -80vw; }
-      }
-      @keyframes mic-blow-soft-right {
-        0%   { margin-left: 0; }
-        100% { margin-left: 40vw; }
-      }
-      @keyframes mic-blow-medium-right {
-        0%   { margin-left: 0; }
-        100% { margin-left: 80vw; }
-      }
-      ${Array.from({ length: SWAY_COUNT }, (_, i) => {
-        const base = i * 12
-        return `
-          @keyframes mic-sway-${i} {
-            0%   { transform: rotate(${base - 5}deg); }
-            40%  { transform: rotate(${base + 30}deg); }
-            100% { transform: rotate(${base + 8}deg); }
-          }
-        `
-      }).join('')}
     `
     document.head.appendChild(style)
 
-    // Create DOM petal nodes
-    const nodes: HTMLDivElement[] = petals.map(p => {
+    const swayAnims = ['mic-petal-sway-a', 'mic-petal-sway-b', 'mic-petal-sway-c']
+
+    const nodes: HTMLDivElement[] = Array.from({ length: PETAL_COUNT }, () => {
+      const size = rnd(9, 17)
+      const fallDur = rnd(9, 18)
+      const swayDur = rnd(2.5, 5)
+      const delay = rnd(0, fallDur * 0.9)
+      const sway = swayAnims[randInt(0, swayAnims.length - 1)]
+      const br = `${randInt(12, 22)}px ${randInt(1, 4)}px`
+
       const el = document.createElement('div')
       el.style.cssText = `
         pointer-events: none;
         position: absolute;
-        left: ${p.left}vw;
-        top: -20px;
-        width: ${p.size}px;
-        height: ${Math.round(p.size * 1.2)}px;
-        background: ${p.color};
-        border-radius: ${p.borderRadius};
-        opacity: 0.85;
+        left: ${rnd(2, 98)}vw;
+        top: -5%;
+        width: ${size}px;
+        height: ${Math.round(size * 1.25)}px;
+        background: ${PETAL_COLOR};
+        border-radius: ${br};
+        opacity: 0.88;
         animation:
-          mic-fall ${p.fallDuration}s linear ${p.delay}s infinite,
-          ${p.blowAnim.replace('blow-', 'mic-blow-')} ${p.blowDuration}s linear 0s infinite,
-          mic-sway-${p.swayAnim} ${p.swayDuration}s linear 0s infinite;
+          mic-petal-fall ${fallDur}s linear ${delay}s 1 forwards,
+          ${sway} ${swayDur}s ease-in-out ${delay}s 1 forwards;
       `
+      el.addEventListener('animationend', () => el.remove(), { once: true })
       container.appendChild(el)
       return el
     })
 
-    return () => {
-      nodes.forEach(n => n.remove())
-      style.remove()
-    }
+    return () => { nodes.forEach(n => n.isConnected && n.remove()); style.remove() }
   }, [])
 
   return (
