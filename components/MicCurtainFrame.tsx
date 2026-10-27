@@ -32,6 +32,9 @@ export default function MicCurtainFrame() {
     if (opened) return
     setOpened(true)
 
+    // Signal petal overlay to start
+    window.dispatchEvent(new CustomEvent('mic:curtain-opened'))
+
     // Play music — audio element inserted once; user gesture satisfies autoplay policy
     const audio = document.getElementById('mic-bg-audio') as HTMLAudioElement | null
     if (audio) {

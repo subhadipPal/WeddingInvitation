@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useRef } from 'react'
 
-const PETAL_COLOR = '#8a1538' // deep rose red — Wireframes.md §F.5
+// Theme colours: deep rose red, white, gold
+const PETAL_COLORS = ['#8a1538', '#f5f0e8', '#c9a84c']
 const PETAL_COUNT = 20
 
 function rnd(min: number, max: number) { return min + Math.random() * (max - min) }
@@ -44,35 +45,47 @@ export default function MicPetalOverlay() {
 
     const swayAnims = ['mic-petal-sway-a', 'mic-petal-sway-b', 'mic-petal-sway-c']
 
-    const nodes: HTMLDivElement[] = Array.from({ length: PETAL_COUNT }, () => {
-      const size = rnd(9, 17)
-      const fallDur = rnd(9, 18)
-      const swayDur = rnd(2.5, 5)
-      const delay = rnd(0, fallDur * 0.9)
-      const sway = swayAnims[randInt(0, swayAnims.length - 1)]
-      const br = `${randInt(12, 22)}px ${randInt(1, 4)}px`
+    function spawnPetals(el: HTMLDivElement) {
+      return Array.from({ length: PETAL_COUNT }, () => {
+        const size = rnd(9, 17)
+        const fallDur = rnd(9, 18)
+        const swayDur = rnd(2.5, 5)
+        const delay = rnd(0, fallDur * 0.9)
+        const sway = swayAnims[randInt(0, swayAnims.length - 1)]
+        const br = `${randInt(12, 22)}px ${randInt(1, 4)}px`
+        const color = PETAL_COLORS[randInt(0, PETAL_COLORS.length - 1)]
 
-      const el = document.createElement('div')
-      el.style.cssText = `
-        pointer-events: none;
-        position: absolute;
-        left: ${rnd(2, 98)}vw;
-        top: -5%;
-        width: ${size}px;
-        height: ${Math.round(size * 1.25)}px;
-        background: ${PETAL_COLOR};
-        border-radius: ${br};
-        opacity: 0.88;
-        animation:
-          mic-petal-fall ${fallDur}s linear ${delay}s 1 forwards,
-          ${sway} ${swayDur}s ease-in-out ${delay}s 1 forwards;
-      `
-      el.addEventListener('animationend', () => el.remove(), { once: true })
-      container.appendChild(el)
-      return el
-    })
+        const node = document.createElement('div')
+        node.style.cssText = `
+          pointer-events: none;
+          position: absolute;
+          left: ${rnd(2, 98)}vw;
+          top: -5%;
+          width: ${size}px;
+          height: ${Math.round(size * 1.25)}px;
+          background: ${color};
+          border-radius: ${br};
+          opacity: 0.88;
+          animation:
+            mic-petal-fall ${fallDur}s linear ${delay}s 1 forwards,
+            ${sway} ${swayDur}s ease-in-out ${delay}s 1 forwards;
+        `
+        node.addEventListener('animationend', () => node.remove(), { once: true })
+        el.appendChild(node)
+        return node
+      })
+    }
 
-    return () => { nodes.forEach(n => n.isConnected && n.remove()); style.remove() }
+    // Wait for curtain-opened signal before spawning petals
+    let nodes: HTMLDivElement[] = []
+    const onOpen = () => { nodes = spawnPetals(container) }
+    window.addEventListener('mic:curtain-opened', onOpen, { once: true })
+
+    return () => {
+      window.removeEventListener('mic:curtain-opened', onOpen)
+      nodes.forEach(n => n.isConnected && n.remove())
+      style.remove()
+    }
   }, [])
 
   return (
