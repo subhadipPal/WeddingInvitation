@@ -5,9 +5,9 @@ import { eq } from 'drizzle-orm'
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ token: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { token } = await params
+  const { id: token } = await params
   const guest = await db.select().from(guests).where(eq(guests.token, token)).limit(1)
   if (!guest.length) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
