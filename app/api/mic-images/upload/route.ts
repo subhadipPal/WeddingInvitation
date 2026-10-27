@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer())
 
+  if (buffer.length === 0) {
+    return NextResponse.json({ error: 'File is empty — please select a valid image' }, { status: 400 })
+  }
+
   // Resize to ≤1600px wide, convert to JPEG q=82
   let processed: Buffer
   try {
@@ -46,8 +50,9 @@ export async function POST(req: NextRequest) {
       .resize({ width: 1600, withoutEnlargement: true })
       .jpeg({ quality: 82 })
       .toBuffer()
-  } catch {
-    return NextResponse.json({ error: 'Image processing failed — ensure file is a valid image' }, { status: 422 })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: `Image processing failed: ${msg}` }, { status: 422 })
   }
 
   const blobPath = `mic/${slot}/${variant}.jpg`
