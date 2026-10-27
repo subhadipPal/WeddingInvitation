@@ -328,7 +328,23 @@ export default function AdminPage() {
   const micContentRef = useRef<Record<MicContentKey, string>>(MIC_DEFAULTS)
   const [micUploading, setMicUploading] = useState<string | null>(null)
   const [micUploadStatus, setMicUploadStatus] = useState<Record<string, 'ok' | 'error'>>({})
+  // slot/variant → raw blob URL (loaded from DB, updated after upload/delete)
+  const [micImages, setMicImages] = useState<Record<string, string>>({})
 
+  const loadMicImages = useCallback(async () => {
+    try {
+      const res = await fetch('/api/mic-images')
+      if (!res.ok) return
+      const data: Record<string, Record<string, string>> = await res.json()
+      const flat: Record<string, string> = {}
+      for (const [slot, variants] of Object.entries(data)) {
+        for (const [variant, url] of Object.entries(variants)) {
+          flat[`${slot}/${variant}`] = url as string
+        }
+      }
+      setMicImages(flat)
+    } catch { /* ignore */ }
+  }, [])
   // ── Deploy logic ─────────────────────────────────────────────────────────────
 
   const handleRedeploy = async () => {
@@ -489,8 +505,9 @@ export default function AdminPage() {
         micContentRef.current = d
       })
       .catch(() => {/* keep defaults */})
+    loadMicImages()
     return () => controller.abort()
-  }, [tab])
+  }, [tab, loadMicImages])
 
   const handleMicChange = (key: MicContentKey, value: string) => {
     setMicContent(prev => {
@@ -529,11 +546,31 @@ export default function AdminPage() {
         method: 'POST',
         body: form,
       })
-      setMicUploadStatus(prev => ({ ...prev, [key]: res.ok ? 'ok' : 'error' }))
+      if (res.ok) {
+        setMicUploadStatus(prev => ({ ...prev, [key]: 'ok' }))
+        await loadMicImages()
+      } else {
+        const body = await res.json().catch(() => ({}))
+        setMicUploadStatus(prev => ({ ...prev, [key]: 'error' }))
+        console.error('Upload error:', body)
+      }
     } catch {
       setMicUploadStatus(prev => ({ ...prev, [key]: 'error' }))
     }
     setMicUploading(null)
+  }
+
+  const handleMicImageDelete = async (slot: MicImageSlot, variant: string) => {
+    const key = `${slot}/${variant}`
+    if (!confirm('Bild löschen?')) return
+    setMicUploading(key)
+    try {
+      await fetch(`/api/mic-images?slot=${slot}&variant=${variant}`, { method: 'DELETE' })
+      setMicImages(prev => { const n = { ...prev }; delete n[key]; return n })
+      setMicUploadStatus(prev => { const n = { ...prev }; delete n[key]; return n })
+    } finally {
+      setMicUploading(null)
+    }
   }
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -902,39 +939,55 @@ export default function AdminPage() {
                             const key = `${slot}/${v}`
                             const isUp = micUploading === key
                             const status = micUploadStatus[key]
+                            const existingUrl = micImages[key]
+                            const proxyUrl = existingUrl
+                              ? `/api/mic-images/img?url=${encodeURIComponent(existingUrl)}`
+                              : null
                             return (
-                              <label key={v} className="flex items-center gap-3 cursor-pointer group">
+                              <div key={v} className="flex items-center gap-3">
                                 <span className="font-serif text-[#c9a84c]/80 text-sm w-16 shrink-0 uppercase tracking-wider">
                                   {slot === 'hero' ? v : 'Bild'}
                                 </span>
-                                <div className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
-                                  isUp
-                                    ? 'border-[#c9a84c]/60 bg-[#c9a84c]/5'
-                                    : 'border-[#c9a84c]/20 bg-black/20 hover:border-[#c9a84c]/40 group-hover:bg-black/30'
-                                }`}>
-                                  {isUp ? (
-                                    <span className="font-serif text-[#c9a84c]/60 text-sm animate-pulse">Hochladen…</span>
-                                  ) : (
-                                    <>
+                                {proxyUrl ? (
+                                  /* Uploaded — show thumbnail + replace/delete */
+                                  <div className="flex-1 flex items-center gap-2">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={proxyUrl} alt="" className="h-10 w-16 object-cover rounded border border-[#c9a84c]/30" />
+                                    <label className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-[#c9a84c]/20 bg-black/20 hover:border-[#c9a84c]/40 cursor-pointer transition-colors">
                                       <span className="font-serif text-[#f5f0e8]/70 text-sm flex-1">
-                                        {status === 'ok' ? '✓ Hochgeladen' : status === 'error' ? '✕ Fehler' : 'Datei wählen…'}
+                                        {isUp ? <span className="animate-pulse text-[#c9a84c]/60">Hochladen…</span> : 'Ersetzen'}
                                       </span>
                                       <span className="text-[#c9a84c] text-sm">↑</span>
-                                    </>
-                                  )}
-                                </div>
-                                <input
-                                  type="file"
-                                  accept="image/*"
-                                  className="sr-only"
-                                  disabled={!!micUploading}
-                                  onChange={e => {
-                                    const f = e.target.files?.[0]
-                                    if (f) handleMicImageUpload(slot, v, f)
-                                    e.target.value = ''
-                                  }}
-                                />
-                              </label>
+                                      <input type="file" accept="image/*" className="sr-only" disabled={!!micUploading}
+                                        onChange={e => { const f = e.target.files?.[0]; if (f) handleMicImageUpload(slot, v, f); e.target.value = '' }} />
+                                    </label>
+                                    <button
+                                      onClick={() => handleMicImageDelete(slot, v)}
+                                      disabled={!!micUploading}
+                                      className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors disabled:opacity-30"
+                                      title="Bild löschen"
+                                    >✕</button>
+                                  </div>
+                                ) : (
+                                  /* Not uploaded yet */
+                                  <label className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors cursor-pointer group ${
+                                    isUp ? 'border-[#c9a84c]/60 bg-[#c9a84c]/5' : 'border-[#c9a84c]/20 bg-black/20 hover:border-[#c9a84c]/40 group-hover:bg-black/30'
+                                  }`}>
+                                    {isUp ? (
+                                      <span className="font-serif text-[#c9a84c]/60 text-sm animate-pulse">Hochladen…</span>
+                                    ) : (
+                                      <>
+                                        <span className="font-serif text-[#f5f0e8]/70 text-sm flex-1">
+                                          {status === 'error' ? '✕ Fehler' : 'Datei wählen…'}
+                                        </span>
+                                        <span className="text-[#c9a84c] text-sm">↑</span>
+                                      </>
+                                    )}
+                                    <input type="file" accept="image/*" className="sr-only" disabled={!!micUploading}
+                                      onChange={e => { const f = e.target.files?.[0]; if (f) handleMicImageUpload(slot, v, f); e.target.value = '' }} />
+                                  </label>
+                                )}
+                              </div>
                             )
                           })}
                         </div>
