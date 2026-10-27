@@ -4,7 +4,7 @@ import styles from './MicPetalOverlay.module.css'
 
 // Theme colours: deep rose red, white, gold
 const PETAL_COLORS = ['#8a1538', '#f5f0e8', '#c9a84c']
-const PETAL_COUNT = 20
+const PETAL_COUNT = 30
 
 function rnd(min: number, max: number) { return min + Math.random() * (max - min) }
 function randInt(min: number, max: number) { return Math.floor(rnd(min, max + 1)) }
@@ -46,12 +46,11 @@ export default function MicPetalOverlay() {
 
     const swayAnims = ['mic-petal-sway-a', 'mic-petal-sway-b', 'mic-petal-sway-c']
 
-    function spawnPetals(el: HTMLDivElement) {
-      return Array.from({ length: PETAL_COUNT }, () => {
+    function spawnPetal(el: HTMLDivElement, initialDelay?: number) {
         const size = rnd(9, 17)
-        const fallDur = rnd(9, 18)
+        const fallDur = rnd(12, 22)
         const swayDur = rnd(2.5, 5)
-        const delay = rnd(0, fallDur * 0.9)
+        const delay = initialDelay ?? 0
         const sway = swayAnims[randInt(0, swayAnims.length - 1)]
         const br = `${randInt(12, 22)}px ${randInt(1, 4)}px`
         const color = PETAL_COLORS[randInt(0, PETAL_COLORS.length - 1)]
@@ -69,12 +68,24 @@ export default function MicPetalOverlay() {
           opacity: 0.88;
           animation:
             mic-petal-fall ${fallDur}s linear ${delay}s 1 forwards,
-            ${sway} ${swayDur}s ease-in-out ${delay}s 1 forwards;
+            ${sway} ${swayDur}s ease-in-out ${delay}s infinite;
         `
-        node.addEventListener('animationend', () => node.remove(), { once: true })
+        // Only remove + respawn when the fall animation finishes (reaches 105%)
+        // No delay on respawn — keeps density constant throughout
+        node.addEventListener('animationend', (e: AnimationEvent) => {
+          if (e.animationName === 'mic-petal-fall') {
+            node.remove()
+            if (el.isConnected) spawnPetal(el)
+          }
+        })
         el.appendChild(node)
         return node
-      })
+      }
+
+    function spawnPetals(el: HTMLDivElement) {
+      // Stagger initial wave (0–3s) so petals reach bottom at different times,
+      // ensuring continuous density forever via zero-delay respawns.
+      return Array.from({ length: PETAL_COUNT }, () => spawnPetal(el, rnd(0, 3)))
     }
 
     // Wait for curtain-opened signal before spawning petals
@@ -84,6 +95,7 @@ export default function MicPetalOverlay() {
 
     return () => {
       window.removeEventListener('mic:curtain-opened', onOpen)
+      // Removing container children stops respawn (el.isConnected check in animationend)
       nodes.forEach(n => n.isConnected && n.remove())
       style.remove()
     }
