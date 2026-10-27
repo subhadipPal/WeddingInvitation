@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { translations as defaults, GUEST_FACING_KEYS, HINDU_GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
 import { triggerRedeploy } from './actions'
+import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, type MicContentKey, type MicImageSlot } from '@/lib/mic'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -36,7 +37,7 @@ interface Guest {
   micRsvp: MicRsvp | null
 }
 
-type Tab = 'guests' | 'content'
+type Tab = 'guests' | 'content' | 'mic'
 type ContentState = { de: Record<string, string>; en: Record<string, string>; bn: Record<string, string> }
 
 // ── Content key groups for the editor UI ───────────────────────────────────────
@@ -77,6 +78,134 @@ const CONTENT_GROUPS: { label: string; keys: (keyof Translations)[]; deOnly?: bo
     enBn: true,
   },
 ]
+
+// ── MIC key groups for the editor UI ──────────────────────────────────────────
+
+interface MicGroup {
+  label: string
+  keys: MicContentKey[]
+  timetable?: boolean // textarea keys that use the multiline timetable format
+  toggles?: boolean   // boolean toggle keys (stored as 'true'/'false')
+}
+
+const MIC_GROUPS: MicGroup[] = [
+  {
+    label: 'Hero',
+    keys: ['micHeroDate', 'micImagePlaceholder', 'micMenuOpenStd', 'micInvalidTokenBody'],
+  },
+  {
+    label: '22 Januar — Zeremonie',
+    keys: ['mic22Eyebrow', 'mic22DateLine', 'mic22Body', 'mic22BodyMulti',
+           'mic22TimetableHeading', 'mic22Timetable',
+           'mic22VenueVillaName', 'mic22VenueVillaAddress',
+           'mic22VenueHofName', 'mic22VenueHofAddress', 'mic22RouteButton'],
+    timetable: true,
+  },
+  {
+    label: '23 Januar — Feier',
+    keys: ['mic23Eyebrow', 'mic23DateLine', 'mic23Tagline', 'mic23Body', 'mic23BodyMulti',
+           'mic23TimetableHeading', 'mic23Timetable',
+           'mic23VenueName', 'mic23VenueAddress'],
+    timetable: true,
+  },
+  {
+    label: 'FAQ — Häufige Fragen',
+    keys: ['micFaqHeading',
+           'micFaqDressCodeTitle', 'micFaqDressCodeBody',
+           'micFaqGiftsTitle', 'micFaqGiftsBody',
+           'micFaqChildrenTitle', 'micFaqChildrenBody',
+           'micFaqRsvpDeadlineTitle', 'micFaqRsvpDeadlineBody',
+           'micFaqPhotosTitle', 'micFaqPhotosBody'],
+  },
+  {
+    label: 'RSVP-Formular',
+    keys: ['micRsvpHeading', 'micRsvpGreeting', 'micRsvpGreetingMulti',
+           'micRsvpQuestion22', 'micRsvpQuestion23',
+           'micRsvpYes', 'micRsvpNo',
+           'micRsvpAddressLabel', 'micRsvpAddressPlaceholder',
+           'micRsvpNoteLabel', 'micRsvpNotePlaceholder',
+           'micRsvpSubmit', 'micRsvpUpdate',
+           'micRsvpConfirmation', 'micRsvpConfirmationMulti'],
+  },
+  {
+    label: 'Abschluss',
+    keys: ['micClosingBody', 'micClosingSign'],
+  },
+  {
+    label: 'Animationen',
+    keys: ['micEnableCurtain', 'micEnablePetals'],
+    toggles: true,
+  },
+]
+
+const MIC_KEY_LABELS: Partial<Record<MicContentKey, string>> = {
+  micHeroDate: 'Datum im Hero (z.B. "22. und 23. Januar 2027")',
+  micImagePlaceholder: 'Platzhaltertext wenn kein Bild hochgeladen',
+  micMenuOpenStd: 'Hamburger-Menü — "Save-the-Date öffnen"',
+  micInvalidTokenBody: 'Text bei ungültigem Token',
+  mic22Eyebrow: '22 Jan — Wochentag-Label (oben)',
+  mic22DateLine: '22 Jan — Datum',
+  mic22Body: '22 Jan — Einladungstext (Du-Form)',
+  mic22BodyMulti: '22 Jan — Einladungstext (Ihr-Form)',
+  mic22TimetableHeading: '22 Jan — Ablauf-Überschrift',
+  mic22Timetable: '22 Jan — Ablauf (je Zeile: "HH:MM Uhr   Beschreibung")',
+  mic22VenueVillaName: '22 Jan — Hochzeitsvilla Name',
+  mic22VenueVillaAddress: '22 Jan — Hochzeitsvilla Adresse',
+  mic22VenueHofName: '22 Jan — Zehlendorfer Hof Name',
+  mic22VenueHofAddress: '22 Jan — Zehlendorfer Hof Adresse',
+  mic22RouteButton: 'Route-Button Beschriftung',
+  mic23Eyebrow: '23 Jan — Wochentag-Label (oben)',
+  mic23DateLine: '23 Jan — Datum',
+  mic23Tagline: '23 Jan — Tagline',
+  mic23Body: '23 Jan — Einladungstext (Du-Form)',
+  mic23BodyMulti: '23 Jan — Einladungstext (Ihr-Form)',
+  mic23TimetableHeading: '23 Jan — Ablauf-Überschrift',
+  mic23Timetable: '23 Jan — Ablauf (je Zeile: "HH:MM Uhr   Beschreibung")',
+  mic23VenueName: '23 Jan — Venue Name',
+  mic23VenueAddress: '23 Jan — Venue Adresse',
+  micFaqHeading: 'FAQ — Hauptüberschrift',
+  micFaqDressCodeTitle: 'FAQ — Dresscode Titel',
+  micFaqDressCodeBody: 'FAQ — Dresscode Text',
+  micFaqGiftsTitle: 'FAQ — Geschenke Titel',
+  micFaqGiftsBody: 'FAQ — Geschenke Text',
+  micFaqChildrenTitle: 'FAQ — Kinder Titel',
+  micFaqChildrenBody: 'FAQ — Kinder Text',
+  micFaqRsvpDeadlineTitle: 'FAQ — RSVP-Frist Titel',
+  micFaqRsvpDeadlineBody: 'FAQ — RSVP-Frist Text',
+  micFaqPhotosTitle: 'FAQ — Fotos Titel',
+  micFaqPhotosBody: 'FAQ — Fotos Text',
+  micRsvpHeading: 'RSVP — Überschrift',
+  micRsvpGreeting: 'RSVP — Begrüßung (Du-Form)',
+  micRsvpGreetingMulti: 'RSVP — Begrüßung (Ihr-Form)',
+  micRsvpQuestion22: 'RSVP — Frage 22. Jan',
+  micRsvpQuestion23: 'RSVP — Frage 23. Jan',
+  micRsvpYes: 'RSVP — Ja-Button',
+  micRsvpNo: 'RSVP — Nein-Button',
+  micRsvpAddressLabel: 'RSVP — Adressfeld Label',
+  micRsvpAddressPlaceholder: 'RSVP — Adressfeld Platzhalter',
+  micRsvpNoteLabel: 'RSVP — Notizfeld Label',
+  micRsvpNotePlaceholder: 'RSVP — Notizfeld Platzhalter',
+  micRsvpSubmit: 'RSVP — Senden-Button',
+  micRsvpUpdate: 'RSVP — Aktualisieren-Button',
+  micRsvpConfirmation: 'RSVP — Bestätigung (Du-Form)',
+  micRsvpConfirmationMulti: 'RSVP — Bestätigung (Ihr-Form)',
+  micClosingBody: 'Abschluss — Text',
+  micClosingSign: 'Abschluss — Unterschrift',
+  micEnableCurtain: 'Vorhang-Animation aktiviert',
+  micEnablePetals: 'Blütenblatt-Animation aktiviert',
+}
+
+const MIC_TIMETABLE_KEYS: Set<MicContentKey> = new Set(['mic22Timetable', 'mic23Timetable'])
+const MIC_TOGGLE_KEYS: Set<MicContentKey> = new Set(['micEnableCurtain', 'micEnablePetals'])
+
+const MIC_SLOT_LABELS: Record<MicImageSlot, string> = {
+  hero: 'Hero (Startbild)',
+  day22Bg: '22 Jan — Hintergrund',
+  day23Bg: '23 Jan — Hintergrund',
+  faqBg: 'FAQ — Hintergrund',
+  rsvpBg: 'RSVP — Hintergrund',
+  closingBg: 'Abschluss — Hintergrund',
+}
 
 // ── Human-readable labels for each key ────────────────────────────────────────
 
@@ -190,6 +319,15 @@ export default function AdminPage() {
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const contentRef = useRef<ContentState>(defaultContent())
+
+  // MIC content tab state
+  const [micContent, setMicContent] = useState<Record<MicContentKey, string>>(MIC_DEFAULTS)
+  const [micSaveStatus, setMicSaveStatus] = useState<'idle' | 'pending' | 'saving' | 'saved' | 'error'>('idle')
+  const micSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const micDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const micContentRef = useRef<Record<MicContentKey, string>>(MIC_DEFAULTS)
+  const [micUploading, setMicUploading] = useState<string | null>(null)
+  const [micUploadStatus, setMicUploadStatus] = useState<Record<string, 'ok' | 'error'>>({})
 
   // ── Deploy logic ─────────────────────────────────────────────────────────────
 
@@ -339,6 +477,65 @@ export default function AdminPage() {
     debounceRef.current = setTimeout(() => doSave(contentRef.current), 5000)
   }
 
+  // ── MIC content logic ───────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (tab !== 'mic') return
+    const controller = new AbortController()
+    fetch('/api/mic-content', { signal: controller.signal })
+      .then(r => r.json())
+      .then((d: Record<MicContentKey, string>) => {
+        setMicContent(d)
+        micContentRef.current = d
+      })
+      .catch(() => {/* keep defaults */})
+    return () => controller.abort()
+  }, [tab])
+
+  const handleMicChange = (key: MicContentKey, value: string) => {
+    setMicContent(prev => {
+      const next = { ...prev, [key]: value }
+      micContentRef.current = next
+      if (micDebounceRef.current) clearTimeout(micDebounceRef.current)
+      micDebounceRef.current = setTimeout(() => doMicSave(micContentRef.current), 5000)
+      setMicSaveStatus('pending')
+      return next
+    })
+  }
+
+  const doMicSave = async (data: Record<MicContentKey, string>) => {
+    setMicSaveStatus('saving')
+    try {
+      const res = await fetch('/api/mic-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      setMicSaveStatus(res.ok ? 'saved' : 'error')
+    } catch {
+      setMicSaveStatus('error')
+    }
+    if (micSaveTimerRef.current) clearTimeout(micSaveTimerRef.current)
+    micSaveTimerRef.current = setTimeout(() => setMicSaveStatus('idle'), 3000)
+  }
+
+  const handleMicImageUpload = async (slot: MicImageSlot, variant: string, file: File) => {
+    const key = `${slot}/${variant}`
+    setMicUploading(key)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await fetch(`/api/mic-images/upload?slot=${slot}&variant=${variant}`, {
+        method: 'POST',
+        body: form,
+      })
+      setMicUploadStatus(prev => ({ ...prev, [key]: res.ok ? 'ok' : 'error' }))
+    } catch {
+      setMicUploadStatus(prev => ({ ...prev, [key]: 'error' }))
+    }
+    setMicUploading(null)
+  }
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   const toastVisible = saveStatus !== 'idle'
@@ -377,7 +574,7 @@ export default function AdminPage() {
 
         {/* Tab bar */}
         <div className="flex gap-1 mb-6 bg-black/30 rounded-xl p-1 w-fit">
-          {(['guests', 'content'] as const).map(t => (
+          {(['guests', 'content', 'mic'] as const).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -387,7 +584,7 @@ export default function AdminPage() {
                   : 'text-[#f5f0e8]/60 hover:text-[#f5f0e8]'
               }`}
             >
-              {t === 'guests' ? 'Guests' : 'Content'}
+              {t === 'guests' ? 'Guests' : t === 'content' ? 'Save-the-Date' : 'Einladung (MIC)'}
             </button>
           ))}
         </div>
@@ -673,6 +870,143 @@ export default function AdminPage() {
               )}
               {saveStatus === 'error' && (
                 <span className="font-serif text-red-400 text-xs">Save failed — will retry on next change</span>
+              )}
+            </div>
+          </div>
+        )}
+        {/* ── MIC Content tab ── */}
+        {tab === 'mic' && (
+          <div className="max-w-5xl flex-1 flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-6 scrollbar-gold">
+              <p className="font-serif text-[#f5f0e8]/50 text-sm mb-6">
+                Einladungstext bearbeiten. Automatisch gespeichert 5s nach Änderung.
+              </p>
+
+              {/* Image upload section */}
+              <div className="mb-8">
+                <h2 className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
+                  Bilder hochladen
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {MIC_IMAGE_SLOTS.map(slot => {
+                    const variants = slot === 'hero'
+                      ? ['mobile', 'tablet', 'desktop']
+                      : ['default']
+                    return (
+                      <div key={slot} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
+                        <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
+                          {MIC_SLOT_LABELS[slot]}
+                        </p>
+                        <div className="flex flex-col gap-2">
+                          {variants.map(v => {
+                            const key = `${slot}/${v}`
+                            const isUp = micUploading === key
+                            const status = micUploadStatus[key]
+                            return (
+                              <label key={v} className="flex items-center gap-3 cursor-pointer group">
+                                <span className="font-serif text-[#c9a84c]/70 text-xs w-16 shrink-0 uppercase tracking-wider">
+                                  {slot === 'hero' ? v : 'Bild'}
+                                </span>
+                                <div className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
+                                  isUp
+                                    ? 'border-[#c9a84c]/60 bg-[#c9a84c]/5'
+                                    : 'border-[#c9a84c]/20 bg-black/20 hover:border-[#c9a84c]/40 group-hover:bg-black/30'
+                                }`}>
+                                  {isUp ? (
+                                    <span className="font-serif text-[#c9a84c]/60 text-xs animate-pulse">Hochladen…</span>
+                                  ) : (
+                                    <>
+                                      <span className="font-serif text-[#f5f0e8]/40 text-xs flex-1">
+                                        {status === 'ok' ? '✓ Hochgeladen' : status === 'error' ? '✕ Fehler' : 'Datei wählen…'}
+                                      </span>
+                                      <span className="text-[#c9a84c] text-sm">↑</span>
+                                    </>
+                                  )}
+                                </div>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="sr-only"
+                                  disabled={!!micUploading}
+                                  onChange={e => {
+                                    const f = e.target.files?.[0]
+                                    if (f) handleMicImageUpload(slot, v, f)
+                                    e.target.value = ''
+                                  }}
+                                />
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Content key groups */}
+              {MIC_GROUPS.map(group => (
+                <div key={group.label} className="mb-8">
+                  <h2 className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
+                    {group.label}
+                  </h2>
+                  <div className="flex flex-col gap-4">
+                    {group.keys.map(key => {
+                      const isToggle = MIC_TOGGLE_KEYS.has(key)
+                      const isTimetable = MIC_TIMETABLE_KEYS.has(key)
+                      return (
+                        <div key={key} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
+                          <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
+                            {MIC_KEY_LABELS[key] ?? key}
+                          </p>
+                          {isToggle ? (
+                            <label className="flex items-center gap-3 cursor-pointer">
+                              <div
+                                className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                                  micContent[key] === 'true' ? 'bg-[#c9a84c]' : 'bg-white/20'
+                                }`}
+                                onClick={() => handleMicChange(key, micContent[key] === 'true' ? 'false' : 'true')}
+                              >
+                                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                                  micContent[key] === 'true' ? 'translate-x-5' : 'translate-x-0.5'
+                                }`} />
+                              </div>
+                              <span className="font-serif text-[#f5f0e8] text-sm">
+                                {micContent[key] === 'true' ? 'Aktiviert' : 'Deaktiviert'}
+                              </span>
+                            </label>
+                          ) : (
+                            <>
+                              <textarea
+                                value={micContent[key] ?? ''}
+                                onChange={e => handleMicChange(key, e.target.value)}
+                                rows={isTimetable ? 8 : key.includes('Body') || key.includes('body') ? 4 : 2}
+                                className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-y"
+                              />
+                              {isTimetable && (
+                                <p className="font-serif text-[#f5f0e8]/30 text-[11px] mt-1.5">
+                                  Format: <code className="text-[#c9a84c]/60">14:00 Uhr{'   '}Herzlich willkommen</code> — eine Zeile pro Eintrag, min. 2 Leerzeichen als Trenner
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
+              {(micSaveStatus === 'pending' || micSaveStatus === 'saving') && (
+                <span className="font-serif text-[#c9a84c]/60 text-xs">{micSaveStatus === 'pending' ? 'Nicht gespeichert…' : 'Speichern…'}</span>
+              )}
+              {micSaveStatus === 'saved' && (
+                <span className="font-serif text-green-400 text-xs">Gespeichert ✓</span>
+              )}
+              {micSaveStatus === 'error' && (
+                <span className="font-serif text-red-400 text-xs">Fehler beim Speichern — wird beim nächsten Ändern wiederholt</span>
               )}
             </div>
           </div>
