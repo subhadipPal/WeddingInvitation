@@ -76,6 +76,7 @@ export default function MicCurtainFrame() {
           perspective-origin: center center;
           transition: transform ${OPEN_DURATION}s cubic-bezier(0.4,0,0.2,1);
           will-change: transform;
+          opacity: 0.5;
         }
         .mcp-l {
           left: 0;
