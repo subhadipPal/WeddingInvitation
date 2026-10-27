@@ -316,34 +316,126 @@ function SectionBg({ url, placeholder }: { url?: string; placeholder: string }) 
   )
 }
 
+const TIMETABLE_ICONS: [RegExp, string][] = [
+  [/eintreff|ankommen|herzlich will/i, '🚶'],
+  [/first look/i, '💑'],
+  [/einlass/i, '🚪'],
+  [/trauung|ja|zeremonie|ceremony/i, '💍'],
+  [/glückwunsch|foto|photo|shooting/i, '📸'],
+  [/essen|dinner|buffet|tisch|hof/i, '🍽️'],
+  [/kaffee|torte|cake/i, '🎂'],
+  [/ginergy|aperitif|sekt/i, '🥂'],
+  [/tanz|dance|party/i, '💃'],
+  [/feuerwerk/i, '🎆'],
+]
+
+function timetableIcon(label: string): string {
+  for (const [re, icon] of TIMETABLE_ICONS) if (re.test(label)) return icon
+  return '✨'
+}
+
 function TimetableCard({ heading, body }: { heading: string; body: string }) {
+  const rows = body
+    .split('\n')
+    .map(line => line.trim())
+    .filter(Boolean)
+    .map(line => {
+      // Accept any run of spaces or tabs as the separator between time and label
+      const match = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
+      if (match) return { time: match[1].trim(), label: match[2].trim() }
+      // fallback: treat whole line as label
+      return { time: '', label: line }
+    })
+
   return (
     <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-4">
-      <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-3">
-        ⏰ {heading}
+      <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-5 text-center">
+        {heading}
       </p>
-      <pre className="font-serif text-[#f5f0e8] text-sm leading-relaxed whitespace-pre-wrap font-sans">
-        {body}
-      </pre>
+      <div className="relative">
+        {/* Centre vertical line */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2" />
+
+        <div className="flex flex-col gap-5">
+          {rows.map((row, i) => {
+            const icon = timetableIcon(row.label)
+            const isLeft = i % 2 === 0
+            return (
+              <div key={i} className="relative flex items-center">
+                {/* Left side */}
+                <div className={`w-[calc(50%-16px)] ${isLeft ? 'flex flex-col items-end pr-3' : ''}`}>
+                  {isLeft && (
+                    <>
+                      <span className="text-xl leading-none">{icon}</span>
+                      <span className="font-serif text-[#c9a84c] text-[10px] tracking-wider mt-0.5">{row.time}</span>
+                      <span className="font-serif text-[#f5f0e8] text-xs text-right mt-0.5 leading-snug">{row.label}</span>
+                    </>
+                  )}
+                </div>
+
+                {/* Centre dot */}
+                <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
+
+                {/* Right side */}
+                <div className={`w-[calc(50%-16px)] ml-auto ${!isLeft ? 'flex flex-col items-start pl-3' : ''}`}>
+                  {!isLeft && (
+                    <>
+                      <span className="text-xl leading-none">{icon}</span>
+                      <span className="font-serif text-[#c9a84c] text-[10px] tracking-wider mt-0.5">{row.time}</span>
+                      <span className="font-serif text-[#f5f0e8] text-xs mt-0.5 leading-snug">{row.label}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }
 
 function VenueCard({ name, address, routeLabel }: { name: string; address: string; routeLabel: string }) {
+  // Only render the map when we have a real address (not the "folgt" placeholder)
+  const hasAddress = address && !address.toLowerCase().includes('folgt')
+  const mapSrc = hasAddress
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=&layer=mapnik&marker=&mlat=&mlon=&query=${encodeURIComponent(address)}`
+    : null
+
+  // OSM embed via search query — simpler than lat/lon, no API key needed
+  const osmSearchSrc = hasAddress
+    ? `https://www.openstreetmap.org/export/embed.html?layer=mapnik&query=${encodeURIComponent(address)}`
+    : null
+
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-4 flex flex-col gap-3">
-      <div>
-        <p className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-1">📍 {name}</p>
-        <p className="font-serif text-[#f5f0e8] text-sm whitespace-pre-wrap">{address}</p>
+    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col">
+      {osmSearchSrc && (
+        <iframe
+          src={osmSearchSrc}
+          width="100%"
+          height="140"
+          loading="lazy"
+          title={`Karte: ${name}`}
+          className="w-full border-0 opacity-90"
+          style={{ colorScheme: 'normal' }}
+        />
+      )}
+      <div className="p-4 flex flex-col gap-3">
+        <div>
+          <p className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-1">📍 {name}</p>
+          <p className="font-serif text-[#f5f0e8] text-sm whitespace-pre-wrap">{address}</p>
+        </div>
+        {hasAddress && (
+          <a
+            href={routeLink(address)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="self-start px-3 py-1.5 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif text-xs hover:bg-[#c9a84c]/20 transition-colors"
+          >
+            {routeLabel}
+          </a>
+        )}
       </div>
-      <a
-        href={routeLink(address)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="self-start px-3 py-1.5 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif text-xs hover:bg-[#c9a84c]/20 transition-colors"
-      >
-        {routeLabel}
-      </a>
     </div>
   )
 }
