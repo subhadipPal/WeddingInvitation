@@ -550,19 +550,19 @@ export default function AdminPage() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="font-script text-4xl text-[#c9a84c]">Julia & Ravi</h1>
-            <p className="font-serif text-[#f5f0e8]/50 text-sm tracking-widest uppercase mt-1">Guest Management</p>
+            <p className="font-serif text-[#f5f0e8]/80 text-sm tracking-widest uppercase mt-1">Guest Management</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <button onClick={exportCsv}
-              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-xs hover:bg-[#c9a84c]/10 transition-colors">
+              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors">
               CSV
             </button>
             <button onClick={printPdf}
-              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-xs hover:bg-[#c9a84c]/10 transition-colors">
+              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors">
               Print PDF
             </button>
             <button onClick={handleRedeploy} disabled={deploying}
-              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-xs hover:bg-[#c9a84c]/10 transition-colors disabled:opacity-50">
+              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors disabled:opacity-50">
               {deploying ? 'Deploying…' : deployStatus === 'triggered' ? 'Triggered ✓' : deployStatus === 'error' ? 'Failed ✗' : 'Redeploy'}
             </button>
             <Link href="/admin/create"
@@ -603,7 +603,7 @@ export default function AdminPage() {
               ].map(s => (
                 <div key={s.label} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-4 text-center shadow-lg">
                   <div className="text-3xl font-serif" style={{ color: s.color }}>{s.value}</div>
-                  <div className="text-xs font-serif text-[#f5f0e8]/50 mt-1 uppercase tracking-wider">{s.label}</div>
+                  <div className="text-sm font-serif text-[#f5f0e8]/80 mt-1 uppercase tracking-wider">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -649,7 +649,7 @@ export default function AdminPage() {
                               <span className="px-1.5 py-0.5 rounded text-[11px] bg-[#c9a84c]/20 text-[#c9a84c] border border-[#c9a84c]/40 font-serif">বাং</span>
                             )}
                           </div>
-                          <p className="text-white/50 font-serif text-xs mt-0.5">Invitation & Contact Details</p>
+                          <p className="text-white/70 font-serif text-sm mt-0.5">Invitation & Contact Details</p>
                         </div>
                         <button
                           onClick={() => deleteGuest(g.id, g.name)}
@@ -810,13 +810,13 @@ export default function AdminPage() {
           <div className="max-w-5xl flex-1 flex flex-col min-h-0">
             <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-6 scrollbar-gold">
                 <div className="flex items-center justify-between mb-6">
-                  <p className="font-serif text-[#f5f0e8]/50 text-sm">
+                  <p className="font-serif text-[#f5f0e8]/80 text-sm">
                     Edit guest-facing invitation text. Auto-saves 5s after changes.
                   </p>
                   <button
                     onClick={handleResetDefaults}
                     disabled
-                    className="shrink-0 border border-[#c9a84c]/20 text-[#c9a84c]/30 font-serif text-xs px-3 py-1.5 rounded-lg cursor-not-allowed ml-4"
+                    className="shrink-0 border border-[#c9a84c]/20 text-[#c9a84c]/30 font-serif text-sm px-3 py-1.5 rounded-lg cursor-not-allowed ml-4"
                   >
                     Reset to defaults
                   </button>
@@ -824,7 +824,7 @@ export default function AdminPage() {
 
                 {CONTENT_GROUPS.map(group => (
                   <div key={group.label} className="mb-8">
-                    <h2 className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
+                    <h2 className="font-serif text-[#c9a84c] text-sm uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
                       {group.label}
                     </h2>
                     <div className="flex flex-col gap-4">
@@ -832,15 +832,15 @@ export default function AdminPage() {
                         const editLangs: ('de' | 'en' | 'bn')[] = group.deOnly ? ['de'] : group.enBn ? ['en', 'bn'] : ['de', 'en']
                         const langLabel: Record<'de' | 'en' | 'bn', string> = { de: 'German', en: 'English', bn: 'Bengali' }
                         return (
-                        <div key={key} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
-                          <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
+                        <div key={key} className="bg-black/20 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
+                          <p className="font-serif text-[#f5f0e8]/80 text-sm mb-3">
                             {KEY_LABELS[key] ?? key}
                           </p>
                           <div className={`grid gap-3 ${editLangs.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
                             {editLangs.map(lang => (
                               <div key={lang}>
                                 {editLangs.length > 1 && (
-                                  <label className="block text-[#c9a84c]/70 text-xs font-serif mb-1 uppercase tracking-wider">
+                                  <label className="block text-[#c9a84c]/80 text-sm font-serif mb-1 uppercase tracking-wider">
                                     {langLabel[lang]}
                                   </label>
                                 )}
@@ -848,7 +848,7 @@ export default function AdminPage() {
                                   value={content[lang][key] ?? ''}
                                   onChange={e => handleContentChange(lang, key, e.target.value)}
                                   rows={key.includes('Body') || key.includes('body') ? 4 : 2}
-                                  className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-y"
+                                  className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60 resize-y"
                                 />
                               </div>
                             ))}
@@ -863,13 +863,13 @@ export default function AdminPage() {
 
             <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
               {(saveStatus === 'pending' || saveStatus === 'saving') && (
-                <span className="font-serif text-[#c9a84c]/60 text-xs">{saveStatus === 'pending' ? 'Unsaved changes…' : 'Saving…'}</span>
+                <span className="font-serif text-[#c9a84c]/80 text-sm">{saveStatus === 'pending' ? 'Unsaved changes…' : 'Saving…'}</span>
               )}
               {saveStatus === 'saved' && (
-                <span className="font-serif text-green-400 text-xs">Saved ✓</span>
+                <span className="font-serif text-green-400 text-sm">Saved ✓</span>
               )}
               {saveStatus === 'error' && (
-                <span className="font-serif text-red-400 text-xs">Save failed — will retry on next change</span>
+                <span className="font-serif text-red-400 text-sm">Save failed — will retry on next change</span>
               )}
             </div>
           </div>
@@ -878,7 +878,7 @@ export default function AdminPage() {
         {tab === 'mic' && (
           <div className="max-w-5xl flex-1 flex flex-col min-h-0">
             <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-6 scrollbar-gold">
-              <p className="font-serif text-[#f5f0e8]/50 text-sm mb-6">
+              <p className="font-serif text-[#f5f0e8]/80 text-sm mb-6">
                 Einladungstext bearbeiten. Automatisch gespeichert 5s nach Änderung.
               </p>
 
@@ -894,7 +894,7 @@ export default function AdminPage() {
                       : ['default']
                     return (
                       <div key={slot} className="bg-black/20 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
-                        <p className="font-serif text-[#f5f0e8]/60 text-sm mb-3">
+                        <p className="font-serif text-[#f5f0e8]/80 text-sm mb-3">
                           {MIC_SLOT_LABELS[slot]}
                         </p>
                         <div className="flex flex-col gap-2">
@@ -904,7 +904,7 @@ export default function AdminPage() {
                             const status = micUploadStatus[key]
                             return (
                               <label key={v} className="flex items-center gap-3 cursor-pointer group">
-                                <span className="font-serif text-[#c9a84c]/70 text-sm w-16 shrink-0 uppercase tracking-wider">
+                                <span className="font-serif text-[#c9a84c]/80 text-sm w-16 shrink-0 uppercase tracking-wider">
                                   {slot === 'hero' ? v : 'Bild'}
                                 </span>
                                 <div className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
@@ -916,7 +916,7 @@ export default function AdminPage() {
                                     <span className="font-serif text-[#c9a84c]/60 text-sm animate-pulse">Hochladen…</span>
                                   ) : (
                                     <>
-                                      <span className="font-serif text-[#f5f0e8]/40 text-sm flex-1">
+                                      <span className="font-serif text-[#f5f0e8]/70 text-sm flex-1">
                                         {status === 'ok' ? '✓ Hochgeladen' : status === 'error' ? '✕ Fehler' : 'Datei wählen…'}
                                       </span>
                                       <span className="text-[#c9a84c] text-sm">↑</span>
@@ -956,7 +956,7 @@ export default function AdminPage() {
                       const isTimetable = MIC_TIMETABLE_KEYS.has(key)
                       return (
                         <div key={key} className="bg-black/20 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
-                          <p className="font-serif text-[#f5f0e8]/60 text-sm mb-3">
+                          <p className="font-serif text-[#f5f0e8]/80 text-sm mb-3">
                             {MIC_KEY_LABELS[key] ?? key}
                           </p>
                           {isToggle ? (
