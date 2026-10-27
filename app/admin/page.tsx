@@ -884,7 +884,7 @@ export default function AdminPage() {
 
               {/* Image upload section */}
               <div className="mb-8">
-                <h2 className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
+                <h2 className="font-serif text-[#c9a84c] text-sm uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
                   Bilder hochladen
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -893,8 +893,8 @@ export default function AdminPage() {
                       ? ['mobile', 'tablet', 'desktop']
                       : ['default']
                     return (
-                      <div key={slot} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
-                        <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
+                      <div key={slot} className="bg-black/20 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
+                        <p className="font-serif text-[#f5f0e8]/60 text-sm mb-3">
                           {MIC_SLOT_LABELS[slot]}
                         </p>
                         <div className="flex flex-col gap-2">
@@ -904,7 +904,7 @@ export default function AdminPage() {
                             const status = micUploadStatus[key]
                             return (
                               <label key={v} className="flex items-center gap-3 cursor-pointer group">
-                                <span className="font-serif text-[#c9a84c]/70 text-xs w-16 shrink-0 uppercase tracking-wider">
+                                <span className="font-serif text-[#c9a84c]/70 text-sm w-16 shrink-0 uppercase tracking-wider">
                                   {slot === 'hero' ? v : 'Bild'}
                                 </span>
                                 <div className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
@@ -913,10 +913,10 @@ export default function AdminPage() {
                                     : 'border-[#c9a84c]/20 bg-black/20 hover:border-[#c9a84c]/40 group-hover:bg-black/30'
                                 }`}>
                                   {isUp ? (
-                                    <span className="font-serif text-[#c9a84c]/60 text-xs animate-pulse">Hochladen…</span>
+                                    <span className="font-serif text-[#c9a84c]/60 text-sm animate-pulse">Hochladen…</span>
                                   ) : (
                                     <>
-                                      <span className="font-serif text-[#f5f0e8]/40 text-xs flex-1">
+                                      <span className="font-serif text-[#f5f0e8]/40 text-sm flex-1">
                                         {status === 'ok' ? '✓ Hochgeladen' : status === 'error' ? '✕ Fehler' : 'Datei wählen…'}
                                       </span>
                                       <span className="text-[#c9a84c] text-sm">↑</span>
@@ -947,7 +947,7 @@ export default function AdminPage() {
               {/* Content key groups */}
               {MIC_GROUPS.map(group => (
                 <div key={group.label} className="mb-8">
-                  <h2 className="font-serif text-[#c9a84c] text-xs uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
+                  <h2 className="font-serif text-[#c9a84c] text-sm uppercase tracking-widest mb-4 border-b border-[#c9a84c]/20 pb-2">
                     {group.label}
                   </h2>
                   <div className="flex flex-col gap-4">
@@ -955,8 +955,8 @@ export default function AdminPage() {
                       const isToggle = MIC_TOGGLE_KEYS.has(key)
                       const isTimetable = MIC_TIMETABLE_KEYS.has(key)
                       return (
-                        <div key={key} className="bg-black/40 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
-                          <p className="font-serif text-[#f5f0e8]/60 text-xs mb-3">
+                        <div key={key} className="bg-black/20 backdrop-blur-md border border-[#c9a84c]/20 rounded-xl p-4">
+                          <p className="font-serif text-[#f5f0e8]/60 text-sm mb-3">
                             {MIC_KEY_LABELS[key] ?? key}
                           </p>
                           {isToggle ? (
@@ -985,7 +985,7 @@ export default function AdminPage() {
                               value={micContent[key] ?? ''}
                               onChange={e => handleMicChange(key, e.target.value)}
                               rows={key.includes('Body') || key.includes('body') ? 4 : 2}
-                              className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-y"
+                              className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60 resize-y"
                             />
                           )}
                         </div>
@@ -998,13 +998,13 @@ export default function AdminPage() {
 
             <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
               {(micSaveStatus === 'pending' || micSaveStatus === 'saving') && (
-                <span className="font-serif text-[#c9a84c]/60 text-xs">{micSaveStatus === 'pending' ? 'Nicht gespeichert…' : 'Speichern…'}</span>
+                <span className="font-serif text-[#c9a84c]/60 text-sm">{micSaveStatus === 'pending' ? 'Nicht gespeichert…' : 'Speichern…'}</span>
               )}
               {micSaveStatus === 'saved' && (
-                <span className="font-serif text-green-400 text-xs">Gespeichert ✓</span>
+                <span className="font-serif text-green-400 text-sm">Gespeichert ✓</span>
               )}
               {micSaveStatus === 'error' && (
-                <span className="font-serif text-red-400 text-xs">Fehler beim Speichern — wird beim nächsten Ändern wiederholt</span>
+                <span className="font-serif text-red-400 text-sm">Fehler beim Speichern — wird beim nächsten Ändern wiederholt</span>
               )}
             </div>
           </div>
@@ -1098,25 +1098,25 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
             value={row.time}
             onChange={e => setRow(i, 'time', e.target.value)}
             placeholder="14:00 Uhr"
-            className="w-28 shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60"
+            className="w-28 shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
           />
           <input
             type="text"
             value={row.label}
             onChange={e => setRow(i, 'label', e.target.value)}
             placeholder="Beschreibung"
-            className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60"
+            className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
           />
           <button
             onClick={() => removeRow(i)}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-sm"
+            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"
             title="Eintrag entfernen"
           >✕</button>
         </div>
       ))}
       <button
         onClick={addRow}
-        className="self-start mt-1 px-3 py-1.5 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/70 font-serif text-xs hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors"
+        className="self-start mt-1 px-3 py-1.5 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/70 font-serif text-sm hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors"
       >
         + Eintrag hinzufügen
       </button>
