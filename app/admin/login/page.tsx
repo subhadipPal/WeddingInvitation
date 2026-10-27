@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-[#1a0a0a] flex items-center justify-center">
       <div className="bg-[#4a0a0a]/60 border border-[#c9a84c]/40 rounded-2xl p-10 w-full max-w-sm">
-        <h1 className="font-script text-4xl text-[#c9a84c] text-center mb-8">Julia & Ravi</h1>
+        <h1 className="font-script text-4xl text-[#c9a84c] text-center mb-8">Julia & Subhadip</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="password"

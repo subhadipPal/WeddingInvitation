@@ -76,12 +76,12 @@ export default async function InvitePage({ params }: Props) {
     return (
       <main className="relative min-h-screen flex flex-col items-center justify-center px-8 text-center"
         style={{ background: 'radial-gradient(ellipse at 20% 20%, #5a1010 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, #2a0505 0%, transparent 60%), #3a0808' }}>
-        <p className="font-script text-5xl text-[#c9a84c] mb-4">Julia & Ravi</p>
+        <p className="font-script text-5xl text-[#c9a84c] mb-4">Julia & Subhadip</p>
         <div className="w-16 h-px bg-[#c9a84c]/40 mb-6" />
         <p className="font-serif text-[#f5f0e8]/70 text-base max-w-xs leading-relaxed">
           {lang === 'de'
-            ? 'Dieser Einladungslink ist leider ungültig. Bitte wende dich an Julia oder Ravi.'
-            : 'This invitation link is invalid. Please contact Julia or Ravi.'}
+            ? 'Dieser Einladungslink ist leider ungültig. Bitte wende dich an Julia oder Subhadip.'
+            : 'This invitation link is invalid. Please contact Julia or Subhadip.'}
         </p>
         <p className="font-script text-2xl text-[#c9a84c]/60 mt-6">♥</p>
       </main>

@@ -419,12 +419,12 @@ export default function AdminPage() {
         <td style="font-size:10px">${base}/de/invite/${g.token}</td>
       </tr>`
     }).join('')
-    const html = `<!DOCTYPE html><html><head><title>Julia & Ravi — Guest List</title>
+    const html = `<!DOCTYPE html><html><head><title>Julia & Subhadip — Guest List</title>
     <style>body{font-family:Georgia,serif;padding:24px}h1{font-size:22px;margin-bottom:4px;color:#3a0808}p{font-size:12px;color:#666;margin-bottom:16px}
     table{width:100%;border-collapse:collapse;font-size:12px}th{background:#3a0808;color:#c9a84c;padding:6px 8px;text-align:left}
     td{padding:5px 8px;border-bottom:1px solid #ddd}tr:nth-child(even) td{background:#fdf8f0}
     @media print{button{display:none}}</style></head>
-    <body><h1>Julia & Ravi — Guest List</h1><p>Wedding 22 Jan & Celebration 23 Jan 2027 · Berlin · Hindu Wedding 28 Jan · Kolkata · ${guests.length} guests</p>
+    <body><h1>Julia & Subhadip — Guest List</h1><p>Wedding 22 Jan & Celebration 23 Jan 2027 · Berlin · Hindu Wedding 28 Jan · Kolkata · ${guests.length} guests</p>
     <table><thead><tr><th>Name</th><th>Contact</th><th>Invited</th><th>RSVP 22</th><th>RSVP 23</th><th>RSVP 28</th><th>Address</th><th>Note</th><th>Link</th></tr></thead>
     <tbody>${rows}</tbody></table></body></html>`
     const w = window.open('', '_blank')!
@@ -586,7 +586,7 @@ export default function AdminPage() {
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="font-script text-4xl text-[#c9a84c]">Julia & Ravi</h1>
+            <h1 className="font-script text-4xl text-[#c9a84c]">Julia & Subhadip</h1>
             <p className="font-serif text-[#f5f0e8]/80 text-sm tracking-widest uppercase mt-1">Guest Management</p>
           </div>
           <div className="flex flex-wrap gap-2">

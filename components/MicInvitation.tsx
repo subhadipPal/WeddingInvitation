@@ -1,10 +1,16 @@
 'use client'
 import { useRef } from 'react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { Section, FadeIn, useInView } from './invitation-helpers'
 import MicHamburgerMenu from './MicHamburgerMenu'
 import MicRsvpForm from './MicRsvpForm'
 import type { MicContentKey, MicImageSlot, MicImageVariant } from '@/lib/mic'
+import { isToggleOn } from '@/lib/mic'
+
+// Load animation overlays lazily so the main invite bundle stays small
+const MicCurtainFrame = dynamic(() => import('./MicCurtainFrame'), { ssr: false })
+const MicPetalOverlay = dynamic(() => import('./MicPetalOverlay'), { ssr: false })
 
 type MicContent = Record<MicContentKey, string>
 type MicImages = Partial<Record<MicImageSlot, Partial<Record<MicImageVariant, string>>>>
@@ -46,6 +52,8 @@ export default function MicInvitation({
 }: Props) {
   const showDay22 = guest.invitedDays === '22+23'
   const stdHref = `/de/invite/${guest.stdToken}`
+  const showCurtain = isToggleOn(content, 'micEnableCurtain')
+  const showPetals = isToggleOn(content, 'micEnablePetals')
 
   // Section refs — each self-manages its own fade-in via IntersectionObserver.
   const s1 = useRef<HTMLElement>(null)
@@ -79,6 +87,8 @@ export default function MicInvitation({
 
   return (
     <>
+      {showCurtain && <MicCurtainFrame />}
+      {showPetals && <MicPetalOverlay />}
       <MicHamburgerMenu stdHref={stdHref} openStdLabel={content.micMenuOpenStd} />
 
       <div
