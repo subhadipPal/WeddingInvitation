@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
   let blobUrl: string
   try {
     const result = await put(blobPath, processed, {
-      access: 'public',
+      access: 'private',
       contentType: 'image/jpeg',
       addRandomSuffix: false,
     })

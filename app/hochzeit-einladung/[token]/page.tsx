@@ -47,7 +47,10 @@ async function getMicPayload(guestId: string) {
   for (const slot of MIC_IMAGE_SLOTS) images[slot] = {}
   for (const row of imageRows) {
     if ((MIC_IMAGE_SLOTS as readonly string[]).includes(row.slot)) {
-      images[row.slot as MicImageSlot]![row.variant as MicImageVariant] = row.url
+      // Rewrite private blob URL → our public proxy
+      const blobPath = new URL(row.url).pathname.replace(/^\//, '')
+      const proxyUrl = `/api/mic-images/img?path=${encodeURIComponent(blobPath)}`
+      images[row.slot as MicImageSlot]![row.variant as MicImageVariant] = proxyUrl
     }
   }
 
