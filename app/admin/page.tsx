@@ -1041,6 +1041,14 @@ interface TimetableRow { id: number; time: string; label: string }
 let _rowId = 0
 const newRow = (time = '', label = ''): TimetableRow => ({ id: ++_rowId, time, label })
 
+// Strip " Uhr" suffix so the time field shows just "HH:MM"
+function stripUhr(t: string) { return t.replace(/\s*Uhr\s*$/i, '').trim() }
+
+// Valid if empty (new row) or matches HH:MM or special words like "danach"
+function isValidTime(t: string) {
+  return t === '' || /^\d{1,2}:\d{2}$/.test(t) || /^[a-zA-ZäöüÄÖÜß\s]+$/.test(t.trim())
+}
+
 function parseTimetable(raw: string): TimetableRow[] {
   return raw
     .split('\n')
@@ -1048,14 +1056,18 @@ function parseTimetable(raw: string): TimetableRow[] {
     .filter(Boolean)
     .map(line => {
       const m = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
-      return m ? newRow(m[1].trim(), m[2].trim()) : newRow('', line)
+      return m ? newRow(stripUhr(m[1]), m[2].trim()) : newRow('', line)
     })
 }
 
 function serialiseTimetable(rows: TimetableRow[]): string {
   return rows
     .filter(r => r.time || r.label)
-    .map(r => `${r.time}   ${r.label}`)
+    .map(r => {
+      // Append " Uhr" if time looks like HH:MM
+      const t = /^\d{1,2}:\d{2}$/.test(r.time.trim()) ? `${r.time.trim()} Uhr` : r.time.trim()
+      return `${t}   ${r.label}`
+    })
     .join('\n')
 }
 
@@ -1064,6 +1076,7 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     const parsed = parseTimetable(value)
     return parsed.length ? parsed : [newRow()]
   })
+  const dragIdxRef = useRef<number | null>(null)
 
   // Resync when the parent loads DB content (value changes from default → DB value)
   const prevValueRef = useRef(value)
@@ -1076,7 +1089,7 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
   }, [value])
 
   // Propagate to parent (triggers debounced save + resync).
-  // Only call this for structural changes (add/move/remove), NOT while typing.
+  // Only call for structural changes (add/move/remove), NOT while typing.
   const propagate = (next: TimetableRow[]) => {
     onChange(serialiseTimetable(next))
   }
@@ -1086,91 +1099,94 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     setRows(rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r))
   }
 
-  // On blur: propagate whatever is in the row now
-  const flushRow = () => {
-    propagate(rows)
-  }
+  // On blur: propagate (saves to DB after debounce)
+  const flushRow = () => { propagate(rows) }
 
   const addRow = () => {
     const next = [...rows, newRow()]
-    setRows(next)
-    propagate(next)
-  }
-
-  const insertAfter = (i: number) => {
-    const next = [...rows]
-    next.splice(i + 1, 0, newRow())
-    setRows(next)
-    propagate(next)
-  }
-
-  const moveRow = (i: number, dir: -1 | 1) => {
-    const j = i + dir
-    if (j < 0 || j >= rows.length) return
-    const next = [...rows]
-    ;[next[i], next[j]] = [next[j], next[i]]
-    setRows(next)
-    propagate(next)
+    setRows(next); propagate(next)
   }
 
   const removeRow = (i: number) => {
     const next = rows.filter((_, idx) => idx !== i)
     const final = next.length ? next : [newRow()]
-    setRows(final)
-    propagate(final)
+    setRows(final); propagate(final)
+  }
+
+  // ── Drag-to-reorder (HTML5 drag API, no library) ──
+  const onDragStart = (i: number) => { dragIdxRef.current = i }
+  const onDragOver = (e: React.DragEvent, i: number) => {
+    e.preventDefault()
+    const from = dragIdxRef.current
+    if (from === null || from === i) return
+    const next = [...rows]
+    const [moved] = next.splice(from, 1)
+    next.splice(i, 0, moved)
+    dragIdxRef.current = i
+    setRows(next)
+  }
+  const onDragEnd = () => {
+    dragIdxRef.current = null
+    propagate(rows)
   }
 
   return (
     <div className="flex flex-col gap-2">
-      {rows.map((row, i) => (
-        <div key={row.id} className="flex gap-2 items-center">
-          {/* Move up/down */}
-          <div className="flex flex-col gap-0.5 shrink-0">
+      {rows.map((row, i) => {
+        const timeInvalid = row.time !== '' && !isValidTime(row.time)
+        return (
+          <div
+            key={row.id}
+            draggable
+            onDragStart={() => onDragStart(i)}
+            onDragOver={e => onDragOver(e, i)}
+            onDragEnd={onDragEnd}
+            className="flex gap-2 items-center group/row"
+          >
+            {/* Drag handle */}
+            <span
+              className="shrink-0 cursor-grab active:cursor-grabbing text-[#c9a84c]/30 group-hover/row:text-[#c9a84c]/70 transition-colors select-none text-lg leading-none"
+              title="Ziehen zum Sortieren"
+            >⠿</span>
+            {/* Time: HH:MM only — "Uhr" is appended automatically */}
+            <div className="relative shrink-0">
+              <input
+                type="text"
+                value={row.time}
+                onChange={e => setRow(i, 'time', e.target.value)}
+                onBlur={flushRow}
+                placeholder="HH:MM"
+                maxLength={10}
+                className={`w-24 bg-black/30 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-base focus:outline-none transition-colors ${
+                  timeInvalid
+                    ? 'border-2 border-red-400 focus:border-red-400'
+                    : 'border border-[#c9a84c]/20 focus:border-[#c9a84c]/60'
+                }`}
+              />
+              {timeInvalid && (
+                <span className="absolute -bottom-4 left-0 text-red-400 text-[10px] font-serif whitespace-nowrap">HH:MM oder Text</span>
+              )}
+            </div>
+            <span className="shrink-0 text-[#c9a84c]/40 font-serif text-sm">Uhr</span>
+            <input
+              type="text"
+              value={row.label}
+              onChange={e => setRow(i, 'label', e.target.value)}
+              onBlur={flushRow}
+              placeholder="Beschreibung"
+              className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
+            />
             <button
-              onClick={() => moveRow(i, -1)}
-              disabled={i === 0}
-              className="w-6 h-6 flex items-center justify-center rounded border border-[#c9a84c]/20 text-[#c9a84c]/50 hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors disabled:opacity-20 text-xs leading-none"
-              title="Nach oben"
-            >▲</button>
-            <button
-              onClick={() => moveRow(i, 1)}
-              disabled={i === rows.length - 1}
-              className="w-6 h-6 flex items-center justify-center rounded border border-[#c9a84c]/20 text-[#c9a84c]/50 hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors disabled:opacity-20 text-xs leading-none"
-              title="Nach unten"
-            >▼</button>
+              onClick={() => removeRow(i)}
+              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"
+              title="Eintrag entfernen"
+            >✕</button>
           </div>
-          <input
-            type="text"
-            value={row.time}
-            onChange={e => setRow(i, 'time', e.target.value)}
-            onBlur={flushRow}
-            placeholder="14:00 Uhr"
-            className="w-28 shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
-          />
-          <input
-            type="text"
-            value={row.label}
-            onChange={e => setRow(i, 'label', e.target.value)}
-            onBlur={flushRow}
-            placeholder="Beschreibung"
-            className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
-          />
-          {/* Insert after this row */}
-          <button
-            onClick={() => insertAfter(i)}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/60 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors text-base"
-            title="Zeile danach einfügen"
-          >+</button>
-          <button
-            onClick={() => removeRow(i)}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"
-            title="Eintrag entfernen"
-          >✕</button>
-        </div>
-      ))}
+        )
+      })}
       <button
         onClick={addRow}
-        className="self-start mt-1 px-3 py-1.5 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/70 font-serif text-sm hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors"
+        className="self-start mt-2 px-3 py-1.5 rounded-lg border border-[#c9a84c]/30 text-[#c9a84c]/70 font-serif text-sm hover:border-[#c9a84c]/60 hover:text-[#c9a84c] transition-colors"
       >
         + Eintrag hinzufügen
       </button>
