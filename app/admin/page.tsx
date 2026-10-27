@@ -1036,7 +1036,10 @@ export default function AdminPage() {
 // Parses the multiline "HH:MM Uhr   Label" string into structured rows,
 // lets the admin edit each row with individual inputs, and serialises back.
 
-interface TimetableRow { time: string; label: string }
+interface TimetableRow { id: number; time: string; label: string }
+
+let _rowId = 0
+const newRow = (time = '', label = ''): TimetableRow => ({ id: ++_rowId, time, label })
 
 function parseTimetable(raw: string): TimetableRow[] {
   return raw
@@ -1045,7 +1048,7 @@ function parseTimetable(raw: string): TimetableRow[] {
     .filter(Boolean)
     .map(line => {
       const m = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
-      return m ? { time: m[1].trim(), label: m[2].trim() } : { time: '', label: line }
+      return m ? newRow(m[1].trim(), m[2].trim()) : newRow('', line)
     })
 }
 
@@ -1059,7 +1062,7 @@ function serialiseTimetable(rows: TimetableRow[]): string {
 function TimetableEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [rows, setRows] = useState<TimetableRow[]>(() => {
     const parsed = parseTimetable(value)
-    return parsed.length ? parsed : [{ time: '', label: '' }]
+    return parsed.length ? parsed : [newRow()]
   })
 
   // Resync when the parent loads DB content (value changes from default → DB value)
@@ -1068,26 +1071,37 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     if (value !== prevValueRef.current) {
       prevValueRef.current = value
       const parsed = parseTimetable(value)
-      setRows(parsed.length ? parsed : [{ time: '', label: '' }])
+      setRows(parsed.length ? parsed : [newRow()])
     }
   }, [value])
 
-  const update = (next: TimetableRow[]) => {
-    setRows(next)
+  // Propagate to parent (triggers debounced save + resync).
+  // Only call this for structural changes (add/move/remove), NOT while typing.
+  const propagate = (next: TimetableRow[]) => {
     onChange(serialiseTimetable(next))
   }
 
+  // Typing: update local state only — never propagate mid-keystroke
   const setRow = (i: number, field: 'time' | 'label', v: string) => {
-    const next = rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r)
-    update(next)
+    setRows(rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r))
   }
 
-  const addRow = () => update([...rows, { time: '', label: '' }])
+  // On blur: propagate whatever is in the row now
+  const flushRow = () => {
+    propagate(rows)
+  }
+
+  const addRow = () => {
+    const next = [...rows, newRow()]
+    setRows(next)
+    propagate(next)
+  }
 
   const insertAfter = (i: number) => {
     const next = [...rows]
-    next.splice(i + 1, 0, { time: '', label: '' })
-    update(next)
+    next.splice(i + 1, 0, newRow())
+    setRows(next)
+    propagate(next)
   }
 
   const moveRow = (i: number, dir: -1 | 1) => {
@@ -1095,18 +1109,21 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     if (j < 0 || j >= rows.length) return
     const next = [...rows]
     ;[next[i], next[j]] = [next[j], next[i]]
-    update(next)
+    setRows(next)
+    propagate(next)
   }
 
   const removeRow = (i: number) => {
     const next = rows.filter((_, idx) => idx !== i)
-    update(next.length ? next : [{ time: '', label: '' }])
+    const final = next.length ? next : [newRow()]
+    setRows(final)
+    propagate(final)
   }
 
   return (
     <div className="flex flex-col gap-2">
       {rows.map((row, i) => (
-        <div key={i} className="flex gap-2 items-center">
+        <div key={row.id} className="flex gap-2 items-center">
           {/* Move up/down */}
           <div className="flex flex-col gap-0.5 shrink-0">
             <button
@@ -1126,6 +1143,7 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
             type="text"
             value={row.time}
             onChange={e => setRow(i, 'time', e.target.value)}
+            onBlur={flushRow}
             placeholder="14:00 Uhr"
             className="w-28 shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
           />
@@ -1133,6 +1151,7 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
             type="text"
             value={row.label}
             onChange={e => setRow(i, 'label', e.target.value)}
+            onBlur={flushRow}
             placeholder="Beschreibung"
             className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
           />
