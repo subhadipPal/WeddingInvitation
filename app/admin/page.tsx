@@ -1077,20 +1077,26 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     return parsed.length ? parsed : [newRow()]
   })
   const dragIdxRef = useRef<number | null>(null)
+  // When we call propagate we push a new value up; suppress the echo resync.
+  const ownPropagateRef = useRef(false)
 
-  // Resync when the parent loads DB content (value changes from default → DB value)
+  // Resync only when the parent loads fresh DB content, not when we caused the change.
   const prevValueRef = useRef(value)
   useEffect(() => {
     if (value !== prevValueRef.current) {
       prevValueRef.current = value
-      const parsed = parseTimetable(value)
-      setRows(parsed.length ? parsed : [newRow()])
+      if (!ownPropagateRef.current) {
+        const parsed = parseTimetable(value)
+        setRows(parsed.length ? parsed : [newRow()])
+      }
+      ownPropagateRef.current = false
     }
   }, [value])
 
-  // Propagate to parent (triggers debounced save + resync).
+  // Propagate to parent (triggers debounced save).
   // Only call for structural changes (add/move/remove), NOT while typing.
   const propagate = (next: TimetableRow[]) => {
+    ownPropagateRef.current = true
     onChange(serialiseTimetable(next))
   }
 
