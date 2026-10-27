@@ -93,10 +93,7 @@ export default function MicCurtainFrame() {
       {/* Left panel */}
       <div className={`mcp mcp-l${opened ? ' opened' : ''}`} aria-hidden="true">
         {slats.map((_, i) => {
-          // Slat fold: outer slat (i=0) folds most, inner (i=9) is flat
-          // Left panel: slats fold away to the left (negative rotateY)
-          const closedAngle = -(i === 0 ? 28 : i < 3 ? 18 : i < 6 ? 10 : 4)
-          // Stagger: inner slats (high i) start unfolding first
+          // Stagger: inner slats (high i) crush first, outer (i=0) last
           const delay = ((SLAT_COUNT - 1 - i) / SLAT_COUNT) * 0.8
           return (
             <div
@@ -104,7 +101,7 @@ export default function MicCurtainFrame() {
               className="mcp-s"
               style={{
                 background: SLAT_COLORS[i % 2],
-                transform: opened ? 'rotateY(0deg)' : `rotateY(${closedAngle}deg)`,
+                transform: opened ? 'scaleX(0)' : 'scaleX(1)',
                 transitionDelay: opened ? `${delay}s` : '0s',
               }}
             />
@@ -115,7 +112,6 @@ export default function MicCurtainFrame() {
       {/* Right panel */}
       <div className={`mcp mcp-r${opened ? ' opened' : ''}`} aria-hidden="true">
         {slats.map((_, i) => {
-          const closedAngle = (i === 0 ? 28 : i < 3 ? 18 : i < 6 ? 10 : 4)
           const delay = ((SLAT_COUNT - 1 - i) / SLAT_COUNT) * 0.8
           return (
             <div
@@ -123,7 +119,7 @@ export default function MicCurtainFrame() {
               className="mcp-s"
               style={{
                 background: SLAT_COLORS[i % 2],
-                transform: opened ? 'rotateY(0deg)' : `rotateY(${closedAngle}deg)`,
+                transform: opened ? 'scaleX(0)' : 'scaleX(1)',
                 transitionDelay: opened ? `${delay}s` : '0s',
               }}
             />

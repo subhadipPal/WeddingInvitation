@@ -6,9 +6,6 @@
   z-index: 9999;
   pointer-events: none;
   display: flex;
-  /* 3-D perspective context for slat rotateY */
-  perspective: 800px;
-  perspective-origin: center center;
   transition: transform var(--open-dur) cubic-bezier(0.4,0,0.2,1);
   will-change: transform;
   opacity: 0.85;
@@ -46,14 +43,11 @@
 :global(.mcp-s) {
   flex: 1;
   position: relative;
-  transform-style: preserve-3d;
-  /* Closed: inner slat faces viewer straight-on (rotateY 0),
-     outer slat is partially folded toward the wall (rotateY −30deg left / +30deg right).
-     On open: all slats flatten to 0 deg. */
+  /* scaleX crush: no 3D foreshortening → no gaps between slats */
   transition: transform var(--slat-fold-dur) cubic-bezier(0.4,0,0.2,1);
   transform-origin: left center;
 }
-/* Right panel slats fold from the other direction */
+/* Right panel slats crush from the right edge */
 :global(.mcp-r .mcp-s) { transform-origin: right center; }
 
 /* Fabric gradient simulates fold-lighting: bright centre → shadow at edge */
