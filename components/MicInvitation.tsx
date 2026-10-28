@@ -362,16 +362,16 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
       <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-5 text-center">
         {heading}
       </p>
-      <div className="relative max-h-[60vh] overflow-y-auto">
-        <div className="flex flex-col gap-5">
+      <div className="max-h-[60vh] overflow-y-auto">
+        <div className="relative flex flex-col gap-5">
+          {/* Single continuous centre line spanning all rows */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2 pointer-events-none" />
+
           {rows.map((row, i) => {
             const icon = timetableIcon(row.label)
             const isLeft = i % 2 === 0
             return (
               <div key={i} className="relative flex items-start">
-                {/* Centre vertical line — spans full height via pseudo-element trick */}
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2" />
-
                 {/* Left side */}
                 <div className="w-[calc(50%-16px)] min-w-0 shrink-0">
                   {isLeft && (
