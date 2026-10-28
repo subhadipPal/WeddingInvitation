@@ -591,8 +591,8 @@ export default function AdminPage() {
     setMicUploading(key)
     try {
       await fetch(`/api/mic-images?slot=${slot}&variant=${variant}`, { method: 'DELETE' })
-      setMicImages(prev => { const n = { ...prev }; delete n[key]; return n })
       setMicUploadStatus(prev => { const n = { ...prev }; delete n[key]; return n })
+      await loadMicImages()
     } finally {
       setMicUploading(null)
     }
