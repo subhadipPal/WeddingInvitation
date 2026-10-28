@@ -1,10 +1,11 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import styles from './MicPetalOverlay.module.css'
 
-// Theme colours: deep rose red, white, gold
-const PETAL_COLORS = ['#8a1538', '#f5f0e8', '#c9a84c']
-const PETAL_COUNT = 15
+// White and silver snowflake colours only
+const FLAKE_COLORS = ['#ffffff', '#e8e8e8', '#c8d8e8', '#dce8f0']
+const FLAKE_COUNT = 15
+// Unicode snowflake characters for variety
+const FLAKE_CHARS = ['❄', '❅', '❆', '✦', '✧']
 
 function rnd(min: number, max: number) { return min + Math.random() * (max - min) }
 function randInt(min: number, max: number) { return Math.floor(rnd(min, max + 1)) }
@@ -19,83 +20,85 @@ export default function MicPetalOverlay() {
     const style = document.createElement('style')
     style.textContent = `
       @media (prefers-reduced-motion: no-preference) {
-        @keyframes mic-petal-fall {
+        @keyframes mic-flake-fall {
           0%   { top: -5%; opacity: 0.9; }
-          100% { top: 105%; opacity: 0.1; }
+          100% { top: 105%; opacity: 0.15; }
         }
-        @keyframes mic-petal-sway-a {
+        @keyframes mic-flake-spin-a {
           0%   { transform: rotate(0deg)   translateX(0); }
-          30%  { transform: rotate(25deg)  translateX(30px); }
-          60%  { transform: rotate(-10deg) translateX(-15px); }
-          100% { transform: rotate(20deg)  translateX(20px); }
+          30%  { transform: rotate(72deg)  translateX(20px); }
+          60%  { transform: rotate(144deg) translateX(-15px); }
+          100% { transform: rotate(360deg) translateX(10px); }
         }
-        @keyframes mic-petal-sway-b {
-          0%   { transform: rotate(15deg)  translateX(0); }
-          40%  { transform: rotate(-20deg) translateX(-25px); }
-          80%  { transform: rotate(30deg)  translateX(25px); }
-          100% { transform: rotate(5deg)   translateX(-10px); }
+        @keyframes mic-flake-spin-b {
+          0%   { transform: rotate(0deg)   translateX(0); }
+          40%  { transform: rotate(-90deg) translateX(-18px); }
+          80%  { transform: rotate(-200deg) translateX(22px); }
+          100% { transform: rotate(-360deg) translateX(-8px); }
         }
-        @keyframes mic-petal-sway-c {
-          0%   { transform: rotate(-5deg)  translateX(0); }
-          50%  { transform: rotate(30deg)  translateX(35px); }
-          100% { transform: rotate(-15deg) translateX(-20px); }
+        @keyframes mic-flake-spin-c {
+          0%   { transform: rotate(0deg)  translateX(0); }
+          50%  { transform: rotate(180deg) translateX(25px); }
+          100% { transform: rotate(360deg) translateX(-12px); }
         }
       }
     `
     document.head.appendChild(style)
 
-    const swayAnims = ['mic-petal-sway-a', 'mic-petal-sway-b', 'mic-petal-sway-c']
+    const spinAnims = ['mic-flake-spin-a', 'mic-flake-spin-b', 'mic-flake-spin-c']
 
-    function spawnPetal(el: HTMLDivElement, initialDelay?: number) {
-        const size = rnd(9, 17)
-        const fallDur = rnd(12, 22)
-        const swayDur = rnd(2.5, 5)
-        const delay = initialDelay ?? 0
-        const sway = swayAnims[randInt(0, swayAnims.length - 1)]
-        const br = `${randInt(12, 22)}px ${randInt(1, 4)}px`
-        const color = PETAL_COLORS[randInt(0, PETAL_COLORS.length - 1)]
+    function spawnFlake(el: HTMLDivElement, initialDelay?: number) {
+      const size = rnd(8, 32)
+      const fallDur = rnd(12, 24)
+      const spinDur = rnd(4, 9)
+      const delay = initialDelay ?? 0
+      const spin = spinAnims[randInt(0, spinAnims.length - 1)]
+      const color = FLAKE_COLORS[randInt(0, FLAKE_COLORS.length - 1)]
+      const char = FLAKE_CHARS[randInt(0, FLAKE_CHARS.length - 1)]
 
-        const node = document.createElement('div')
-        node.style.cssText = `
-          pointer-events: none;
-          position: absolute;
-          left: ${rnd(2, 98)}vw;
-          top: -5%;
-          width: ${size}px;
-          height: ${Math.round(size * 1.25)}px;
-          background: ${color};
-          border-radius: ${br};
-          opacity: 0.88;
-          animation:
-            mic-petal-fall ${fallDur}s linear ${delay}s 1 forwards,
-            ${sway} ${swayDur}s ease-in-out ${delay}s infinite;
-        `
-        // Only remove + respawn when the fall animation finishes (reaches 105%)
-        // No delay on respawn — keeps density constant throughout
-        node.addEventListener('animationend', (e: AnimationEvent) => {
-          if (e.animationName === 'mic-petal-fall') {
-            node.remove()
-            if (el.isConnected) spawnPetal(el)
-          }
-        })
-        el.appendChild(node)
-        return node
-      }
+      const opacity = 0.4 + (size / 32) * 0.55
+      const glowStr = rnd(0.4, 1.4)
+      const g1 = Math.round(size * 0.5 * glowStr)
+      const g2 = Math.round(size * 1.4 * glowStr)
+      const g3 = Math.round(size * 3.2 * glowStr)
 
-    function spawnPetals(el: HTMLDivElement) {
-      // Stagger initial wave (0–3s) so petals reach bottom at different times,
-      // ensuring continuous density forever via zero-delay respawns.
-      return Array.from({ length: PETAL_COUNT }, () => spawnPetal(el, rnd(0, 3)))
+      const node = document.createElement('div')
+      node.textContent = char
+      node.style.cssText = `
+        pointer-events: none;
+        position: absolute;
+        left: ${rnd(2, 98)}vw;
+        top: -5%;
+        font-size: ${size}px;
+        line-height: 1;
+        color: ${color};
+        text-shadow: 0 0 ${g1}px rgba(220,240,255,0.95), 0 0 ${g2}px rgba(180,220,255,0.6), 0 0 ${g3}px rgba(140,200,255,0.3);
+        opacity: ${opacity.toFixed(2)};
+        user-select: none;
+        animation:
+          mic-flake-fall ${fallDur}s linear ${delay}s 1 forwards,
+          ${spin} ${spinDur}s linear ${delay}s infinite;
+      `
+      node.addEventListener('animationend', (e: AnimationEvent) => {
+        if (e.animationName === 'mic-flake-fall') {
+          node.remove()
+          if (el.isConnected) spawnFlake(el)
+        }
+      })
+      el.appendChild(node)
+      return node
     }
 
-    // Wait for curtain-opened signal before spawning petals
+    function spawnFlakes(el: HTMLDivElement) {
+      return Array.from({ length: FLAKE_COUNT }, () => spawnFlake(el, rnd(0, 3)))
+    }
+
     let nodes: HTMLDivElement[] = []
-    const onOpen = () => { nodes = spawnPetals(container) }
+    const onOpen = () => { nodes = spawnFlakes(container) }
     window.addEventListener('mic:curtain-opened', onOpen, { once: true })
 
     return () => {
       window.removeEventListener('mic:curtain-opened', onOpen)
-      // Removing container children stops respawn (el.isConnected check in animationend)
       nodes.forEach(n => n.isConnected && n.remove())
       style.remove()
     }
