@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   title: 'Hochzeit · Julia & Subhadip',
   description: 'Hochzeitseinladung — Julia & Subhadip, Berlin, Januar 2027',
   robots: 'noindex, nofollow',
+  openGraph: {
+    images: [{ url: '/photos/MIC/MIC_home.jpeg', width: 1456, height: 816 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    images: ['/photos/MIC/MIC_home.jpeg'],
+  },
 }
 
 async function getGuest(micToken: string) {
