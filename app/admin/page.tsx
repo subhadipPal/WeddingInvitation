@@ -332,6 +332,8 @@ export default function AdminPage() {
   const [micUploadStatus, setMicUploadStatus] = useState<Record<string, 'ok' | 'error'>>({})
   // slot/variant → raw blob URL (loaded from DB, updated after upload/delete)
   const [micImages, setMicImages] = useState<Record<string, string>>({})
+  // Bumped after every upload/delete so admin thumbnails bypass the browser cache.
+  const [micImagesBust, setMicImagesBust] = useState(() => Date.now())
 
   const loadMicImages = useCallback(async () => {
     try {
@@ -345,6 +347,7 @@ export default function AdminPage() {
         }
       }
       setMicImages(flat)
+      setMicImagesBust(Date.now())
     } catch { /* ignore */ }
   }, [])
   // ── Deploy logic ─────────────────────────────────────────────────────────────
@@ -588,8 +591,8 @@ export default function AdminPage() {
     setMicUploading(key)
     try {
       await fetch(`/api/mic-images?slot=${slot}&variant=${variant}`, { method: 'DELETE' })
-      setMicImages(prev => { const n = { ...prev }; delete n[key]; return n })
       setMicUploadStatus(prev => { const n = { ...prev }; delete n[key]; return n })
+      await loadMicImages()
     } finally {
       setMicUploading(null)
     }
@@ -974,7 +977,7 @@ export default function AdminPage() {
                             const status = micUploadStatus[key]
                             const existingUrl = micImages[key]
                             const proxyUrl = existingUrl
-                              ? `/api/mic-images/img?url=${encodeURIComponent(existingUrl)}`
+                              ? `/api/mic-images/img?url=${encodeURIComponent(existingUrl)}&v=${micImagesBust}`
                               : null
                             return (
                               <div key={v} className="flex items-center gap-3">

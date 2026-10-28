@@ -47,8 +47,10 @@ async function getMicPayload(guestId: string) {
   for (const slot of MIC_IMAGE_SLOTS) images[slot] = {}
   for (const row of imageRows) {
     if ((MIC_IMAGE_SLOTS as readonly string[]).includes(row.slot)) {
-      // Rewrite private blob URL → our public proxy
-      const proxyUrl = `/api/mic-images/img?url=${encodeURIComponent(row.url)}`
+      // Rewrite private blob URL → our public proxy; append uploadedAt as cache-buster
+      // so browsers reload when admin replaces an image (same slot = same URL otherwise).
+      const v = row.uploadedAt ? new Date(row.uploadedAt).getTime() : 0
+      const proxyUrl = `/api/mic-images/img?url=${encodeURIComponent(row.url)}&v=${v}`
       images[row.slot as MicImageSlot]![row.variant as MicImageVariant] = proxyUrl
     }
   }
