@@ -48,13 +48,15 @@ export default function MicPetalOverlay() {
     const spinAnims = ['mic-flake-spin-a', 'mic-flake-spin-b', 'mic-flake-spin-c']
 
     function spawnFlake(el: HTMLDivElement, initialDelay?: number) {
-      const size = rnd(10, 20)
+      const size = rnd(8, 32)
       const fallDur = rnd(12, 24)
       const spinDur = rnd(4, 9)
       const delay = initialDelay ?? 0
       const spin = spinAnims[randInt(0, spinAnims.length - 1)]
       const color = FLAKE_COLORS[randInt(0, FLAKE_COLORS.length - 1)]
       const char = FLAKE_CHARS[randInt(0, FLAKE_CHARS.length - 1)]
+
+      const opacity = 0.4 + (size / 32) * 0.55
 
       const node = document.createElement('div')
       node.textContent = char
@@ -66,8 +68,8 @@ export default function MicPetalOverlay() {
         font-size: ${size}px;
         line-height: 1;
         color: ${color};
-        text-shadow: 0 0 6px rgba(200,230,255,0.6);
-        opacity: 0.88;
+        text-shadow: 0 0 ${Math.round(size * 0.4)}px rgba(200,230,255,0.7);
+        opacity: ${opacity.toFixed(2)};
         user-select: none;
         animation:
           mic-flake-fall ${fallDur}s linear ${delay}s 1 forwards,
