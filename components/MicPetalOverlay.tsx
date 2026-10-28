@@ -57,6 +57,10 @@ export default function MicPetalOverlay() {
       const char = FLAKE_CHARS[randInt(0, FLAKE_CHARS.length - 1)]
 
       const opacity = 0.4 + (size / 32) * 0.55
+      const glowStr = rnd(0.4, 1.4)
+      const g1 = Math.round(size * 0.5 * glowStr)
+      const g2 = Math.round(size * 1.4 * glowStr)
+      const g3 = Math.round(size * 3.2 * glowStr)
 
       const node = document.createElement('div')
       node.textContent = char
@@ -68,7 +72,7 @@ export default function MicPetalOverlay() {
         font-size: ${size}px;
         line-height: 1;
         color: ${color};
-        text-shadow: 0 0 ${Math.round(size * 0.4)}px rgba(200,230,255,0.7);
+        text-shadow: 0 0 ${g1}px rgba(220,240,255,0.95), 0 0 ${g2}px rgba(180,220,255,0.6), 0 0 ${g3}px rgba(140,200,255,0.3);
         opacity: ${opacity.toFixed(2)};
         user-select: none;
         animation:
