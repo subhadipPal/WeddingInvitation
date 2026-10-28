@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { put } from '@vercel/blob'
+import { put, del } from '@vercel/blob'
 import sharp from 'sharp'
+import { eq, and } from 'drizzle-orm'
 import { db } from '@/lib/db'
 import { micImages } from '@/lib/schema'
 import { isValidSlot, isValidVariantForSlot, type MicImageSlot, type MicImageVariant } from '@/lib/mic'
@@ -58,10 +59,12 @@ export async function POST(req: NextRequest) {
   const blobPath = `mic/${slot}/${variant}.jpg`
   let blobUrl: string
   try {
+    // addRandomSuffix:true ensures every upload gets a unique URL, avoiding
+    // Vercel Blob edge-cache staleness when the same path is deleted+re-uploaded.
     const result = await put(blobPath, processed, {
       access: 'private',
       contentType: 'image/jpeg',
-      addRandomSuffix: false,
+      addRandomSuffix: true,
     })
     blobUrl = result.url
   } catch (err) {
@@ -71,6 +74,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'BLOB_READ_WRITE_TOKEN not configured in this environment' }, { status: 502 })
     }
     return NextResponse.json({ error: `Blob upload failed: ${msg}` }, { status: 502 })
+  }
+
+  // Delete old blob (if any) before updating the DB row, so orphaned blobs don't accumulate.
+  const existing = await db.select({ url: micImages.url }).from(micImages)
+    .where(and(eq(micImages.slot, slot as MicImageSlot), eq(micImages.variant, variant as MicImageVariant)))
+  if (existing.length) {
+    try { await del(existing[0].url) } catch { /* already gone — ignore */ }
   }
 
   // Upsert mic_images row
