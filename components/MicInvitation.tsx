@@ -1,5 +1,5 @@
 'use client'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { Section, FadeIn, useInView } from './invitation-helpers'
@@ -56,6 +56,15 @@ export default function MicInvitation({
   const showPetals = isToggleOn(content, 'micEnablePetals')
   const showRsvp = isToggleOn(content, 'micEnableRsvp')
 
+  // Lock scrolling until the curtain is opened. If the curtain is disabled, start unlocked.
+  const [scrollUnlocked, setScrollUnlocked] = useState(!showCurtain)
+  useEffect(() => {
+    if (!showCurtain) return
+    const unlock = () => setScrollUnlocked(true)
+    window.addEventListener('mic:curtain-opened', unlock, { once: true })
+    return () => window.removeEventListener('mic:curtain-opened', unlock)
+  }, [showCurtain])
+
   // Section refs — each self-manages its own fade-in via IntersectionObserver.
   const s1 = useRef<HTMLElement>(null)
   const s2 = useRef<HTMLElement>(null)
@@ -94,7 +103,11 @@ export default function MicInvitation({
 
       <div
         className="h-[100dvh] overflow-y-scroll"
-        style={{ scrollSnapType: 'y mandatory', scrollBehavior: 'smooth' }}
+        style={{
+          scrollSnapType: scrollUnlocked ? 'y mandatory' : 'none',
+          scrollBehavior: 'smooth',
+          overflowY: scrollUnlocked ? 'scroll' : 'hidden',
+        }}
       >
         {/* ─── Section 1 — Hero ─── */}
         <Section ref={s1} style={{ scrollSnapAlign: 'start' }}>
