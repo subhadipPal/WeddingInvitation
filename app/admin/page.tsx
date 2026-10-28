@@ -311,6 +311,7 @@ export default function AdminPage() {
   const [deleting, setDeleting] = useState<string | null>(null)
   const [activeNote, setActiveNote] = useState<string | null>(null)
   const [generatingMic, setGeneratingMic] = useState<string | null>(null)
+  const [generatingAllMic, setGeneratingAllMic] = useState(false)
 
   // Content tab state
   const [content, setContent] = useState<ContentState>(defaultContent())
@@ -359,9 +360,15 @@ export default function AdminPage() {
   // ── Guests tab logic ────────────────────────────────────────────────────────
 
   const loadGuests = useCallback(() =>
-    fetch('/api/guests').then(r => r.json()).then(d => setGuests(d.guests ?? [])), [])
+    fetch('/api/guests').then(r => r.json()).then(d => {
+      const list: Guest[] = d.guests ?? []
+      setGuests(list)
+      return list
+    }), [])
 
-  useEffect(() => { loadGuests() }, [loadGuests])
+  useEffect(() => {
+    loadGuests().then(list => generateAllMicTokens(list))
+  }, [loadGuests]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const copyLink = (link: string, id: string) => {
     navigator.clipboard.writeText(link)
@@ -384,6 +391,20 @@ export default function AdminPage() {
       if (res.ok) await loadGuests()
     } finally {
       setGeneratingMic(null)
+    }
+  }
+
+  const generateAllMicTokens = async (guestList: Guest[]) => {
+    const berlin = guestList.filter(g => g.invitedDays !== '28' && !g.micToken)
+    if (!berlin.length) return
+    setGeneratingAllMic(true)
+    try {
+      for (const g of berlin) {
+        await fetch(`/api/guests/${g.id}/generate-mic-token`, { method: 'POST' })
+      }
+      await loadGuests()
+    } finally {
+      setGeneratingAllMic(false)
     }
   }
 
@@ -646,6 +667,17 @@ export default function AdminPage() {
             </div>
 
             {/* Guest cards */}
+            {guests.length > 0 && guests.some(g => g.invitedDays !== '28' && !g.micToken) && (
+              <div className="mb-4 flex justify-end">
+                <button
+                  onClick={() => generateAllMicTokens(guests)}
+                  disabled={generatingAllMic}
+                  className="px-4 py-2 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif text-sm hover:bg-[#c9a84c]/20 transition-all disabled:opacity-40"
+                >
+                  {generatingAllMic ? '… Generating' : '💍 Generate All MIC'}
+                </button>
+              </div>
+            )}
             {guests.length === 0 ? (
               <p className="text-center text-[#f5f0e8]/30 font-serif py-12">No guests added yet.</p>
             ) : (

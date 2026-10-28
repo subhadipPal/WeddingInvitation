@@ -363,37 +363,37 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
         {heading}
       </p>
       <div className="relative max-h-[60vh] overflow-y-auto">
-        {/* Centre vertical line */}
-        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2" />
-
         <div className="flex flex-col gap-5">
           {rows.map((row, i) => {
             const icon = timetableIcon(row.label)
             const isLeft = i % 2 === 0
             return (
-              <div key={i} className="relative flex items-center">
+              <div key={i} className="relative flex items-start">
+                {/* Centre vertical line — spans full height via pseudo-element trick */}
+                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2" />
+
                 {/* Left side */}
-                <div className={`w-[calc(50%-16px)] ${isLeft ? 'flex flex-col items-end pr-3' : ''}`}>
+                <div className="w-[calc(50%-16px)] min-w-0 shrink-0">
                   {isLeft && (
-                    <>
+                    <div className="flex flex-col items-end pr-3">
                       <span className="text-2xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-sm text-right mt-0.5 leading-snug">{row.label}</span>
-                    </>
+                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                      <span className="font-serif text-[#f5f0e8] text-xs text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                    </div>
                   )}
                 </div>
 
                 {/* Centre dot */}
-                <div className="absolute left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
+                <div className="absolute left-1/2 -translate-x-1/2 top-1 w-3 h-3 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
 
                 {/* Right side */}
-                <div className={`w-[calc(50%-16px)] ml-auto ${!isLeft ? 'flex flex-col items-start pl-3' : ''}`}>
+                <div className="w-[calc(50%-16px)] min-w-0 shrink-0 ml-auto">
                   {!isLeft && (
-                    <>
+                    <div className="flex flex-col items-start pl-3">
                       <span className="text-2xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-sm mt-0.5 leading-snug">{row.label}</span>
-                    </>
+                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                      <span className="font-serif text-[#f5f0e8] text-xs mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                    </div>
                   )}
                 </div>
               </div>
