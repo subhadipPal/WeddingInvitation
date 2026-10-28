@@ -133,7 +133,7 @@ const MIC_GROUPS: MicGroup[] = [
   },
   {
     label: 'Animationen',
-    keys: ['micEnableCurtain', 'micEnablePetals'],
+    keys: ['micEnableCurtain', 'micEnablePetals', 'micEnableRsvp'],
     toggles: true,
   },
 ]
@@ -192,11 +192,12 @@ const MIC_KEY_LABELS: Partial<Record<MicContentKey, string>> = {
   micClosingBody: 'Abschluss — Text',
   micClosingSign: 'Abschluss — Unterschrift',
   micEnableCurtain: 'Vorhang-Animation aktiviert',
-  micEnablePetals: 'Blütenblatt-Animation aktiviert',
+  micEnablePetals: 'Schneeflocken-Animation aktiviert',
+  micEnableRsvp: 'RSVP-Sektion anzeigen',
 }
 
 const MIC_TIMETABLE_KEYS: Set<MicContentKey> = new Set(['mic22Timetable', 'mic23Timetable'])
-const MIC_TOGGLE_KEYS: Set<MicContentKey> = new Set(['micEnableCurtain', 'micEnablePetals'])
+const MIC_TOGGLE_KEYS: Set<MicContentKey> = new Set(['micEnableCurtain', 'micEnablePetals', 'micEnableRsvp'])
 
 const MIC_SLOT_LABELS: Record<MicImageSlot, string> = {
   hero: 'Hero (Startbild)',
