@@ -54,6 +54,7 @@ export default function MicInvitation({
   const stdHref = `/de/invite/${guest.stdToken}`
   const showCurtain = isToggleOn(content, 'micEnableCurtain')
   const showPetals = isToggleOn(content, 'micEnablePetals')
+  const showRsvp = isToggleOn(content, 'micEnableRsvp')
 
   // Section refs — each self-manages its own fade-in via IntersectionObserver.
   const s1 = useRef<HTMLElement>(null)
@@ -239,38 +240,40 @@ export default function MicInvitation({
           </div>
         </Section>
 
-        {/* ─── Section 5 — RSVP ─── */}
-        <Section ref={s5} style={{ scrollSnapAlign: 'start' }}>
-          <SectionBg url={images.rsvpBg?.default} placeholder={content.micImagePlaceholder} />
-          <div className="relative z-10 h-full overflow-y-auto px-6 py-12 flex items-start sm:items-center justify-center">
-            <FadeIn inView={v5} className="w-full">
-              <MicRsvpForm
-                micToken={guest.micToken}
-                guestName={guest.name}
-                isMulti={guest.isMulti}
-                showDay22={showDay22}
-                content={{
-                  heading: content.micRsvpHeading,
-                  greeting: content.micRsvpGreeting,
-                  greetingMulti: content.micRsvpGreetingMulti,
-                  question22: content.micRsvpQuestion22,
-                  question23: content.micRsvpQuestion23,
-                  yes: content.micRsvpYes,
-                  no: content.micRsvpNo,
-                  addressLabel: content.micRsvpAddressLabel,
-                  addressPlaceholder: content.micRsvpAddressPlaceholder,
-                  noteLabel: content.micRsvpNoteLabel,
-                  notePlaceholder: content.micRsvpNotePlaceholder,
-                  submit: content.micRsvpSubmit,
-                  update: content.micRsvpUpdate,
-                  confirmation: content.micRsvpConfirmation,
-                  confirmationMulti: content.micRsvpConfirmationMulti,
-                }}
-                initialRsvp={existingRsvp}
-              />
-            </FadeIn>
-          </div>
-        </Section>
+        {/* ─── Section 5 — RSVP (toggle-gated) ─── */}
+        {showRsvp && (
+          <Section ref={s5} style={{ scrollSnapAlign: 'start' }}>
+            <SectionBg url={images.rsvpBg?.default} placeholder={content.micImagePlaceholder} />
+            <div className="relative z-10 h-full overflow-y-auto px-6 py-12 flex items-start sm:items-center justify-center">
+              <FadeIn inView={v5} className="w-full">
+                <MicRsvpForm
+                  micToken={guest.micToken}
+                  guestName={guest.name}
+                  isMulti={guest.isMulti}
+                  showDay22={showDay22}
+                  content={{
+                    heading: content.micRsvpHeading,
+                    greeting: content.micRsvpGreeting,
+                    greetingMulti: content.micRsvpGreetingMulti,
+                    question22: content.micRsvpQuestion22,
+                    question23: content.micRsvpQuestion23,
+                    yes: content.micRsvpYes,
+                    no: content.micRsvpNo,
+                    addressLabel: content.micRsvpAddressLabel,
+                    addressPlaceholder: content.micRsvpAddressPlaceholder,
+                    noteLabel: content.micRsvpNoteLabel,
+                    notePlaceholder: content.micRsvpNotePlaceholder,
+                    submit: content.micRsvpSubmit,
+                    update: content.micRsvpUpdate,
+                    confirmation: content.micRsvpConfirmation,
+                    confirmationMulti: content.micRsvpConfirmationMulti,
+                  }}
+                  initialRsvp={existingRsvp}
+                />
+              </FadeIn>
+            </div>
+          </Section>
+        )}
 
         {/* ─── Section 6 — Closing ─── */}
         <Section ref={s6} style={{ scrollSnapAlign: 'start' }}>
