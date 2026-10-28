@@ -9,16 +9,22 @@ export async function GET(req: NextRequest) {
     return new NextResponse('Bad url', { status: 400 })
   }
 
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.error('[mic-images/img] BLOB_READ_WRITE_TOKEN not set')
+    return new NextResponse('Missing token', { status: 500 })
+  }
+
   let result: Awaited<ReturnType<typeof get>>
   try {
     result = await get(blobUrl, { access: 'private' })
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
-    console.error('[mic-images/img] get() error:', msg)
+    console.error('[mic-images/img] get() error:', msg, 'url:', blobUrl)
     return new NextResponse('Not found', { status: 404 })
   }
 
   if (!result || result.statusCode !== 200 || !result.stream) {
+    console.error('[mic-images/img] unexpected result:', result?.statusCode, 'url:', blobUrl)
     return new NextResponse('Not found', { status: 404 })
   }
 
@@ -26,7 +32,7 @@ export async function GET(req: NextRequest) {
     status: 200,
     headers: {
       'Content-Type': result.blob.contentType ?? 'image/jpeg',
-      'Cache-Control': 'private, max-age=3600',
+      'Cache-Control': 'private, max-age=86400',
     },
   })
 }
