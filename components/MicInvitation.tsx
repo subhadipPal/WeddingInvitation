@@ -167,18 +167,20 @@ export default function MicInvitation({
                   <TimetableCard heading={content.mic22TimetableHeading} body={content.mic22Timetable} />
                 </FadeIn>
                 <FadeIn inView={v2} delay={400}>
-                  <VenueCard
-                    name={content.mic22VenueVillaName}
-                    address={content.mic22VenueVillaAddress}
-                    routeLabel={content.mic22RouteButton}
-                  />
-                </FadeIn>
-                <FadeIn inView={v2} delay={500}>
-                  <VenueCard
-                    name={content.mic22VenueHofName}
-                    address={content.mic22VenueHofAddress}
-                    routeLabel={content.mic22RouteButton}
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <VenueCard
+                      name={content.mic22VenueVillaName}
+                      address={content.mic22VenueVillaAddress}
+                      routeLabel={content.mic22RouteButton}
+                      compact
+                    />
+                    <VenueCard
+                      name={content.mic22VenueHofName}
+                      address={content.mic22VenueHofAddress}
+                      routeLabel={content.mic22RouteButton}
+                      compact
+                    />
+                  </div>
                 </FadeIn>
               </div>
             </div>
@@ -362,48 +364,46 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
     })
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-4">
-      <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-5 text-center">
+    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-3">
+      <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-3 text-center">
         {heading}
       </p>
-      <div className="max-h-[60vh] overflow-y-auto">
-        <div className="relative flex flex-col gap-5">
-          {/* Single continuous centre line spanning all rows */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2 pointer-events-none" />
+      <div className="relative flex flex-col gap-3">
+        {/* Single continuous centre line spanning all rows */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2 pointer-events-none" />
 
-          {rows.map((row, i) => {
-            const icon = timetableIcon(row.label)
-            const isLeft = i % 2 === 0
-            return (
-              <div key={i} className="relative flex items-start">
-                {/* Left side */}
-                <div className="w-[calc(50%-16px)] min-w-0 shrink-0">
-                  {isLeft && (
-                    <div className="flex flex-col items-end pr-3">
-                      <span className="text-2xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-xs text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Centre dot */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-1 w-3 h-3 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
-
-                {/* Right side */}
-                <div className="w-[calc(50%-16px)] min-w-0 shrink-0 ml-auto">
-                  {!isLeft && (
-                    <div className="flex flex-col items-start pl-3">
-                      <span className="text-2xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-xs mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
-                    </div>
-                  )}
-                </div>
+        {rows.map((row, i) => {
+          const icon = timetableIcon(row.label)
+          const isLeft = i % 2 === 0
+          return (
+            <div key={i} className="relative flex items-start">
+              {/* Left side */}
+              <div className="w-[calc(50%-12px)] min-w-0 shrink-0">
+                {isLeft && (
+                  <div className="flex flex-col items-end pr-2">
+                    <span className="text-lg leading-none">{icon}</span>
+                    <span className="font-serif text-[#c9a84c] text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[11px] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                  </div>
+                )}
               </div>
-            )
-          })}
-        </div>
+
+              {/* Centre dot */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-1 w-2.5 h-2.5 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
+
+              {/* Right side */}
+              <div className="w-[calc(50%-12px)] min-w-0 shrink-0 ml-auto">
+                {!isLeft && (
+                  <div className="flex flex-col items-start pl-2">
+                    <span className="text-lg leading-none">{icon}</span>
+                    <span className="font-serif text-[#c9a84c] text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[11px] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -426,9 +426,10 @@ function venueMapSrc(address: string): string | null {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`
 }
 
-function VenueCard({ name, address, routeLabel }: { name: string; address: string; routeLabel: string }) {
+function VenueCard({ name, address, routeLabel, compact }: { name: string; address: string; routeLabel: string; compact?: boolean }) {
   const hasAddress = address && !address.toLowerCase().includes('folgt')
   const osmSrc = hasAddress ? venueMapSrc(address) : null
+  const mapHeight = compact ? 90 : 110
 
   return (
     <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col">
@@ -436,24 +437,24 @@ function VenueCard({ name, address, routeLabel }: { name: string; address: strin
         <iframe
           src={osmSrc}
           width="100%"
-          height="140"
+          height={mapHeight}
           loading="lazy"
           title={`Karte: ${name}`}
           className="w-full border-0 opacity-90"
           style={{ colorScheme: 'normal' }}
         />
       )}
-      <div className="p-4 flex flex-col gap-3">
+      <div className={compact ? 'p-2.5 flex flex-col gap-1.5' : 'p-3 flex flex-col gap-2'}>
         <div>
-          <p className="font-serif text-[#c9a84c] text-sm uppercase tracking-widest mb-1">📍 {name}</p>
-          <p className="font-serif text-[#f5f0e8] text-base whitespace-pre-wrap">{address}</p>
+          <p className={`font-serif text-[#c9a84c] uppercase tracking-widest mb-0.5 ${compact ? 'text-[10px]' : 'text-xs'}`}>📍 {name}</p>
+          <p className={`font-serif text-[#f5f0e8] whitespace-pre-wrap leading-snug ${compact ? 'text-xs' : 'text-sm'}`}>{address}</p>
         </div>
         {hasAddress && (
           <a
             href={routeLink(address)}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start px-3 py-1.5 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif text-xs hover:bg-[#c9a84c]/20 transition-colors"
+            className={`self-start rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif hover:bg-[#c9a84c]/20 transition-colors ${compact ? 'px-2 py-1 text-[10px]' : 'px-3 py-1.5 text-xs'}`}
           >
             {routeLabel}
           </a>
