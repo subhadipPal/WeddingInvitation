@@ -388,9 +388,9 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
               <div className="w-[calc(50%-10px)] min-w-0 shrink-0">
                 {isLeft && (
                   <div className="flex flex-col items-end pr-2 text-[#c9a84c]">
-                    <TimetableIcon id={row.iconId} className="w-4 h-4" />
-                    <span className="font-serif text-[0.8rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                    <span className="font-serif text-[#f5f0e8] text-[0.8rem] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                    <TimetableIcon id={row.iconId} className="w-8 h-8" />
+                    <span className="font-serif text-[1rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[1rem] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
                   </div>
                 )}
               </div>
@@ -402,9 +402,9 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
               <div className="w-[calc(50%-10px)] min-w-0 shrink-0 ml-auto">
                 {!isLeft && (
                   <div className="flex flex-col items-start pl-2 text-[#c9a84c]">
-                    <TimetableIcon id={row.iconId} className="w-4 h-4" />
-                    <span className="font-serif text-[0.8rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                    <span className="font-serif text-[#f5f0e8] text-[0.8rem] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                    <TimetableIcon id={row.iconId} className="w-8 h-8" />
+                    <span className="font-serif text-[1rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[1rem] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
                   </div>
                 )}
               </div>
