@@ -351,9 +351,9 @@ const TIMETABLE_ICON_MAP: Record<TimetableIconId, React.ComponentType<{ classNam
   sparkle: Sparkles,
 }
 
-function TimetableIcon({ id, className = 'w-5 h-5' }: { id: TimetableIconId; className?: string }) {
+function TimetableIcon({ id, className = 'w-4 h-4' }: { id: TimetableIconId; className?: string }) {
   const Icon = TIMETABLE_ICON_MAP[id] ?? Sparkles
-  return <Icon className={className} strokeWidth={1.4} />
+  return <Icon className={`${className} drop-shadow-[0_0_4px_rgba(201,168,76,0.7)]`} strokeWidth={1.4} />
 }
 
 function TimetableCard({ heading, body }: { heading: string; body: string }) {
@@ -372,7 +372,7 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
     })
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-3 w-[15rem] mx-auto">
+    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-3 w-[18rem] h-[40rem] mx-auto overflow-y-auto">
       <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-3 text-center">
         {heading}
       </p>
@@ -389,8 +389,8 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
                 {isLeft && (
                   <div className="flex flex-col items-end pr-2 text-[#c9a84c]">
                     <TimetableIcon id={row.iconId} className="w-4 h-4" />
-                    <span className="font-serif text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                    <span className="font-serif text-[#f5f0e8] text-[11px] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                    <span className="font-serif text-[0.8rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[0.8rem] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
                   </div>
                 )}
               </div>
@@ -403,8 +403,8 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
                 {!isLeft && (
                   <div className="flex flex-col items-start pl-2 text-[#c9a84c]">
                     <TimetableIcon id={row.iconId} className="w-4 h-4" />
-                    <span className="font-serif text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                    <span className="font-serif text-[#f5f0e8] text-[11px] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                    <span className="font-serif text-[0.8rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[0.8rem] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
                   </div>
                 )}
               </div>
