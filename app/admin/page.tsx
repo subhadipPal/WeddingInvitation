@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { translations as defaults, GUEST_FACING_KEYS, HINDU_GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
 import { triggerRedeploy } from './actions'
-import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, type MicContentKey, type MicImageSlot } from '@/lib/mic'
+import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, type MicContentKey, type MicFaqItem, type MicImageSlot } from '@/lib/mic'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -86,6 +86,7 @@ interface MicGroup {
   keys: MicContentKey[]
   timetable?: boolean // textarea keys that use the multiline timetable format
   toggles?: boolean   // boolean toggle keys (stored as 'true'/'false')
+  faqEditor?: boolean // render the variable-length FAQ item editor after the keys
 }
 
 const MIC_GROUPS: MicGroup[] = [
@@ -110,12 +111,8 @@ const MIC_GROUPS: MicGroup[] = [
   },
   {
     label: 'FAQ — Häufige Fragen',
-    keys: ['micFaqHeading',
-           'micFaqDressCodeTitle', 'micFaqDressCodeBody',
-           'micFaqGiftsTitle', 'micFaqGiftsBody',
-           'micFaqChildrenTitle', 'micFaqChildrenBody',
-           'micFaqRsvpDeadlineTitle', 'micFaqRsvpDeadlineBody',
-           'micFaqPhotosTitle', 'micFaqPhotosBody'],
+    keys: ['micFaqHeading'],
+    faqEditor: true,
   },
   {
     label: 'RSVP-Formular',
@@ -164,16 +161,6 @@ const MIC_KEY_LABELS: Partial<Record<MicContentKey, string>> = {
   mic23VenueName: '23 Jan — Venue Name',
   mic23VenueAddress: '23 Jan — Venue Adresse',
   micFaqHeading: 'FAQ — Hauptüberschrift',
-  micFaqDressCodeTitle: 'FAQ — Dresscode Titel',
-  micFaqDressCodeBody: 'FAQ — Dresscode Text',
-  micFaqGiftsTitle: 'FAQ — Geschenke Titel',
-  micFaqGiftsBody: 'FAQ — Geschenke Text',
-  micFaqChildrenTitle: 'FAQ — Kinder Titel',
-  micFaqChildrenBody: 'FAQ — Kinder Text',
-  micFaqRsvpDeadlineTitle: 'FAQ — RSVP-Frist Titel',
-  micFaqRsvpDeadlineBody: 'FAQ — RSVP-Frist Text',
-  micFaqPhotosTitle: 'FAQ — Fotos Titel',
-  micFaqPhotosBody: 'FAQ — Fotos Text',
   micRsvpHeading: 'RSVP — Überschrift',
   micRsvpGreeting: 'RSVP — Begrüßung (Du-Form)',
   micRsvpGreetingMulti: 'RSVP — Begrüßung (Ihr-Form)',
@@ -1080,6 +1067,7 @@ export default function AdminPage() {
                         </div>
                       )
                     })}
+                    {group.faqEditor && <FaqItemsEditor />}
                   </div>
                 </div>
               ))}
@@ -1158,6 +1146,214 @@ function serialiseTimetable(rows: TimetableRow[]): string {
       return `${t}   ${r.label}`
     })
     .join('\n')
+}
+
+// ── FaqItemsEditor ─────────────────────────────────────────────────────────────
+// Variable-length FAQ card list for the MIC page. Backed by the mic_faq_items
+// table (not the mic_content key/value store, since the number of items is
+// dynamic). Each card has a title, body, "important" toggle (yellow glow on
+// the guest page), ↑/↓ reorder, and delete. New items append at the end.
+// Edits debounce for 1.5s per item before PUT; add/delete/reorder are immediate.
+
+function FaqItemsEditor() {
+  const [items, setItems] = useState<MicFaqItem[]>([])
+  const [loaded, setLoaded] = useState(false)
+  const [savingId, setSavingId] = useState<string | null>(null)
+  const [busy, setBusy] = useState<'idle' | 'adding' | 'reordering' | 'deleting'>('idle')
+  const [error, setError] = useState<string | null>(null)
+  const saveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout> | undefined>>({})
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/mic-faq-items')
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`${r.status}`)))
+      .then((data: { items: MicFaqItem[] }) => {
+        if (cancelled) return
+        setItems(data.items)
+        setLoaded(true)
+      })
+      .catch(() => { if (!cancelled) { setError('Konnte FAQ nicht laden'); setLoaded(true) } })
+    const timers = saveTimersRef.current
+    return () => {
+      cancelled = true
+      for (const t of Object.values(timers)) if (t) clearTimeout(t)
+    }
+  }, [])
+
+  function queueSave(id: string, patch: Partial<Pick<MicFaqItem, 'title' | 'body' | 'isImportant'>>) {
+    const timers = saveTimersRef.current
+    if (timers[id]) clearTimeout(timers[id])
+    timers[id] = setTimeout(async () => {
+      setSavingId(id)
+      try {
+        const res = await fetch(`/api/mic-faq-items/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        })
+        if (!res.ok) throw new Error(`${res.status}`)
+        setError(null)
+      } catch {
+        setError('Speichern fehlgeschlagen')
+      } finally {
+        setSavingId(prev => (prev === id ? null : prev))
+      }
+    }, 1500)
+  }
+
+  function updateLocal(id: string, patch: Partial<MicFaqItem>) {
+    setItems(prev => prev.map(it => it.id === id ? { ...it, ...patch } : it))
+  }
+
+  async function addItem() {
+    setBusy('adding')
+    try {
+      const res = await fetch('/api/mic-faq-items', { method: 'POST' })
+      if (!res.ok) throw new Error(`${res.status}`)
+      const data: { item: MicFaqItem } = await res.json()
+      setItems(prev => [...prev, data.item])
+      setError(null)
+    } catch {
+      setError('Hinzufügen fehlgeschlagen')
+    } finally {
+      setBusy('idle')
+    }
+  }
+
+  async function deleteItem(id: string) {
+    if (!confirm('Diese Frage löschen?')) return
+    setBusy('deleting')
+    try {
+      const res = await fetch(`/api/mic-faq-items/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error(`${res.status}`)
+      setItems(prev => prev.filter(it => it.id !== id)
+        .map((it, i) => ({ ...it, position: i })))
+      setError(null)
+    } catch {
+      setError('Löschen fehlgeschlagen')
+    } finally {
+      setBusy('idle')
+    }
+  }
+
+  async function move(id: string, direction: 'up' | 'down') {
+    setBusy('reordering')
+    try {
+      const res = await fetch('/api/mic-faq-items', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'move', id, direction }),
+      })
+      if (!res.ok) throw new Error(`${res.status}`)
+      const data: { items: MicFaqItem[] } = await res.json()
+      setItems(data.items)
+      setError(null)
+    } catch {
+      setError('Verschieben fehlgeschlagen')
+    } finally {
+      setBusy('idle')
+    }
+  }
+
+  if (!loaded) {
+    return <p className="font-serif text-[#f5f0e8]/50 text-sm italic">Lade FAQ…</p>
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {error && (
+        <p className="font-serif text-red-400 text-sm">{error}</p>
+      )}
+      {items.map((item, idx) => (
+        <div
+          key={item.id}
+          className={`backdrop-blur-md rounded-xl p-4 ${
+            item.isImportant
+              ? 'bg-[#c9a84c]/15 border-2 border-[#c9a84c]/70 shadow-[0_0_20px_rgba(201,168,76,0.3)]'
+              : 'bg-black/20 border border-[#c9a84c]/20'
+          }`}
+        >
+          <div className="flex items-start gap-2 mb-3">
+            <div className="flex-1 flex items-center gap-2">
+              <span className="font-serif text-[#c9a84c]/60 text-xs uppercase tracking-widest">
+                Frage {idx + 1}
+              </span>
+              {savingId === item.id && (
+                <span className="font-serif text-[#c9a84c]/50 text-xs italic">Speichern…</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => move(item.id, 'up')}
+                disabled={idx === 0 || busy !== 'idle'}
+                className="w-7 h-7 flex items-center justify-center rounded border border-[#c9a84c]/30 text-[#c9a84c]/70 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Nach oben"
+              >↑</button>
+              <button
+                type="button"
+                onClick={() => move(item.id, 'down')}
+                disabled={idx === items.length - 1 || busy !== 'idle'}
+                className="w-7 h-7 flex items-center justify-center rounded border border-[#c9a84c]/30 text-[#c9a84c]/70 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                title="Nach unten"
+              >↓</button>
+              <button
+                type="button"
+                onClick={() => deleteItem(item.id)}
+                disabled={busy !== 'idle'}
+                className="w-7 h-7 flex items-center justify-center rounded border border-red-400/30 text-red-400/70 hover:border-red-400 hover:text-red-400 transition-colors disabled:opacity-30"
+                title="Löschen"
+              >✕</button>
+            </div>
+          </div>
+
+          <input
+            type="text"
+            value={item.title}
+            onChange={e => { updateLocal(item.id, { title: e.target.value }); queueSave(item.id, { title: e.target.value }) }}
+            placeholder="Titel der Frage"
+            className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 mb-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
+          />
+          <textarea
+            value={item.body}
+            onChange={e => { updateLocal(item.id, { body: e.target.value }); queueSave(item.id, { body: e.target.value }) }}
+            placeholder="Antworttext"
+            rows={4}
+            className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 mb-3 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60 resize-y"
+          />
+
+          <label className="flex items-center gap-3 cursor-pointer">
+            <div
+              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                item.isImportant ? 'bg-[#c9a84c]' : 'bg-white/20'
+              }`}
+              onClick={() => {
+                const next = !item.isImportant
+                updateLocal(item.id, { isImportant: next })
+                queueSave(item.id, { isImportant: next })
+              }}
+            >
+              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                item.isImportant ? 'translate-x-5' : 'translate-x-0.5'
+              }`} />
+            </div>
+            <span className="font-serif text-[#f5f0e8] text-sm">
+              {item.isImportant ? 'Wichtig (hervorgehoben)' : 'Normal'}
+            </span>
+          </label>
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={addItem}
+        disabled={busy !== 'idle'}
+        className="font-serif text-[#c9a84c] text-sm border border-dashed border-[#c9a84c]/40 rounded-lg py-3 hover:border-[#c9a84c] hover:bg-[#c9a84c]/5 transition-colors disabled:opacity-50"
+      >
+        + Frage hinzufügen
+      </button>
+    </div>
+  )
 }
 
 function TimetableEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {

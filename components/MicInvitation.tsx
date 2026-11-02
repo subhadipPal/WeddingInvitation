@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Section, FadeIn, useInView } from './invitation-helpers'
 import MicHamburgerMenu from './MicHamburgerMenu'
 import MicRsvpForm from './MicRsvpForm'
-import type { MicContentKey, MicImageSlot, MicImageVariant } from '@/lib/mic'
+import type { MicContentKey, MicFaqItem, MicImageSlot, MicImageVariant } from '@/lib/mic'
 import { isToggleOn } from '@/lib/mic'
 
 // Load animation overlays lazily so the main invite bundle stays small
@@ -32,6 +32,7 @@ interface Props {
     note: string | null
   } | null
   bakedHeroPath: string
+  faqItems: MicFaqItem[]
 }
 
 function interp(template: string, name: string) {
@@ -49,6 +50,7 @@ export default function MicInvitation({
   guest,
   existingRsvp,
   bakedHeroPath,
+  faqItems,
 }: Props) {
   const showDay22 = guest.invitedDays === '22+23'
   const stdHref = `/de/invite/${guest.stdToken}`
@@ -230,25 +232,11 @@ export default function MicInvitation({
                 </p>
                 <div className="w-16 h-px bg-[#c9a84c]/40 mx-auto mb-4" />
               </FadeIn>
-              <FadeIn inView={v4} delay={150}>
-                <FaqCard title={content.micFaqDressCodeTitle} body={content.micFaqDressCodeBody} />
-              </FadeIn>
-              <FadeIn inView={v4} delay={200}>
-                <FaqCard title={content.micFaqGiftsTitle} body={content.micFaqGiftsBody} />
-              </FadeIn>
-              <FadeIn inView={v4} delay={250}>
-                <FaqCard title={content.micFaqChildrenTitle} body={content.micFaqChildrenBody} />
-              </FadeIn>
-              <FadeIn inView={v4} delay={300}>
-                <FaqCard
-                  title={content.micFaqRsvpDeadlineTitle}
-                  body={content.micFaqRsvpDeadlineBody}
-                  accent
-                />
-              </FadeIn>
-              <FadeIn inView={v4} delay={350}>
-                <FaqCard title={content.micFaqPhotosTitle} body={content.micFaqPhotosBody} />
-              </FadeIn>
+              {faqItems.map((item, i) => (
+                <FadeIn key={item.id} inView={v4} delay={150 + i * 50}>
+                  <FaqCard title={item.title} body={item.body} accent={item.isImportant} />
+                </FadeIn>
+              ))}
             </div>
           </div>
         </Section>
