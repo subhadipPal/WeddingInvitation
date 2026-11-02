@@ -43,40 +43,39 @@ export async function POST(req: NextRequest) {
 }
 
 /** PATCH /api/mic-faq-items — admin only. Reorder helper.
- *  Body: { action: 'move'; id: string; direction: 'up' | 'down' }.
- *  Swaps position with the adjacent sibling (if any). */
+ *  Body: { action: 'reorder'; ids: string[] }.
+ *  Writes `position` for each id in the order provided. Uses a two-phase
+ *  update so a future UNIQUE(position) constraint wouldn't trip. */
 export async function PATCH(req: NextRequest) {
   if (!isAdmin(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  let body: { action?: unknown; id?: unknown; direction?: unknown }
+  let body: { action?: unknown; ids?: unknown }
   try { body = await req.json() } catch {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
-  if (body.action !== 'move' || typeof body.id !== 'string' ||
-      (body.direction !== 'up' && body.direction !== 'down')) {
+  if (body.action !== 'reorder' || !Array.isArray(body.ids) ||
+      !body.ids.every(id => typeof id === 'string')) {
     return NextResponse.json({ error: 'Bad request' }, { status: 400 })
   }
+  const ids = body.ids as string[]
 
-  const rows = await db.select().from(micFaqItems).orderBy(asc(micFaqItems.position))
-  const idx = rows.findIndex(r => r.id === body.id)
-  if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 })
-
-  const targetIdx = body.direction === 'up' ? idx - 1 : idx + 1
-  if (targetIdx < 0 || targetIdx >= rows.length) {
-    // At the edge — no-op, return current ordering.
-    return NextResponse.json({ items: rows.map(toApi) })
+  const existing = await db.select({ id: micFaqItems.id }).from(micFaqItems)
+  const knownIds = new Set(existing.map(r => r.id))
+  if (ids.length !== knownIds.size || !ids.every(id => knownIds.has(id))) {
+    return NextResponse.json({ error: 'ids do not match stored set' }, { status: 400 })
   }
 
-  const a = rows[idx]
-  const b = rows[targetIdx]
-  // Two-phase swap to dodge a potential future UNIQUE(position) constraint.
-  const sentinel = -1 - Date.now() // guaranteed not to collide with real positions
-  await db.update(micFaqItems).set({ position: sentinel, updatedAt: new Date() })
-    .where(eq(micFaqItems.id, a.id))
-  await db.update(micFaqItems).set({ position: a.position, updatedAt: new Date() })
-    .where(eq(micFaqItems.id, b.id))
-  await db.update(micFaqItems).set({ position: b.position, updatedAt: new Date() })
-    .where(eq(micFaqItems.id, a.id))
+  // Phase 1: push every row to a unique negative position to clear the way.
+  const base = -1 - Date.now()
+  for (let i = 0; i < ids.length; i++) {
+    await db.update(micFaqItems).set({ position: base - i, updatedAt: new Date() })
+      .where(eq(micFaqItems.id, ids[i]))
+  }
+  // Phase 2: assign final positions 0..N-1.
+  for (let i = 0; i < ids.length; i++) {
+    await db.update(micFaqItems).set({ position: i, updatedAt: new Date() })
+      .where(eq(micFaqItems.id, ids[i]))
+  }
 
   const refreshed = await db.select().from(micFaqItems).orderBy(asc(micFaqItems.position))
   return NextResponse.json({ items: refreshed.map(toApi) })

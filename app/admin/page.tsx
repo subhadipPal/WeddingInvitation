@@ -1152,16 +1152,21 @@ function serialiseTimetable(rows: TimetableRow[]): string {
 // Variable-length FAQ card list for the MIC page. Backed by the mic_faq_items
 // table (not the mic_content key/value store, since the number of items is
 // dynamic). Each card has a title, body, "important" toggle (yellow glow on
-// the guest page), ↑/↓ reorder, and delete. New items append at the end.
-// Edits debounce for 1.5s per item before PUT; add/delete/reorder are immediate.
+// the guest page), a drag handle to reorder, and a delete button. New items
+// append at the end. Edits debounce for 1.5s per item before PUT; add/delete/
+// reorder are immediate.
 
 function FaqItemsEditor() {
   const [items, setItems] = useState<MicFaqItem[]>([])
   const [loaded, setLoaded] = useState(false)
   const [savingId, setSavingId] = useState<string | null>(null)
-  const [busy, setBusy] = useState<'idle' | 'adding' | 'reordering' | 'deleting'>('idle')
   const [error, setError] = useState<string | null>(null)
   const saveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout> | undefined>>({})
+  const dragIdxRef = useRef<number | null>(null)
+  const itemsRef = useRef<MicFaqItem[]>([])
+  // Keep itemsRef in sync so onDragEnd can read the final order after
+  // setItems calls during the drag.
+  useEffect(() => { itemsRef.current = items }, [items])
 
   useEffect(() => {
     let cancelled = false
@@ -1206,7 +1211,6 @@ function FaqItemsEditor() {
   }
 
   async function addItem() {
-    setBusy('adding')
     try {
       const res = await fetch('/api/mic-faq-items', { method: 'POST' })
       if (!res.ok) throw new Error(`${res.status}`)
@@ -1215,14 +1219,11 @@ function FaqItemsEditor() {
       setError(null)
     } catch {
       setError('Hinzufügen fehlgeschlagen')
-    } finally {
-      setBusy('idle')
     }
   }
 
   async function deleteItem(id: string) {
     if (!confirm('Diese Frage löschen?')) return
-    setBusy('deleting')
     try {
       const res = await fetch(`/api/mic-faq-items/${id}`, { method: 'DELETE' })
       if (!res.ok) throw new Error(`${res.status}`)
@@ -1231,27 +1232,38 @@ function FaqItemsEditor() {
       setError(null)
     } catch {
       setError('Löschen fehlgeschlagen')
-    } finally {
-      setBusy('idle')
     }
   }
 
-  async function move(id: string, direction: 'up' | 'down') {
-    setBusy('reordering')
+  // ── Drag-to-reorder (HTML5 drag API, matches TimetableEditor) ──
+  const onDragStart = (i: number) => { dragIdxRef.current = i }
+  const onDragOver = (e: React.DragEvent, i: number) => {
+    e.preventDefault()
+    const from = dragIdxRef.current
+    if (from === null || from === i) return
+    setItems(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      next.splice(i, 0, moved)
+      return next
+    })
+    dragIdxRef.current = i
+  }
+  const onDragEnd = async () => {
+    dragIdxRef.current = null
+    const ids = itemsRef.current.map(it => it.id)
     try {
       const res = await fetch('/api/mic-faq-items', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'move', id, direction }),
+        body: JSON.stringify({ action: 'reorder', ids }),
       })
       if (!res.ok) throw new Error(`${res.status}`)
       const data: { items: MicFaqItem[] } = await res.json()
       setItems(data.items)
       setError(null)
     } catch {
-      setError('Verschieben fehlgeschlagen')
-    } finally {
-      setBusy('idle')
+      setError('Reihenfolge speichern fehlgeschlagen')
     }
   }
 
@@ -1267,44 +1279,33 @@ function FaqItemsEditor() {
       {items.map((item, idx) => (
         <div
           key={item.id}
-          className={`backdrop-blur-md rounded-xl p-4 ${
+          draggable
+          onDragStart={() => onDragStart(idx)}
+          onDragOver={e => onDragOver(e, idx)}
+          onDragEnd={onDragEnd}
+          className={`backdrop-blur-md rounded-xl p-4 group/faq ${
             item.isImportant
               ? 'bg-[#c9a84c]/15 border-2 border-[#c9a84c]/70 shadow-[0_0_20px_rgba(201,168,76,0.3)]'
               : 'bg-black/20 border border-[#c9a84c]/20'
           }`}
         >
-          <div className="flex items-start gap-2 mb-3">
-            <div className="flex-1 flex items-center gap-2">
-              <span className="font-serif text-[#c9a84c]/60 text-xs uppercase tracking-widest">
-                Frage {idx + 1}
-              </span>
-              {savingId === item.id && (
-                <span className="font-serif text-[#c9a84c]/50 text-xs italic">Speichern…</span>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => move(item.id, 'up')}
-                disabled={idx === 0 || busy !== 'idle'}
-                className="w-7 h-7 flex items-center justify-center rounded border border-[#c9a84c]/30 text-[#c9a84c]/70 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Nach oben"
-              >↑</button>
-              <button
-                type="button"
-                onClick={() => move(item.id, 'down')}
-                disabled={idx === items.length - 1 || busy !== 'idle'}
-                className="w-7 h-7 flex items-center justify-center rounded border border-[#c9a84c]/30 text-[#c9a84c]/70 hover:border-[#c9a84c] hover:text-[#c9a84c] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                title="Nach unten"
-              >↓</button>
-              <button
-                type="button"
-                onClick={() => deleteItem(item.id)}
-                disabled={busy !== 'idle'}
-                className="w-7 h-7 flex items-center justify-center rounded border border-red-400/30 text-red-400/70 hover:border-red-400 hover:text-red-400 transition-colors disabled:opacity-30"
-                title="Löschen"
-              >✕</button>
-            </div>
+          <div className="flex items-center gap-2 mb-3">
+            <span
+              className="shrink-0 cursor-grab active:cursor-grabbing text-[#c9a84c]/40 group-hover/faq:text-[#c9a84c]/80 transition-colors select-none text-xl leading-none"
+              title="Ziehen zum Sortieren"
+            >⠿</span>
+            <span className="flex-1 font-serif text-[#c9a84c]/60 text-xs uppercase tracking-widest">
+              Frage {idx + 1}
+            </span>
+            {savingId === item.id && (
+              <span className="font-serif text-[#c9a84c]/50 text-xs italic">Speichern…</span>
+            )}
+            <button
+              type="button"
+              onClick={() => deleteItem(item.id)}
+              className="w-7 h-7 flex items-center justify-center rounded border border-red-400/30 text-red-400/70 hover:border-red-400 hover:text-red-400 transition-colors"
+              title="Löschen"
+            >✕</button>
           </div>
 
           <input
@@ -1347,8 +1348,7 @@ function FaqItemsEditor() {
       <button
         type="button"
         onClick={addItem}
-        disabled={busy !== 'idle'}
-        className="font-serif text-[#c9a84c] text-sm border border-dashed border-[#c9a84c]/40 rounded-lg py-3 hover:border-[#c9a84c] hover:bg-[#c9a84c]/5 transition-colors disabled:opacity-50"
+        className="font-serif text-[#c9a84c] text-sm border border-dashed border-[#c9a84c]/40 rounded-lg py-3 hover:border-[#c9a84c] hover:bg-[#c9a84c]/5 transition-colors"
       >
         + Frage hinzufügen
       </button>
