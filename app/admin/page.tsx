@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { translations as defaults, GUEST_FACING_KEYS, HINDU_GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
 import { triggerRedeploy } from './actions'
-import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, type MicContentKey, type MicImageSlot } from '@/lib/mic'
+import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, TIMETABLE_ICON_IDS, TIMETABLE_ICON_LABELS, parseTimetableIconPrefix, type MicContentKey, type MicFaqItem, type MicImageSlot, type TimetableIconId } from '@/lib/mic'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -86,6 +86,7 @@ interface MicGroup {
   keys: MicContentKey[]
   timetable?: boolean // textarea keys that use the multiline timetable format
   toggles?: boolean   // boolean toggle keys (stored as 'true'/'false')
+  faqEditor?: boolean // render the variable-length FAQ item editor after the keys
 }
 
 const MIC_GROUPS: MicGroup[] = [
@@ -110,12 +111,8 @@ const MIC_GROUPS: MicGroup[] = [
   },
   {
     label: 'FAQ — Häufige Fragen',
-    keys: ['micFaqHeading',
-           'micFaqDressCodeTitle', 'micFaqDressCodeBody',
-           'micFaqGiftsTitle', 'micFaqGiftsBody',
-           'micFaqChildrenTitle', 'micFaqChildrenBody',
-           'micFaqRsvpDeadlineTitle', 'micFaqRsvpDeadlineBody',
-           'micFaqPhotosTitle', 'micFaqPhotosBody'],
+    keys: ['micFaqHeading'],
+    faqEditor: true,
   },
   {
     label: 'RSVP-Formular',
@@ -164,16 +161,6 @@ const MIC_KEY_LABELS: Partial<Record<MicContentKey, string>> = {
   mic23VenueName: '23 Jan — Venue Name',
   mic23VenueAddress: '23 Jan — Venue Adresse',
   micFaqHeading: 'FAQ — Hauptüberschrift',
-  micFaqDressCodeTitle: 'FAQ — Dresscode Titel',
-  micFaqDressCodeBody: 'FAQ — Dresscode Text',
-  micFaqGiftsTitle: 'FAQ — Geschenke Titel',
-  micFaqGiftsBody: 'FAQ — Geschenke Text',
-  micFaqChildrenTitle: 'FAQ — Kinder Titel',
-  micFaqChildrenBody: 'FAQ — Kinder Text',
-  micFaqRsvpDeadlineTitle: 'FAQ — RSVP-Frist Titel',
-  micFaqRsvpDeadlineBody: 'FAQ — RSVP-Frist Text',
-  micFaqPhotosTitle: 'FAQ — Fotos Titel',
-  micFaqPhotosBody: 'FAQ — Fotos Text',
   micRsvpHeading: 'RSVP — Überschrift',
   micRsvpGreeting: 'RSVP — Begrüßung (Du-Form)',
   micRsvpGreetingMulti: 'RSVP — Begrüßung (Ihr-Form)',
@@ -1080,6 +1067,7 @@ export default function AdminPage() {
                         </div>
                       )
                     })}
+                    {group.faqEditor && <FaqItemsEditor />}
                   </div>
                 </div>
               ))}
@@ -1125,10 +1113,10 @@ export default function AdminPage() {
 // Parses the multiline "HH:MM Uhr   Label" string into structured rows,
 // lets the admin edit each row with individual inputs, and serialises back.
 
-interface TimetableRow { id: number; time: string; label: string }
+interface TimetableRow { id: number; time: string; label: string; iconId: TimetableIconId | '' }
 
 let _rowId = 0
-const newRow = (time = '', label = ''): TimetableRow => ({ id: ++_rowId, time, label })
+const newRow = (time = '', label = '', iconId: TimetableIconId | '' = ''): TimetableRow => ({ id: ++_rowId, time, label, iconId })
 
 // Strip " Uhr" suffix so the time field shows just "HH:MM"
 function stripUhr(t: string) { return t.replace(/\s*Uhr\s*$/i, '').trim() }
@@ -1145,7 +1133,10 @@ function parseTimetable(raw: string): TimetableRow[] {
     .filter(Boolean)
     .map(line => {
       const m = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
-      return m ? newRow(stripUhr(m[1]), m[2].trim()) : newRow('', line)
+      const time = m ? stripUhr(m[1]) : ''
+      const rawLabel = m ? m[2].trim() : line
+      const { iconId, cleaned } = parseTimetableIconPrefix(rawLabel)
+      return newRow(time, cleaned, iconId ?? '')
     })
 }
 
@@ -1153,11 +1144,219 @@ function serialiseTimetable(rows: TimetableRow[]): string {
   return rows
     .filter(r => r.time || r.label)
     .map(r => {
-      // Append " Uhr" if time looks like HH:MM
       const t = /^\d{1,2}:\d{2}$/.test(r.time.trim()) ? `${r.time.trim()} Uhr` : r.time.trim()
-      return `${t}   ${r.label}`
+      const prefix = r.iconId ? `{${r.iconId}} ` : ''
+      return `${t}   ${prefix}${r.label}`
     })
     .join('\n')
+}
+
+// ── FaqItemsEditor ─────────────────────────────────────────────────────────────
+// Variable-length FAQ card list for the MIC page. Backed by the mic_faq_items
+// table (not the mic_content key/value store, since the number of items is
+// dynamic). Each card has a title, body, "important" toggle (yellow glow on
+// the guest page), a drag handle to reorder, and a delete button. New items
+// append at the end. Edits debounce for 1.5s per item before PUT; add/delete/
+// reorder are immediate.
+
+function FaqItemsEditor() {
+  const [items, setItems] = useState<MicFaqItem[]>([])
+  const [loaded, setLoaded] = useState(false)
+  const [savingId, setSavingId] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const saveTimersRef = useRef<Record<string, ReturnType<typeof setTimeout> | undefined>>({})
+  const dragIdxRef = useRef<number | null>(null)
+  const itemsRef = useRef<MicFaqItem[]>([])
+  // Keep itemsRef in sync so onDragEnd can read the final order after
+  // setItems calls during the drag.
+  useEffect(() => { itemsRef.current = items }, [items])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/mic-faq-items')
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(`${r.status}`)))
+      .then((data: { items: MicFaqItem[] }) => {
+        if (cancelled) return
+        setItems(data.items)
+        setLoaded(true)
+      })
+      .catch(() => { if (!cancelled) { setError('Konnte FAQ nicht laden'); setLoaded(true) } })
+    const timers = saveTimersRef.current
+    return () => {
+      cancelled = true
+      for (const t of Object.values(timers)) if (t) clearTimeout(t)
+    }
+  }, [])
+
+  function queueSave(id: string, patch: Partial<Pick<MicFaqItem, 'title' | 'body' | 'isImportant'>>) {
+    const timers = saveTimersRef.current
+    if (timers[id]) clearTimeout(timers[id])
+    timers[id] = setTimeout(async () => {
+      setSavingId(id)
+      try {
+        const res = await fetch(`/api/mic-faq-items/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        })
+        if (!res.ok) throw new Error(`${res.status}`)
+        setError(null)
+      } catch {
+        setError('Speichern fehlgeschlagen')
+      } finally {
+        setSavingId(prev => (prev === id ? null : prev))
+      }
+    }, 1500)
+  }
+
+  function updateLocal(id: string, patch: Partial<MicFaqItem>) {
+    setItems(prev => prev.map(it => it.id === id ? { ...it, ...patch } : it))
+  }
+
+  async function addItem() {
+    try {
+      const res = await fetch('/api/mic-faq-items', { method: 'POST' })
+      if (!res.ok) throw new Error(`${res.status}`)
+      const data: { item: MicFaqItem } = await res.json()
+      setItems(prev => [...prev, data.item])
+      setError(null)
+    } catch {
+      setError('Hinzufügen fehlgeschlagen')
+    }
+  }
+
+  async function deleteItem(id: string) {
+    if (!confirm('Diese Frage löschen?')) return
+    try {
+      const res = await fetch(`/api/mic-faq-items/${id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error(`${res.status}`)
+      setItems(prev => prev.filter(it => it.id !== id)
+        .map((it, i) => ({ ...it, position: i })))
+      setError(null)
+    } catch {
+      setError('Löschen fehlgeschlagen')
+    }
+  }
+
+  // ── Drag-to-reorder (HTML5 drag API, matches TimetableEditor) ──
+  const onDragStart = (i: number) => { dragIdxRef.current = i }
+  const onDragOver = (e: React.DragEvent, i: number) => {
+    e.preventDefault()
+    const from = dragIdxRef.current
+    if (from === null || from === i) return
+    setItems(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      next.splice(i, 0, moved)
+      return next
+    })
+    dragIdxRef.current = i
+  }
+  const onDragEnd = async () => {
+    dragIdxRef.current = null
+    const ids = itemsRef.current.map(it => it.id)
+    try {
+      const res = await fetch('/api/mic-faq-items', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'reorder', ids }),
+      })
+      if (!res.ok) throw new Error(`${res.status}`)
+      const data: { items: MicFaqItem[] } = await res.json()
+      setItems(data.items)
+      setError(null)
+    } catch {
+      setError('Reihenfolge speichern fehlgeschlagen')
+    }
+  }
+
+  if (!loaded) {
+    return <p className="font-serif text-[#f5f0e8]/50 text-sm italic">Lade FAQ…</p>
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {error && (
+        <p className="font-serif text-red-400 text-sm">{error}</p>
+      )}
+      {items.map((item, idx) => (
+        <div
+          key={item.id}
+          draggable
+          onDragStart={() => onDragStart(idx)}
+          onDragOver={e => onDragOver(e, idx)}
+          onDragEnd={onDragEnd}
+          className={`backdrop-blur-md rounded-xl p-4 group/faq ${
+            item.isImportant
+              ? 'bg-[#c9a84c]/15 border-2 border-[#c9a84c]/70 shadow-[0_0_20px_rgba(201,168,76,0.3)]'
+              : 'bg-black/20 border border-[#c9a84c]/20'
+          }`}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <span
+              className="shrink-0 cursor-grab active:cursor-grabbing text-[#c9a84c]/40 group-hover/faq:text-[#c9a84c]/80 transition-colors select-none text-xl leading-none"
+              title="Ziehen zum Sortieren"
+            >⠿</span>
+            <span className="flex-1 font-serif text-[#c9a84c]/60 text-xs uppercase tracking-widest">
+              Frage {idx + 1}
+            </span>
+            {savingId === item.id && (
+              <span className="font-serif text-[#c9a84c]/50 text-xs italic">Speichern…</span>
+            )}
+            <button
+              type="button"
+              onClick={() => deleteItem(item.id)}
+              className="w-7 h-7 flex items-center justify-center rounded border border-red-400/30 text-red-400/70 hover:border-red-400 hover:text-red-400 transition-colors"
+              title="Löschen"
+            >✕</button>
+          </div>
+
+          <input
+            type="text"
+            value={item.title}
+            onChange={e => { updateLocal(item.id, { title: e.target.value }); queueSave(item.id, { title: e.target.value }) }}
+            placeholder="Titel der Frage"
+            className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 mb-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
+          />
+          <textarea
+            value={item.body}
+            onChange={e => { updateLocal(item.id, { body: e.target.value }); queueSave(item.id, { body: e.target.value }) }}
+            placeholder="Antworttext"
+            rows={4}
+            className="w-full bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 mb-3 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60 resize-y"
+          />
+
+          <label className="flex items-center gap-3 cursor-pointer">
+            <div
+              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                item.isImportant ? 'bg-[#c9a84c]' : 'bg-white/20'
+              }`}
+              onClick={() => {
+                const next = !item.isImportant
+                updateLocal(item.id, { isImportant: next })
+                queueSave(item.id, { isImportant: next })
+              }}
+            >
+              <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                item.isImportant ? 'translate-x-5' : 'translate-x-0.5'
+              }`} />
+            </div>
+            <span className="font-serif text-[#f5f0e8] text-sm">
+              {item.isImportant ? 'Wichtig (hervorgehoben)' : 'Normal'}
+            </span>
+          </label>
+        </div>
+      ))}
+
+      <button
+        type="button"
+        onClick={addItem}
+        className="font-serif text-[#c9a84c] text-sm border border-dashed border-[#c9a84c]/40 rounded-lg py-3 hover:border-[#c9a84c] hover:bg-[#c9a84c]/5 transition-colors"
+      >
+        + Frage hinzufügen
+      </button>
+    </div>
+  )
 }
 
 function TimetableEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -1192,6 +1391,12 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
   // Typing: update local state only — never propagate mid-keystroke
   const setRow = (i: number, field: 'time' | 'label', v: string) => {
     setRows(rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r))
+  }
+
+  // Icon dropdown change: propagate immediately (no typing debounce needed)
+  const setRowIcon = (i: number, iconId: TimetableIconId | '') => {
+    const next = rows.map((r, idx) => idx === i ? { ...r, iconId } : r)
+    setRows(next); propagate(next)
   }
 
   // On blur: propagate (saves to DB after debounce)
@@ -1271,6 +1476,17 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
               placeholder="Beschreibung"
               className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
             />
+            <select
+              value={row.iconId}
+              onChange={e => setRowIcon(i, e.target.value as TimetableIconId | '')}
+              className="shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-2 py-2 text-[#f5f0e8] font-serif text-xs focus:outline-none focus:border-[#c9a84c]/60 max-w-[9rem]"
+              title="Icon wählen (leer = automatisch)"
+            >
+              <option value="">⚙ Auto</option>
+              {TIMETABLE_ICON_IDS.map(id => (
+                <option key={id} value={id}>{TIMETABLE_ICON_LABELS[id]}</option>
+              ))}
+            </select>
             <button
               onClick={() => removeRow(i)}
               className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"

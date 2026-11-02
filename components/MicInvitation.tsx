@@ -5,8 +5,9 @@ import Image from 'next/image'
 import { Section, FadeIn, useInView } from './invitation-helpers'
 import MicHamburgerMenu from './MicHamburgerMenu'
 import MicRsvpForm from './MicRsvpForm'
-import type { MicContentKey, MicImageSlot, MicImageVariant } from '@/lib/mic'
-import { isToggleOn } from '@/lib/mic'
+import { Footprints, HeartHandshake, DoorOpen, Gem, Camera, UtensilsCrossed, Cake, Wine, Music, Sparkles, PartyPopper } from 'lucide-react'
+import type { MicContentKey, MicFaqItem, MicImageSlot, MicImageVariant, TimetableIconId } from '@/lib/mic'
+import { isToggleOn, parseTimetableIconPrefix, inferTimetableIcon } from '@/lib/mic'
 
 // Load animation overlays lazily so the main invite bundle stays small
 const MicCurtainFrame = dynamic(() => import('./MicCurtainFrame'), { ssr: false })
@@ -32,6 +33,7 @@ interface Props {
     note: string | null
   } | null
   bakedHeroPath: string
+  faqItems: MicFaqItem[]
 }
 
 function interp(template: string, name: string) {
@@ -49,6 +51,7 @@ export default function MicInvitation({
   guest,
   existingRsvp,
   bakedHeroPath,
+  faqItems,
 }: Props) {
   const showDay22 = guest.invitedDays === '22+23'
   const stdHref = `/de/invite/${guest.stdToken}`
@@ -165,18 +168,20 @@ export default function MicInvitation({
                   <TimetableCard heading={content.mic22TimetableHeading} body={content.mic22Timetable} />
                 </FadeIn>
                 <FadeIn inView={v2} delay={400}>
-                  <VenueCard
-                    name={content.mic22VenueVillaName}
-                    address={content.mic22VenueVillaAddress}
-                    routeLabel={content.mic22RouteButton}
-                  />
-                </FadeIn>
-                <FadeIn inView={v2} delay={500}>
-                  <VenueCard
-                    name={content.mic22VenueHofName}
-                    address={content.mic22VenueHofAddress}
-                    routeLabel={content.mic22RouteButton}
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <VenueCard
+                      name={content.mic22VenueVillaName}
+                      address={content.mic22VenueVillaAddress}
+                      routeLabel={content.mic22RouteButton}
+                      compact
+                    />
+                    <VenueCard
+                      name={content.mic22VenueHofName}
+                      address={content.mic22VenueHofAddress}
+                      routeLabel={content.mic22RouteButton}
+                      compact
+                    />
+                  </div>
                 </FadeIn>
               </div>
             </div>
@@ -213,6 +218,7 @@ export default function MicInvitation({
                   name={content.mic23VenueName}
                   address={content.mic23VenueAddress}
                   routeLabel={content.mic22RouteButton}
+                  compact
                 />
               </FadeIn>
             </div>
@@ -230,25 +236,11 @@ export default function MicInvitation({
                 </p>
                 <div className="w-16 h-px bg-[#c9a84c]/40 mx-auto mb-4" />
               </FadeIn>
-              <FadeIn inView={v4} delay={150}>
-                <FaqCard title={content.micFaqDressCodeTitle} body={content.micFaqDressCodeBody} />
-              </FadeIn>
-              <FadeIn inView={v4} delay={200}>
-                <FaqCard title={content.micFaqGiftsTitle} body={content.micFaqGiftsBody} />
-              </FadeIn>
-              <FadeIn inView={v4} delay={250}>
-                <FaqCard title={content.micFaqChildrenTitle} body={content.micFaqChildrenBody} />
-              </FadeIn>
-              <FadeIn inView={v4} delay={300}>
-                <FaqCard
-                  title={content.micFaqRsvpDeadlineTitle}
-                  body={content.micFaqRsvpDeadlineBody}
-                  accent
-                />
-              </FadeIn>
-              <FadeIn inView={v4} delay={350}>
-                <FaqCard title={content.micFaqPhotosTitle} body={content.micFaqPhotosBody} />
-              </FadeIn>
+              {faqItems.map((item, i) => (
+                <FadeIn key={item.id} inView={v4} delay={150 + i * 50}>
+                  <FaqCard title={item.title} body={item.body} accent={item.isImportant} />
+                </FadeIn>
+              ))}
             </div>
           </div>
         </Section>
@@ -342,22 +334,26 @@ function SectionBg({ url, placeholder }: { url?: string; placeholder: string }) 
   )
 }
 
-const TIMETABLE_ICONS: [RegExp, string][] = [
-  [/eintreff|ankommen|herzlich will/i, '🚶'],
-  [/first look/i, '💑'],
-  [/einlass/i, '🚪'],
-  [/trauung|ja|zeremonie|ceremony/i, '💍'],
-  [/glückwunsch|foto|photo|shooting/i, '📸'],
-  [/essen|dinner|buffet|tisch|hof/i, '🍽️'],
-  [/kaffee|torte|cake/i, '🎂'],
-  [/ginergy|aperitif|sekt/i, '🥂'],
-  [/tanz|dance|party/i, '💃'],
-  [/feuerwerk/i, '🎆'],
-]
+// Fancy line icons for the timetable (lucide-react). Colour follows currentColor
+// so the gold section accent carries through. The icon id is either picked by
+// admin (via a `{iconId}` prefix on the row) or inferred from the label text.
+const TIMETABLE_ICON_MAP: Record<TimetableIconId, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
+  walk: Footprints,
+  couple: HeartHandshake,
+  door: DoorOpen,
+  ring: Gem,
+  camera: Camera,
+  dinner: UtensilsCrossed,
+  cake: Cake,
+  glass: Wine,
+  music: Music,
+  fireworks: PartyPopper,
+  sparkle: Sparkles,
+}
 
-function timetableIcon(label: string): string {
-  for (const [re, icon] of TIMETABLE_ICONS) if (re.test(label)) return icon
-  return '✨'
+function TimetableIcon({ id, className = 'w-4 h-4' }: { id: TimetableIconId; className?: string }) {
+  const Icon = TIMETABLE_ICON_MAP[id] ?? Sparkles
+  return <Icon className={`${className} drop-shadow-[0_0_4px_rgba(201,168,76,0.7)]`} strokeWidth={1.4} />
 }
 
 function TimetableCard({ heading, body }: { heading: string; body: string }) {
@@ -368,54 +364,53 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
     .map(line => {
       // Accept any run of spaces or tabs as the separator between time and label
       const match = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
-      if (match) return { time: match[1].trim(), label: match[2].trim() }
-      // fallback: treat whole line as label
-      return { time: '', label: line }
+      const rawLabel = match ? match[2].trim() : line
+      const time = match ? match[1].trim() : ''
+      const { iconId, cleaned } = parseTimetableIconPrefix(rawLabel)
+      const resolvedIconId = iconId ?? inferTimetableIcon(cleaned)
+      return { time, label: cleaned, iconId: resolvedIconId }
     })
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-4">
-      <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-5 text-center">
+    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-3 w-[18rem] h-[40rem] mx-auto overflow-y-auto">
+      <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-3 text-center">
         {heading}
       </p>
-      <div className="max-h-[60vh] overflow-y-auto">
-        <div className="relative flex flex-col gap-5">
-          {/* Single continuous centre line spanning all rows */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2 pointer-events-none" />
+      <div className="relative flex flex-col gap-3">
+        {/* Single continuous centre line spanning all rows */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2 pointer-events-none" />
 
-          {rows.map((row, i) => {
-            const icon = timetableIcon(row.label)
-            const isLeft = i % 2 === 0
-            return (
-              <div key={i} className="relative flex items-start">
-                {/* Left side */}
-                <div className="w-[calc(50%-16px)] min-w-0 shrink-0">
-                  {isLeft && (
-                    <div className="flex flex-col items-end pr-3">
-                      <span className="text-2xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-xs text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Centre dot */}
-                <div className="absolute left-1/2 -translate-x-1/2 top-1 w-3 h-3 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
-
-                {/* Right side */}
-                <div className="w-[calc(50%-16px)] min-w-0 shrink-0 ml-auto">
-                  {!isLeft && (
-                    <div className="flex flex-col items-start pl-3">
-                      <span className="text-2xl leading-none">{icon}</span>
-                      <span className="font-serif text-[#c9a84c] text-sm tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
-                      <span className="font-serif text-[#f5f0e8] text-xs mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
-                    </div>
-                  )}
-                </div>
+        {rows.map((row, i) => {
+          const isLeft = i % 2 === 0
+          return (
+            <div key={i} className="relative flex items-start">
+              {/* Left side */}
+              <div className="w-[calc(50%-10px)] min-w-0 shrink-0">
+                {isLeft && (
+                  <div className="flex flex-col items-end pr-2 text-[#c9a84c]">
+                    <TimetableIcon id={row.iconId} className="w-8 h-8" />
+                    <span className="font-serif text-[1rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[1rem] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                  </div>
+                )}
               </div>
-            )
-          })}
-        </div>
+
+              {/* Centre dot */}
+              <div className="absolute left-1/2 -translate-x-1/2 top-1 w-2 h-2 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
+
+              {/* Right side */}
+              <div className="w-[calc(50%-10px)] min-w-0 shrink-0 ml-auto">
+                {!isLeft && (
+                  <div className="flex flex-col items-start pl-2 text-[#c9a84c]">
+                    <TimetableIcon id={row.iconId} className="w-8 h-8" />
+                    <span className="font-serif text-[1rem] tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                    <span className="font-serif text-[#f5f0e8] text-[1rem] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -438,34 +433,34 @@ function venueMapSrc(address: string): string | null {
   return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lon}`
 }
 
-function VenueCard({ name, address, routeLabel }: { name: string; address: string; routeLabel: string }) {
+function VenueCard({ name, address, routeLabel, compact }: { name: string; address: string; routeLabel: string; compact?: boolean }) {
   const hasAddress = address && !address.toLowerCase().includes('folgt')
   const osmSrc = hasAddress ? venueMapSrc(address) : null
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col">
+    <div className={`bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col ${compact ? 'w-full max-w-[20rem] mx-auto' : ''}`}>
       {osmSrc && (
         <iframe
           src={osmSrc}
           width="100%"
-          height="140"
+          height={compact ? 160 : 110}
           loading="lazy"
           title={`Karte: ${name}`}
-          className="w-full border-0 opacity-90"
+          className={`w-full border-0 opacity-90 ${compact ? 'h-40' : ''}`}
           style={{ colorScheme: 'normal' }}
         />
       )}
-      <div className="p-4 flex flex-col gap-3">
+      <div className={compact ? 'p-2.5 flex flex-col gap-1.5' : 'p-3 flex flex-col gap-2'}>
         <div>
-          <p className="font-serif text-[#c9a84c] text-sm uppercase tracking-widest mb-1">📍 {name}</p>
-          <p className="font-serif text-[#f5f0e8] text-base whitespace-pre-wrap">{address}</p>
+          <p className={`font-serif text-[#c9a84c] uppercase tracking-widest mb-0.5 ${compact ? 'text-[10px]' : 'text-xs'}`}>📍 {name}</p>
+          <p className={`font-serif text-[#f5f0e8] whitespace-pre-wrap leading-snug ${compact ? 'text-xs' : 'text-sm'}`}>{address}</p>
         </div>
         {hasAddress && (
           <a
             href={routeLink(address)}
             target="_blank"
             rel="noopener noreferrer"
-            className="self-start px-3 py-1.5 rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif text-xs hover:bg-[#c9a84c]/20 transition-colors"
+            className={`self-start rounded-lg border border-[#c9a84c]/50 bg-[#c9a84c]/10 text-[#c9a84c] font-serif hover:bg-[#c9a84c]/20 transition-colors ${compact ? 'px-2 py-1 text-[10px]' : 'px-3 py-1.5 text-xs'}`}
           >
             {routeLabel}
           </a>

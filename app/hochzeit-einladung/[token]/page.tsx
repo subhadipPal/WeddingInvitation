@@ -8,6 +8,7 @@ import {
   type MicImageSlot,
   type MicImageVariant,
 } from '@/lib/mic'
+import { getAllFaqItems } from '@/lib/mic-faq'
 import MicInvitation from '@/components/MicInvitation'
 import type { Metadata } from 'next'
 
@@ -42,10 +43,11 @@ async function getGuest(micToken: string) {
 }
 
 async function getMicPayload(guestId: string) {
-  const [contentRows, imageRows, rsvpRows] = await Promise.all([
+  const [contentRows, imageRows, rsvpRows, faqItems] = await Promise.all([
     db.select().from(micContent),
     db.select().from(micImages),
     db.select().from(micRsvps).where(eq(micRsvps.guestId, guestId)).limit(1),
+    getAllFaqItems(),
   ])
 
   const content = mergeMicContent(contentRows)
@@ -71,7 +73,7 @@ async function getMicPayload(guestId: string) {
       }
     : null
 
-  return { content, images, existingRsvp }
+  return { content, images, existingRsvp, faqItems }
 }
 
 export default async function MicPage({ params }: Props) {
@@ -100,7 +102,7 @@ export default async function MicPage({ params }: Props) {
     )
   }
 
-  const { content, images, existingRsvp } = await getMicPayload(guest.id)
+  const { content, images, existingRsvp, faqItems } = await getMicPayload(guest.id)
 
   // Only '22+23' and '23' reach here. Narrow the type for MicInvitation.
   const invitedDays = guest.invitedDays as '22+23' | '23'
@@ -118,6 +120,7 @@ export default async function MicPage({ params }: Props) {
       }}
       existingRsvp={existingRsvp}
       bakedHeroPath={BAKED_HERO_PATH}
+      faqItems={faqItems}
     />
   )
 }

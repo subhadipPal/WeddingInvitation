@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, boolean, text, timestamp, unique } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, varchar, boolean, text, timestamp, integer, unique } from 'drizzle-orm/pg-core'
 
 export const guests = pgTable('guests', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -59,5 +59,18 @@ export const micRsvps = pgTable('mic_rsvps', {
   address: text('address'),
   note: text('note'),
   submittedAt: timestamp('submitted_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+// Variable-length FAQ list for the MIC page. Admin can add/remove/reorder items
+// and flag any item as `is_important` (same visual treatment as the deadline
+// highlight that used to be hardcoded on the Rsvp-Deadline FAQ).
+export const micFaqItems = pgTable('mic_faq_items', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  position: integer('position').notNull(),
+  title: text('title').notNull(),
+  body: text('body').notNull(),
+  isImportant: boolean('is_important').notNull().default(false),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })

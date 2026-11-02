@@ -55,16 +55,9 @@ export const MIC_CONTENT_KEYS = [
 
   // FAQ
   'micFaqHeading',      // "HÄUFIGE FRAGEN"
-  'micFaqDressCodeTitle',
-  'micFaqDressCodeBody',
-  'micFaqGiftsTitle',
-  'micFaqGiftsBody',
-  'micFaqChildrenTitle',
-  'micFaqChildrenBody',
-  'micFaqRsvpDeadlineTitle',
-  'micFaqRsvpDeadlineBody',
-  'micFaqPhotosTitle',
-  'micFaqPhotosBody',
+  // FAQ items themselves live in the `mic_faq_items` DB table (variable count,
+  // reorderable, each has its own `isImportant` flag). Only the section
+  // heading stays as a content key.
 
   // RSVP form labels
   'micRsvpHeading',     // "RÜCKMELDUNG"
@@ -157,21 +150,6 @@ export const MIC_DEFAULTS: Record<MicContentKey, string> = {
 
   // FAQ
   micFaqHeading: 'HÄUFIGE FRAGEN',
-  micFaqDressCodeTitle: 'Was sollen wir anziehen?',
-  micFaqDressCodeBody:
-    'So bunt und vielfältig wie unsere Gäste! Ob klassisch-elegante Hochzeitsgarderobe oder traditionelle indische Festkleidung — bei uns ist alles herzlich willkommen.\n\nBitte vermeidet nur drei Farben:\n🤍 Weiß — der Braut vorbehalten.\n❤️ Rot — in der bengalischen Hochzeitstradition ebenfalls der Braut vorbehalten.\n🖤 Schwarz — das überlassen wir der Trauer.\n\nAnsonsten: Seid festlich, seid farbenfroh und vor allem seid ihr selbst!',
-  micFaqGiftsTitle: 'Was wünscht ihr euch?',
-  micFaqGiftsBody:
-    'Das größte Geschenk ist für uns, diesen besonderen Tag mit euch zu feiern! Unser Zuhause ist bereits gut gefüllt. Wenn ihr uns dennoch eine Freude machen möchtet, freuen wir uns über einen kleinen Beitrag zu unserer Flitterwochenkasse — so schenkt ihr uns unvergessliche gemeinsame Erinnerungen.',
-  micFaqChildrenTitle: 'Sind Kinder willkommen?',
-  micFaqChildrenBody:
-    'Wir lieben Kinder! Dennoch ist unsere Hochzeitsfeier in erster Linie für Erwachsene geplant — vor Ort gibt es keine Kinderbetreuung und keine Spielangebote. Wenn ihr für euren Nachwuchs eine liebevolle Betreuung organisieren könnt, würde uns das sehr freuen. Falls das nicht möglich ist, sprecht uns bitte persönlich an — wir finden gemeinsam eine Lösung.',
-  micFaqRsvpDeadlineTitle: 'Bis wann müssen wir zusagen?',
-  micFaqRsvpDeadlineBody:
-    'Damit wir gut planen können, bitten wir Euch um Eure Rückmeldung bis spätestens **15. Januar 2027**. Die Rückmeldung könnt ihr direkt über diese Seite abgeben. Sollten wir bis zum 15. Januar keine Nachricht erhalten, gehen wir leider von einer Absage aus. Vielen Dank für Euer Verständnis!',
-  micFaqPhotosTitle: 'Dürfen wir Fotos und Videos machen?',
-  micFaqPhotosBody:
-    'Unbedingt! Haltet unsere Hochzeit gerne aus eurer persönlichen Perspektive fest.\n\nAmazon Photos: Link folgt — hier könnt ihr eure schönsten Bilder hochladen und die Erinnerungen der anderen Gäste entdecken.\n\nWhatsApp: Teilt eure Aufnahmen gerne in unserer WhatsApp-Gruppe oder schickt sie uns direkt. Über kleine Videobotschaften freuen wir uns besonders.',
 
   // RSVP form
   micRsvpHeading: 'RÜCKMELDUNG',
@@ -253,5 +231,120 @@ export function isToggleOn(content: Record<MicContentKey, string>, key: 'micEnab
   return content[key] === 'true'
 }
 
+// ── Timetable icons ───────────────────────────────────────────────────────────
+//
+// Each timetable row may start with `{iconId}` where `iconId` is one of the
+// IDs below. If present, that icon is used. If absent, the regex rules fall
+// back to inferring from the label text (keeps old content working).
+
 /** Baked default hero image path — always present in the repo. */
 export const BAKED_HERO_PATH = '/photos/MIC/MIC_home.jpeg'
+
+export const TIMETABLE_ICON_IDS = [
+  'walk',       // Arrival / entrance
+  'couple',     // First look / couple moment
+  'door',       // Common entrance
+  'ring',       // Ceremony / Ja-Wort
+  'camera',     // Photos / shooting
+  'dinner',     // Dinner / buffet
+  'cake',       // Cake / coffee
+  'glass',      // Aperitif / toast
+  'music',      // Dance / party
+  'fireworks',  // Fireworks / finale
+  'sparkle',    // Generic sparkle (default)
+] as const
+export type TimetableIconId = typeof TIMETABLE_ICON_IDS[number]
+
+/** Human-readable German labels for the icon dropdown in admin. */
+export const TIMETABLE_ICON_LABELS: Record<TimetableIconId, string> = {
+  walk:      '🚶 Ankommen',
+  couple:    '💑 First Look / Paar',
+  door:      '🚪 Einlass',
+  ring:      '💍 Trauung',
+  camera:    '📸 Foto / Shooting',
+  dinner:    '🍽 Essen / Buffet',
+  cake:      '🎂 Torte / Kaffee',
+  glass:     '🥂 Aperitif / Toast',
+  music:     '🎵 Tanz / Party',
+  fireworks: '🎆 Feuerwerk',
+  sparkle:   '✨ Sonstiges',
+}
+
+/** Parse the `{iconId}` prefix out of a label, if present. Returns the
+ *  cleaned label and the resolved icon id (or null if no prefix found). */
+export function parseTimetableIconPrefix(label: string): { iconId: TimetableIconId | null; cleaned: string } {
+  const m = label.match(/^\{([a-z]+)\}\s*(.*)$/i)
+  if (!m) return { iconId: null, cleaned: label }
+  const id = m[1].toLowerCase()
+  if ((TIMETABLE_ICON_IDS as readonly string[]).includes(id)) {
+    return { iconId: id as TimetableIconId, cleaned: m[2].trim() }
+  }
+  return { iconId: null, cleaned: label }
+}
+
+/** Regex fallbacks when no explicit `{iconId}` prefix is set. */
+const TIMETABLE_ICON_FALLBACKS: [RegExp, TimetableIconId][] = [
+  [/eintreff|ankommen|herzlich will/i, 'walk'],
+  [/first look/i, 'couple'],
+  [/einlass/i, 'door'],
+  [/trauung|ja|zeremonie|ceremony/i, 'ring'],
+  [/glückwunsch|foto|photo|shooting/i, 'camera'],
+  [/essen|dinner|buffet|tisch|hof/i, 'dinner'],
+  [/kaffee|torte|cake/i, 'cake'],
+  [/ginergy|aperitif|sekt|toast/i, 'glass'],
+  [/tanz|dance|party/i, 'music'],
+  [/feuerwerk/i, 'fireworks'],
+]
+
+/** Infer an icon from the label if no explicit prefix is set. */
+export function inferTimetableIcon(label: string): TimetableIconId {
+  for (const [re, id] of TIMETABLE_ICON_FALLBACKS) if (re.test(label)) return id
+  return 'sparkle'
+}
+
+// ── FAQ items (variable list) ─────────────────────────────────────────────────
+
+export interface MicFaqItem {
+  id: string
+  position: number
+  title: string
+  body: string
+  isImportant: boolean
+}
+
+/** Seeded on first load if the `mic_faq_items` table is empty. Matches the
+ *  5 FAQs that were previously hardcoded as content keys. The Rsvp-Deadline
+ *  item is flagged `isImportant: true` to preserve the yellow-glow visual
+ *  the old code applied via the `accent` prop. */
+export const MIC_FAQ_DEFAULTS: Array<Omit<MicFaqItem, 'id'>> = [
+  {
+    position: 0,
+    title: 'Was sollen wir anziehen?',
+    body: 'So bunt und vielfältig wie unsere Gäste! Ob klassisch-elegante Hochzeitsgarderobe oder traditionelle indische Festkleidung — bei uns ist alles herzlich willkommen.\n\nBitte vermeidet nur drei Farben:\n🤍 Weiß — der Braut vorbehalten.\n❤️ Rot — in der bengalischen Hochzeitstradition ebenfalls der Braut vorbehalten.\n🖤 Schwarz — das überlassen wir der Trauer.\n\nAnsonsten: Seid festlich, seid farbenfroh und vor allem seid ihr selbst!',
+    isImportant: false,
+  },
+  {
+    position: 1,
+    title: 'Was wünscht ihr euch?',
+    body: 'Das größte Geschenk ist für uns, diesen besonderen Tag mit euch zu feiern! Unser Zuhause ist bereits gut gefüllt. Wenn ihr uns dennoch eine Freude machen möchtet, freuen wir uns über einen kleinen Beitrag zu unserer Flitterwochenkasse — so schenkt ihr uns unvergessliche gemeinsame Erinnerungen.',
+    isImportant: false,
+  },
+  {
+    position: 2,
+    title: 'Sind Kinder willkommen?',
+    body: 'Wir lieben Kinder! Dennoch ist unsere Hochzeitsfeier in erster Linie für Erwachsene geplant — vor Ort gibt es keine Kinderbetreuung und keine Spielangebote. Wenn ihr für euren Nachwuchs eine liebevolle Betreuung organisieren könnt, würde uns das sehr freuen. Falls das nicht möglich ist, sprecht uns bitte persönlich an — wir finden gemeinsam eine Lösung.',
+    isImportant: false,
+  },
+  {
+    position: 3,
+    title: 'Bis wann müssen wir zusagen?',
+    body: 'Damit wir gut planen können, bitten wir Euch um Eure Rückmeldung bis spätestens **15. Januar 2027**. Die Rückmeldung könnt ihr direkt über diese Seite abgeben. Sollten wir bis zum 15. Januar keine Nachricht erhalten, gehen wir leider von einer Absage aus. Vielen Dank für Euer Verständnis!',
+    isImportant: true,
+  },
+  {
+    position: 4,
+    title: 'Dürfen wir Fotos und Videos machen?',
+    body: 'Unbedingt! Haltet unsere Hochzeit gerne aus eurer persönlichen Perspektive fest.\n\nAmazon Photos: Link folgt — hier könnt ihr eure schönsten Bilder hochladen und die Erinnerungen der anderen Gäste entdecken.\n\nWhatsApp: Teilt eure Aufnahmen gerne in unserer WhatsApp-Gruppe oder schickt sie uns direkt. Über kleine Videobotschaften freuen wir uns besonders.',
+    isImportant: false,
+  },
+]
