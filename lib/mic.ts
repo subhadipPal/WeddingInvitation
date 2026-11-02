@@ -231,8 +231,76 @@ export function isToggleOn(content: Record<MicContentKey, string>, key: 'micEnab
   return content[key] === 'true'
 }
 
+// ── Timetable icons ───────────────────────────────────────────────────────────
+//
+// Each timetable row may start with `{iconId}` where `iconId` is one of the
+// IDs below. If present, that icon is used. If absent, the regex rules fall
+// back to inferring from the label text (keeps old content working).
+
 /** Baked default hero image path — always present in the repo. */
 export const BAKED_HERO_PATH = '/photos/MIC/MIC_home.jpeg'
+
+export const TIMETABLE_ICON_IDS = [
+  'walk',       // Arrival / entrance
+  'couple',     // First look / couple moment
+  'door',       // Common entrance
+  'ring',       // Ceremony / Ja-Wort
+  'camera',     // Photos / shooting
+  'dinner',     // Dinner / buffet
+  'cake',       // Cake / coffee
+  'glass',      // Aperitif / toast
+  'music',      // Dance / party
+  'fireworks',  // Fireworks / finale
+  'sparkle',    // Generic sparkle (default)
+] as const
+export type TimetableIconId = typeof TIMETABLE_ICON_IDS[number]
+
+/** Human-readable German labels for the icon dropdown in admin. */
+export const TIMETABLE_ICON_LABELS: Record<TimetableIconId, string> = {
+  walk:      '🚶 Ankommen',
+  couple:    '💑 First Look / Paar',
+  door:      '🚪 Einlass',
+  ring:      '💍 Trauung',
+  camera:    '📸 Foto / Shooting',
+  dinner:    '🍽 Essen / Buffet',
+  cake:      '🎂 Torte / Kaffee',
+  glass:     '🥂 Aperitif / Toast',
+  music:     '🎵 Tanz / Party',
+  fireworks: '🎆 Feuerwerk',
+  sparkle:   '✨ Sonstiges',
+}
+
+/** Parse the `{iconId}` prefix out of a label, if present. Returns the
+ *  cleaned label and the resolved icon id (or null if no prefix found). */
+export function parseTimetableIconPrefix(label: string): { iconId: TimetableIconId | null; cleaned: string } {
+  const m = label.match(/^\{([a-z]+)\}\s*(.*)$/i)
+  if (!m) return { iconId: null, cleaned: label }
+  const id = m[1].toLowerCase()
+  if ((TIMETABLE_ICON_IDS as readonly string[]).includes(id)) {
+    return { iconId: id as TimetableIconId, cleaned: m[2].trim() }
+  }
+  return { iconId: null, cleaned: label }
+}
+
+/** Regex fallbacks when no explicit `{iconId}` prefix is set. */
+const TIMETABLE_ICON_FALLBACKS: [RegExp, TimetableIconId][] = [
+  [/eintreff|ankommen|herzlich will/i, 'walk'],
+  [/first look/i, 'couple'],
+  [/einlass/i, 'door'],
+  [/trauung|ja|zeremonie|ceremony/i, 'ring'],
+  [/glückwunsch|foto|photo|shooting/i, 'camera'],
+  [/essen|dinner|buffet|tisch|hof/i, 'dinner'],
+  [/kaffee|torte|cake/i, 'cake'],
+  [/ginergy|aperitif|sekt|toast/i, 'glass'],
+  [/tanz|dance|party/i, 'music'],
+  [/feuerwerk/i, 'fireworks'],
+]
+
+/** Infer an icon from the label if no explicit prefix is set. */
+export function inferTimetableIcon(label: string): TimetableIconId {
+  for (const [re, id] of TIMETABLE_ICON_FALLBACKS) if (re.test(label)) return id
+  return 'sparkle'
+}
 
 // ── FAQ items (variable list) ─────────────────────────────────────────────────
 

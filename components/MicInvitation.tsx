@@ -5,8 +5,9 @@ import Image from 'next/image'
 import { Section, FadeIn, useInView } from './invitation-helpers'
 import MicHamburgerMenu from './MicHamburgerMenu'
 import MicRsvpForm from './MicRsvpForm'
-import type { MicContentKey, MicFaqItem, MicImageSlot, MicImageVariant } from '@/lib/mic'
-import { isToggleOn } from '@/lib/mic'
+import { Footprints, HeartHandshake, DoorOpen, Gem, Camera, UtensilsCrossed, Cake, Wine, Music, Sparkles, PartyPopper } from 'lucide-react'
+import type { MicContentKey, MicFaqItem, MicImageSlot, MicImageVariant, TimetableIconId } from '@/lib/mic'
+import { isToggleOn, parseTimetableIconPrefix, inferTimetableIcon } from '@/lib/mic'
 
 // Load animation overlays lazily so the main invite bundle stays small
 const MicCurtainFrame = dynamic(() => import('./MicCurtainFrame'), { ssr: false })
@@ -217,6 +218,7 @@ export default function MicInvitation({
                   name={content.mic23VenueName}
                   address={content.mic23VenueAddress}
                   routeLabel={content.mic22RouteButton}
+                  compact
                 />
               </FadeIn>
             </div>
@@ -332,22 +334,26 @@ function SectionBg({ url, placeholder }: { url?: string; placeholder: string }) 
   )
 }
 
-const TIMETABLE_ICONS: [RegExp, string][] = [
-  [/eintreff|ankommen|herzlich will/i, '🚶'],
-  [/first look/i, '💑'],
-  [/einlass/i, '🚪'],
-  [/trauung|ja|zeremonie|ceremony/i, '💍'],
-  [/glückwunsch|foto|photo|shooting/i, '📸'],
-  [/essen|dinner|buffet|tisch|hof/i, '🍽️'],
-  [/kaffee|torte|cake/i, '🎂'],
-  [/ginergy|aperitif|sekt/i, '🥂'],
-  [/tanz|dance|party/i, '💃'],
-  [/feuerwerk/i, '🎆'],
-]
+// Fancy line icons for the timetable (lucide-react). Colour follows currentColor
+// so the gold section accent carries through. The icon id is either picked by
+// admin (via a `{iconId}` prefix on the row) or inferred from the label text.
+const TIMETABLE_ICON_MAP: Record<TimetableIconId, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
+  walk: Footprints,
+  couple: HeartHandshake,
+  door: DoorOpen,
+  ring: Gem,
+  camera: Camera,
+  dinner: UtensilsCrossed,
+  cake: Cake,
+  glass: Wine,
+  music: Music,
+  fireworks: PartyPopper,
+  sparkle: Sparkles,
+}
 
-function timetableIcon(label: string): string {
-  for (const [re, icon] of TIMETABLE_ICONS) if (re.test(label)) return icon
-  return '✨'
+function TimetableIcon({ id, className = 'w-5 h-5' }: { id: TimetableIconId; className?: string }) {
+  const Icon = TIMETABLE_ICON_MAP[id] ?? Sparkles
+  return <Icon className={className} strokeWidth={1.4} />
 }
 
 function TimetableCard({ heading, body }: { heading: string; body: string }) {
@@ -358,13 +364,15 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
     .map(line => {
       // Accept any run of spaces or tabs as the separator between time and label
       const match = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
-      if (match) return { time: match[1].trim(), label: match[2].trim() }
-      // fallback: treat whole line as label
-      return { time: '', label: line }
+      const rawLabel = match ? match[2].trim() : line
+      const time = match ? match[1].trim() : ''
+      const { iconId, cleaned } = parseTimetableIconPrefix(rawLabel)
+      const resolvedIconId = iconId ?? inferTimetableIcon(cleaned)
+      return { time, label: cleaned, iconId: resolvedIconId }
     })
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-3">
+    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl p-3 w-[15rem] mx-auto">
       <p className="font-serif text-[#c9a84c] text-[10px] uppercase tracking-widest mb-3 text-center">
         {heading}
       </p>
@@ -373,30 +381,29 @@ function TimetableCard({ heading, body }: { heading: string; body: string }) {
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#c9a84c]/30 -translate-x-1/2 pointer-events-none" />
 
         {rows.map((row, i) => {
-          const icon = timetableIcon(row.label)
           const isLeft = i % 2 === 0
           return (
             <div key={i} className="relative flex items-start">
               {/* Left side */}
-              <div className="w-[calc(50%-12px)] min-w-0 shrink-0">
+              <div className="w-[calc(50%-10px)] min-w-0 shrink-0">
                 {isLeft && (
-                  <div className="flex flex-col items-end pr-2">
-                    <span className="text-lg leading-none">{icon}</span>
-                    <span className="font-serif text-[#c9a84c] text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                  <div className="flex flex-col items-end pr-2 text-[#c9a84c]">
+                    <TimetableIcon id={row.iconId} className="w-4 h-4" />
+                    <span className="font-serif text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
                     <span className="font-serif text-[#f5f0e8] text-[11px] text-right mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
                   </div>
                 )}
               </div>
 
               {/* Centre dot */}
-              <div className="absolute left-1/2 -translate-x-1/2 top-1 w-2.5 h-2.5 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
+              <div className="absolute left-1/2 -translate-x-1/2 top-1 w-2 h-2 rounded-full bg-[#c9a84c] border-2 border-[#1a0a0a] z-10 shrink-0" />
 
               {/* Right side */}
-              <div className="w-[calc(50%-12px)] min-w-0 shrink-0 ml-auto">
+              <div className="w-[calc(50%-10px)] min-w-0 shrink-0 ml-auto">
                 {!isLeft && (
-                  <div className="flex flex-col items-start pl-2">
-                    <span className="text-lg leading-none">{icon}</span>
-                    <span className="font-serif text-[#c9a84c] text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
+                  <div className="flex flex-col items-start pl-2 text-[#c9a84c]">
+                    <TimetableIcon id={row.iconId} className="w-4 h-4" />
+                    <span className="font-serif text-xs tracking-wider mt-0.5 whitespace-nowrap">{row.time}</span>
                     <span className="font-serif text-[#f5f0e8] text-[11px] mt-0.5 leading-snug break-words hyphens-auto">{row.label}</span>
                   </div>
                 )}
@@ -429,18 +436,17 @@ function venueMapSrc(address: string): string | null {
 function VenueCard({ name, address, routeLabel, compact }: { name: string; address: string; routeLabel: string; compact?: boolean }) {
   const hasAddress = address && !address.toLowerCase().includes('folgt')
   const osmSrc = hasAddress ? venueMapSrc(address) : null
-  const mapHeight = compact ? 90 : 110
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col">
+    <div className={`bg-black/40 backdrop-blur-sm border border-[#c9a84c]/30 rounded-xl overflow-hidden flex flex-col ${compact ? 'w-full max-w-[20rem] mx-auto' : ''}`}>
       {osmSrc && (
         <iframe
           src={osmSrc}
           width="100%"
-          height={mapHeight}
+          height={compact ? 160 : 110}
           loading="lazy"
           title={`Karte: ${name}`}
-          className="w-full border-0 opacity-90"
+          className={`w-full border-0 opacity-90 ${compact ? 'h-40' : ''}`}
           style={{ colorScheme: 'normal' }}
         />
       )}

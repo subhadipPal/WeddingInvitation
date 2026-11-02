@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { translations as defaults, GUEST_FACING_KEYS, HINDU_GUEST_FACING_KEYS, type Translations } from '@/lib/i18n'
 import { triggerRedeploy } from './actions'
-import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, type MicContentKey, type MicFaqItem, type MicImageSlot } from '@/lib/mic'
+import { MIC_DEFAULTS, MIC_IMAGE_SLOTS, TIMETABLE_ICON_IDS, TIMETABLE_ICON_LABELS, parseTimetableIconPrefix, type MicContentKey, type MicFaqItem, type MicImageSlot, type TimetableIconId } from '@/lib/mic'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -1113,10 +1113,10 @@ export default function AdminPage() {
 // Parses the multiline "HH:MM Uhr   Label" string into structured rows,
 // lets the admin edit each row with individual inputs, and serialises back.
 
-interface TimetableRow { id: number; time: string; label: string }
+interface TimetableRow { id: number; time: string; label: string; iconId: TimetableIconId | '' }
 
 let _rowId = 0
-const newRow = (time = '', label = ''): TimetableRow => ({ id: ++_rowId, time, label })
+const newRow = (time = '', label = '', iconId: TimetableIconId | '' = ''): TimetableRow => ({ id: ++_rowId, time, label, iconId })
 
 // Strip " Uhr" suffix so the time field shows just "HH:MM"
 function stripUhr(t: string) { return t.replace(/\s*Uhr\s*$/i, '').trim() }
@@ -1133,7 +1133,10 @@ function parseTimetable(raw: string): TimetableRow[] {
     .filter(Boolean)
     .map(line => {
       const m = line.match(/^([^\t ]{2,12}(?:\s+Uhr)?)\s{2,}(.+)$/)
-      return m ? newRow(stripUhr(m[1]), m[2].trim()) : newRow('', line)
+      const time = m ? stripUhr(m[1]) : ''
+      const rawLabel = m ? m[2].trim() : line
+      const { iconId, cleaned } = parseTimetableIconPrefix(rawLabel)
+      return newRow(time, cleaned, iconId ?? '')
     })
 }
 
@@ -1141,9 +1144,9 @@ function serialiseTimetable(rows: TimetableRow[]): string {
   return rows
     .filter(r => r.time || r.label)
     .map(r => {
-      // Append " Uhr" if time looks like HH:MM
       const t = /^\d{1,2}:\d{2}$/.test(r.time.trim()) ? `${r.time.trim()} Uhr` : r.time.trim()
-      return `${t}   ${r.label}`
+      const prefix = r.iconId ? `{${r.iconId}} ` : ''
+      return `${t}   ${prefix}${r.label}`
     })
     .join('\n')
 }
@@ -1390,6 +1393,12 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
     setRows(rows.map((r, idx) => idx === i ? { ...r, [field]: v } : r))
   }
 
+  // Icon dropdown change: propagate immediately (no typing debounce needed)
+  const setRowIcon = (i: number, iconId: TimetableIconId | '') => {
+    const next = rows.map((r, idx) => idx === i ? { ...r, iconId } : r)
+    setRows(next); propagate(next)
+  }
+
   // On blur: propagate (saves to DB after debounce)
   const flushRow = () => { propagate(rows) }
 
@@ -1467,6 +1476,17 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
               placeholder="Beschreibung"
               className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
             />
+            <select
+              value={row.iconId}
+              onChange={e => setRowIcon(i, e.target.value as TimetableIconId | '')}
+              className="shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-2 py-2 text-[#f5f0e8] font-serif text-xs focus:outline-none focus:border-[#c9a84c]/60 max-w-[9rem]"
+              title="Icon wählen (leer = automatisch)"
+            >
+              <option value="">⚙ Auto</option>
+              {TIMETABLE_ICON_IDS.map(id => (
+                <option key={id} value={id}>{TIMETABLE_ICON_LABELS[id]}</option>
+              ))}
+            </select>
             <button
               onClick={() => removeRow(i)}
               className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"
