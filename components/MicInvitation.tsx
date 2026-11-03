@@ -84,6 +84,9 @@ function LiquidGlassFilter() {
   )
 }
 
+const HERO_TEXT_COLOR = '#e8c96a'
+const HERO_TEXT_SHADOW = '0 1px 2px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.5)'
+
 /** Liquid-glass card wrapper — frosted, refractive, inner highlight. */
 function LiquidGlass({ children, className = '', radius = '22px' }: { children: React.ReactNode; className?: string; radius?: string }) {
   return (
@@ -116,19 +119,19 @@ function CountdownTimer() {
     { value: seconds, label: 'SEKUNDEN' },
   ]
   return (
-    <div className="flex justify-center gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 w-full">
       {units.map(({ value, label }) => (
-        <LiquidGlass key={label} radius="18px" className="min-w-[5rem]">
-          <div className="flex flex-col items-center px-3 py-3">
+        <LiquidGlass key={label} radius="16px" className="w-full">
+          <div className="flex flex-col items-center px-2 py-2.5 sm:px-3">
             <span
-              className="font-serif font-bold text-[2rem] leading-none text-[#b83030]"
-              style={{ textShadow: '0 0 10px rgba(201,168,76,0.95), 0 0 22px rgba(201,168,76,0.55), 0 0 42px rgba(201,168,76,0.3)' }}
+              className="font-display font-bold leading-none"
+              style={{ fontSize: '1rem', color: HERO_TEXT_COLOR, textShadow: HERO_TEXT_SHADOW }}
             >
               {String(value).padStart(2, '0')}
             </span>
             <span
-              className="font-serif font-bold tracking-widest text-[#b83030] mt-2"
-              style={{ fontSize: '2rem', lineHeight: 1, textShadow: '0 0 10px rgba(201,168,76,0.9), 0 0 18px rgba(201,168,76,0.5)' }}
+              className="font-display font-bold tracking-wider sm:tracking-widest mt-1.5"
+              style={{ fontSize: '1rem', lineHeight: 1, color: HERO_TEXT_COLOR, textShadow: HERO_TEXT_SHADOW }}
             >
               {label}
             </span>
@@ -248,15 +251,22 @@ export default function MicInvitation({
             />
           </picture>
           <div className="absolute inset-0 bg-black/15" />
-          <div className="relative z-10 h-full flex flex-col items-center justify-end pb-16 px-6 gap-6">
-            <FadeIn inView={v1} delay={300}>
-              <LiquidGlass radius="24px">
+          {/* Bottom scrim so the date and countdown stay legible over the busy foreground */}
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-1/2 pointer-events-none"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 45%, transparent 100%)' }}
+          />
+          <div className="relative z-10 h-full flex flex-col items-center justify-end pb-16 px-4 sm:px-6 gap-4 sm:gap-6">
+            <FadeIn inView={v1} delay={300} className="max-w-full">
+              <LiquidGlass radius="20px" className="max-w-full">
                 <p
-                  className="font-serif font-bold text-[#b83030] text-center uppercase tracking-widest px-6 py-3"
+                  className="font-display font-bold text-center uppercase tracking-wider sm:tracking-widest px-4 py-2.5 sm:px-6 sm:py-3 [text-wrap:balance]"
                   style={{
-                    fontSize: '3rem',
-                    lineHeight: 1.1,
-                    textShadow: '0 0 12px rgba(201,168,76,0.95), 0 0 24px rgba(201,168,76,0.6), 0 0 48px rgba(201,168,76,0.35)',
+                    fontSize: '1.5rem',
+                    lineHeight: 1.25,
+                    color: HERO_TEXT_COLOR,
+                    textShadow: HERO_TEXT_SHADOW,
                   }}
                 >
                   {content.micHeroDate}
@@ -264,7 +274,7 @@ export default function MicInvitation({
               </LiquidGlass>
             </FadeIn>
             {showCountdown && (
-              <FadeIn inView={v1} delay={500}>
+              <FadeIn inView={v1} delay={500} className="w-full max-w-[20rem] sm:max-w-xl">
                 <CountdownTimer />
               </FadeIn>
             )}

@@ -3,6 +3,7 @@
 :root {
   --font-script: 'Great Vibes', cursive;
   --font-serif: 'Cormorant Garamond', serif;
+  --font-display: 'Cinzel', serif;
   --color-burgundy: #4a0a0a;
   --color-gold: #c9a84c;
   --color-cream: #f5f0e8;
@@ -46,6 +47,7 @@ html, body { height: 100%; overflow: hidden; }
 
 .font-script { font-family: var(--font-script); }
 .font-serif  { font-family: var(--font-serif); }
+.font-display { font-family: var(--font-display); }
 .animate-envelope-flap { animation: envelope-flap 1.2s ease-in-out forwards; }
 .animate-card-rise     { animation: card-rise 0.8s ease-out forwards; }
 .animate-gold-shimmer  { animation: gold-shimmer 3s ease-in-out infinite; }
