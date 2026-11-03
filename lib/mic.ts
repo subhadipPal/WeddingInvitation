@@ -87,6 +87,7 @@ export const MIC_CONTENT_KEYS = [
   'micEnableCurtain',
   'micEnablePetals',
   'micEnableRsvp',
+  'micEnableCountdown',
 
   // Hero + section placeholder label (when no image uploaded yet)
   'micImagePlaceholder',
@@ -175,10 +176,11 @@ export const MIC_DEFAULTS: Record<MicContentKey, string> = {
   // Hamburger menu
   micMenuOpenStd: 'Save-the-Date öffnen',
 
-  // Toggles — curtain/petals default ON, RSVP default OFF
+  // Toggles — curtain/petals/countdown default ON, RSVP default OFF
   micEnableCurtain: 'true',
   micEnablePetals: 'true',
   micEnableRsvp: 'false',
+  micEnableCountdown: 'true',
 
   // Placeholder
   micImagePlaceholder: 'Bild wird noch hochgeladen',
@@ -227,7 +229,7 @@ export function mergeMicContent(rows: { key: string; value: string }[]): Record<
 }
 
 /** Read a toggle as a boolean. Any non-'true' value counts as false. */
-export function isToggleOn(content: Record<MicContentKey, string>, key: 'micEnableCurtain' | 'micEnablePetals' | 'micEnableRsvp'): boolean {
+export function isToggleOn(content: Record<MicContentKey, string>, key: 'micEnableCurtain' | 'micEnablePetals' | 'micEnableRsvp' | 'micEnableCountdown'): boolean {
   return content[key] === 'true'
 }
 

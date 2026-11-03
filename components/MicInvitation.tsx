@@ -45,6 +45,68 @@ function routeLink(address: string) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
 }
 
+/** Wedding date: 22 Jan 2027, 12:00 Berlin time (ceremony start). */
+const WEDDING_DATE = new Date('2027-01-22T12:00:00+01:00')
+
+function useCountdown(targetDate: Date) {
+  const [diff, setDiff] = useState(() => Math.max(0, targetDate.getTime() - Date.now()))
+  useEffect(() => {
+    const id = setInterval(() => {
+      setDiff(Math.max(0, targetDate.getTime() - Date.now()))
+    }, 1000)
+    return () => clearInterval(id)
+  }, [targetDate])
+  const totalSec = Math.floor(diff / 1000)
+  const days = Math.floor(totalSec / 86400)
+  const hours = Math.floor((totalSec % 86400) / 3600)
+  const minutes = Math.floor((totalSec % 3600) / 60)
+  const seconds = totalSec % 60
+  return { days, hours, minutes, seconds }
+}
+
+function CountdownTimer() {
+  const { days, hours, minutes, seconds } = useCountdown(WEDDING_DATE)
+  const units = [
+    { value: days, label: 'TAGE' },
+    { value: hours, label: 'STUNDEN' },
+    { value: minutes, label: 'MINUTEN' },
+    { value: seconds, label: 'SEKUNDEN' },
+  ]
+  return (
+    <div className="flex justify-center gap-4 sm:gap-6">
+      {units.map(({ value, label }) => (
+        <div key={label} className="flex flex-col items-center">
+          <span
+            className="font-serif text-2xl sm:text-3xl text-[#c9a84c] drop-shadow-[0_0_8px_rgba(201,168,76,0.8)] drop-shadow-[0_0_16px_rgba(180,50,50,0.5)]"
+            style={{ textShadow: '0 0 12px rgba(201,168,76,0.9), 0 0 24px rgba(160,60,60,0.6)' }}
+          >
+            {String(value).padStart(2, '0')}
+          </span>
+          <span className="font-serif text-[10px] sm:text-xs tracking-widest text-[#c9a84c]/70 mt-1">{label}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** Navigation arrows for scroll sections. */
+function NavArrows({ showUp, showDown }: { showUp?: boolean; showDown?: boolean }) {
+  return (
+    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6 z-10">
+      {showUp && (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
+          <path d="M12 19V5M5 12l7-7 7 7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      )}
+      {showDown && (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
+          <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      )}
+    </div>
+  )
+}
+
 export default function MicInvitation({
   content,
   images,
@@ -58,6 +120,7 @@ export default function MicInvitation({
   const showCurtain = isToggleOn(content, 'micEnableCurtain')
   const showPetals = isToggleOn(content, 'micEnablePetals')
   const showRsvp = isToggleOn(content, 'micEnableRsvp')
+  const showCountdown = isToggleOn(content, 'micEnableCountdown')
 
   // Lock scrolling until the curtain is opened. If the curtain is disabled, start unlocked.
   const [scrollUnlocked, setScrollUnlocked] = useState(!showCurtain)
@@ -132,16 +195,17 @@ export default function MicInvitation({
           <div className="absolute inset-0 bg-black/15" />
           <div className="relative z-10 h-full flex flex-col items-center justify-end pb-16 px-6">
             <FadeIn inView={v1} delay={300}>
-              <p className="font-serif text-[#c9a84c] text-sm sm:text-base tracking-widest uppercase text-center drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)]">
+              <p className="font-serif text-[#c9a84c] text-sm sm:text-base tracking-widest uppercase text-center drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mb-4">
                 {content.micHeroDate}
               </p>
             </FadeIn>
+            {showCountdown && (
+              <FadeIn inView={v1} delay={500}>
+                <CountdownTimer />
+              </FadeIn>
+            )}
           </div>
-          <div className="absolute bottom-6 left-0 right-0 flex justify-center z-10 animate-bounce">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-          </div>
+          <NavArrows showDown />
         </Section>
 
         {/* ─── Section 2 — 22 Jan block (conditional) ─── */}
@@ -185,6 +249,7 @@ export default function MicInvitation({
                 </FadeIn>
               </div>
             </div>
+          <NavArrows showUp showDown />
           </Section>
         )}
 
@@ -223,6 +288,7 @@ export default function MicInvitation({
               </FadeIn>
             </div>
           </div>
+          <NavArrows showUp showDown />
         </Section>
 
         {/* ─── Section 4 — FAQ ─── */}
@@ -243,6 +309,7 @@ export default function MicInvitation({
               ))}
             </div>
           </div>
+          <NavArrows showUp showDown />
         </Section>
 
         {/* ─── Section 5 — RSVP (toggle-gated) ─── */}
@@ -277,6 +344,7 @@ export default function MicInvitation({
                 />
               </FadeIn>
             </div>
+          <NavArrows showUp showDown />
           </Section>
         )}
 
@@ -299,6 +367,7 @@ export default function MicInvitation({
               <p className="font-serif text-2xl text-[#c9a84c] mt-2">♥</p>
             </FadeIn>
           </div>
+          <NavArrows showUp />
         </Section>
       </div>
     </>
