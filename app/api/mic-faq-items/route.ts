@@ -65,10 +65,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'ids do not match stored set' }, { status: 400 })
   }
 
-  // Phase 1: push every row to a unique negative position to clear the way.
-  const base = -1 - Date.now()
+  // Phase 1: push every row to a unique negative position (-1..-N) to clear the way.
+  // Keep values small — `position` is int4, so timestamp-based offsets overflow.
   for (let i = 0; i < ids.length; i++) {
-    await db.update(micFaqItems).set({ position: base - i, updatedAt: new Date() })
+    await db.update(micFaqItems).set({ position: -1 - i, updatedAt: new Date() })
       .where(eq(micFaqItems.id, ids[i]))
   }
   // Phase 2: assign final positions 0..N-1.
