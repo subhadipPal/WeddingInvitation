@@ -142,22 +142,33 @@ function CountdownTimer() {
   )
 }
 
-/** Navigation arrows for scroll sections — up at top, down at bottom. */
+/** Navigation arrows for scroll sections — up at top, down at bottom.
+ *  Clicking scrolls to the adjacent sibling section in the snap container. */
 function NavArrows({ showUp, showDown }: { showUp?: boolean; showDown?: boolean }) {
+  const goTo = (e: React.MouseEvent<HTMLButtonElement>, dir: 'prev' | 'next') => {
+    const section = e.currentTarget.closest('section')
+    const target = dir === 'prev' ? section?.previousElementSibling : section?.nextElementSibling
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+  const btnClass = 'pointer-events-auto p-3 -m-3 rounded-full cursor-pointer focus-visible:outline focus-visible:outline-1 focus-visible:outline-[#c9a84c]'
   return (
     <>
       {showUp && (
-        <div className="absolute top-4 left-0 right-0 flex justify-center z-10">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
-            <path d="M12 19V5M5 12l7-7 7 7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
+        <div className="absolute top-4 left-0 right-0 flex justify-center z-10 pointer-events-none">
+          <button type="button" aria-label="Vorheriger Abschnitt" className={btnClass} onClick={e => goTo(e, 'prev')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
+              <path d="M12 19V5M5 12l7-7 7 7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
         </div>
       )}
       {showDown && (
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-10">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
-            <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-          </svg>
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-10 pointer-events-none">
+          <button type="button" aria-label="Nächster Abschnitt" className={btnClass} onClick={e => goTo(e, 'next')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
+              <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+          </button>
         </div>
       )}
     </>
@@ -438,7 +449,6 @@ export default function MicInvitation({
               <p className="font-script text-4xl sm:text-5xl text-[#c9a84c]">
                 {content.micClosingSign}
               </p>
-              <p className="font-serif text-2xl text-[#c9a84c] mt-2">♥</p>
             </FadeIn>
           </div>
           <NavArrows showUp />
