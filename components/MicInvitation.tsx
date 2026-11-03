@@ -89,21 +89,25 @@ function CountdownTimer() {
   )
 }
 
-/** Navigation arrows for scroll sections. */
+/** Navigation arrows for scroll sections — up at top, down at bottom. */
 function NavArrows({ showUp, showDown }: { showUp?: boolean; showDown?: boolean }) {
   return (
-    <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-6 z-10">
+    <>
       {showUp && (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
-          <path d="M12 19V5M5 12l7-7 7 7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
+        <div className="absolute top-4 left-0 right-0 flex justify-center z-10">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
+            <path d="M12 19V5M5 12l7-7 7 7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </div>
       )}
       {showDown && (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
-          <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
-        </svg>
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-10">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden className="animate-bounce">
+            <path d="M12 5v14M5 12l7 7 7-7" stroke="#c9a84c" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        </div>
       )}
-    </div>
+    </>
   )
 }
 
