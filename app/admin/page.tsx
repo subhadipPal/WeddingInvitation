@@ -911,18 +911,6 @@ export default function AdminPage() {
                   </div>
                 ))}
             </div>
-
-            <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
-              {(saveStatus === 'pending' || saveStatus === 'saving') && (
-                <span className="font-serif text-[#c9a84c]/80 text-sm">{saveStatus === 'pending' ? 'Unsaved changes…' : 'Saving…'}</span>
-              )}
-              {saveStatus === 'saved' && (
-                <span className="font-serif text-green-400 text-sm">Saved ✓</span>
-              )}
-              {saveStatus === 'error' && (
-                <span className="font-serif text-red-400 text-sm">Save failed — will retry on next change</span>
-              )}
-            </div>
           </div>
         )}
         {/* ── MIC Content tab ── */}
@@ -1062,18 +1050,6 @@ export default function AdminPage() {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="flex items-center pt-3 pb-2 border-t border-[#c9a84c]/10 mt-2 min-h-[2rem]">
-              {(micSaveStatus === 'pending' || micSaveStatus === 'saving') && (
-                <span className="font-serif text-[#c9a84c]/60 text-sm">{micSaveStatus === 'pending' ? 'Nicht gespeichert…' : 'Speichern…'}</span>
-              )}
-              {micSaveStatus === 'saved' && (
-                <span className="font-serif text-green-400 text-sm">Gespeichert ✓</span>
-              )}
-              {micSaveStatus === 'error' && (
-                <span className="font-serif text-red-400 text-sm">Fehler beim Speichern — wird beim nächsten Ändern wiederholt</span>
-              )}
             </div>
           </div>
         )}
