@@ -597,29 +597,19 @@ export default function AdminPage() {
       <div className="relative z-10 w-full max-w-7xl mx-auto flex-1 flex flex-col min-h-0">
 
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex items-center justify-between gap-4 mb-4">
           <div>
-            <h1 className="font-script text-4xl text-[#c9a84c]">Julia & Subhadip</h1>
-            <p className="font-serif text-[#f5f0e8]/80 text-sm tracking-widest uppercase mt-1">Guest Management</p>
+            <h1 className="font-script text-3xl sm:text-4xl text-[#c9a84c]">Julia & Subhadip</h1>
+            <p className="font-serif text-[#f5f0e8]/80 text-xs tracking-widest uppercase mt-0.5">Guest Management</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={exportCsv}
-              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors">
-              CSV
-            </button>
-            <button onClick={printPdf}
-              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors">
-              Print PDF
-            </button>
-            <button onClick={handleRedeploy} disabled={deploying}
-              className="border border-[#c9a84c]/60 text-[#c9a84c] px-3 py-2 rounded-lg font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors disabled:opacity-50">
-              {deploying ? 'Deploying…' : deployStatus === 'triggered' ? 'Triggered ✓' : deployStatus === 'error' ? 'Failed ✗' : 'Redeploy'}
-            </button>
-            <Link href="/admin/create"
-              className="bg-[#c9a84c] text-[#1a0a0a] px-4 py-2 rounded-lg font-serif text-sm font-semibold hover:bg-[#e0bd6e] transition-colors">
-              + Add Guest
-            </Link>
-          </div>
+          {/* Hamburger menu for actions */}
+          <AdminActionsMenu
+            onCsv={exportCsv}
+            onPrintPdf={printPdf}
+            onRedeploy={handleRedeploy}
+            deploying={deploying}
+            deployStatus={deployStatus}
+          />
         </div>
 
         {/* Tab bar */}
@@ -1106,6 +1096,76 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── AdminActionsMenu (hamburger) ──────────────────────────────────────────────
+
+function AdminActionsMenu({
+  onCsv,
+  onPrintPdf,
+  onRedeploy,
+  deploying,
+  deployStatus,
+}: {
+  onCsv: () => void
+  onPrintPdf: () => void
+  onRedeploy: () => void
+  deploying: boolean
+  deployStatus: string
+}) {
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  const btnClass = 'w-full text-left px-4 py-2.5 font-serif text-sm hover:bg-[#c9a84c]/10 transition-colors'
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-10 h-10 flex items-center justify-center rounded-lg border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 transition-colors"
+        aria-label="Actions menu"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-12 w-48 bg-black/90 backdrop-blur-md border border-[#c9a84c]/30 rounded-xl shadow-2xl overflow-hidden z-50">
+          <Link
+            href="/admin/create"
+            onClick={() => setOpen(false)}
+            className={`${btnClass} text-[#c9a84c] font-semibold border-b border-[#c9a84c]/20 block`}
+          >
+            + Add Guest
+          </Link>
+          <button onClick={() => { onCsv(); setOpen(false) }} className={`${btnClass} text-[#f5f0e8]`}>
+            📄 Export CSV
+          </button>
+          <button onClick={() => { onPrintPdf(); setOpen(false) }} className={`${btnClass} text-[#f5f0e8]`}>
+            🖨 Print PDF
+          </button>
+          <button
+            onClick={() => { onRedeploy(); setOpen(false) }}
+            disabled={deploying}
+            className={`${btnClass} text-[#f5f0e8] disabled:opacity-50`}
+          >
+            🚀 {deploying ? 'Deploying…' : deployStatus === 'triggered' ? 'Triggered ✓' : deployStatus === 'error' ? 'Failed ✗' : 'Redeploy'}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
