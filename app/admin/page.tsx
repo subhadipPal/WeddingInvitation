@@ -1441,7 +1441,7 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
             onDragStart={() => onDragStart(i)}
             onDragOver={e => onDragOver(e, i)}
             onDragEnd={onDragEnd}
-            className="flex gap-2 items-center group/row"
+            className="flex gap-2 items-center group/row overflow-x-auto pb-1"
           >
             {/* Drag handle */}
             <span
