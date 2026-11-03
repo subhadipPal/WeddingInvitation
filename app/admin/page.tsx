@@ -1441,57 +1441,61 @@ function TimetableEditor({ value, onChange }: { value: string; onChange: (v: str
             onDragStart={() => onDragStart(i)}
             onDragOver={e => onDragOver(e, i)}
             onDragEnd={onDragEnd}
-            className="flex gap-2 items-center group/row overflow-x-auto pb-1"
+            className="flex flex-col gap-2 group/row border border-[#c9a84c]/10 rounded-lg p-2"
           >
-            {/* Drag handle */}
-            <span
-              className="shrink-0 cursor-grab active:cursor-grabbing text-[#c9a84c]/30 group-hover/row:text-[#c9a84c]/70 transition-colors select-none text-lg leading-none"
-              title="Ziehen zum Sortieren"
-            >⠿</span>
-            {/* Time: HH:MM only — "Uhr" is appended automatically */}
-            <div className="relative shrink-0">
+            {/* Row 1: drag handle, time, Uhr, label */}
+            <div className="flex gap-2 items-center">
+              <span
+                className="shrink-0 cursor-grab active:cursor-grabbing text-[#c9a84c]/30 group-hover/row:text-[#c9a84c]/70 transition-colors select-none text-lg leading-none"
+                title="Ziehen zum Sortieren"
+              >⠿</span>
+              <div className="relative shrink-0">
+                <input
+                  type="text"
+                  value={row.time}
+                  onChange={e => setRow(i, 'time', e.target.value)}
+                  onBlur={flushRow}
+                  placeholder="HH:MM"
+                  maxLength={10}
+                  className={`w-20 bg-black/30 rounded-lg px-2 py-1.5 text-[#c9a84c] font-serif text-sm focus:outline-none transition-colors ${
+                    timeInvalid
+                      ? 'border-2 border-red-400 focus:border-red-400'
+                      : 'border border-[#c9a84c]/20 focus:border-[#c9a84c]/60'
+                  }`}
+                />
+                {timeInvalid && (
+                  <span className="absolute -bottom-4 left-0 text-red-400 text-[10px] font-serif whitespace-nowrap">HH:MM</span>
+                )}
+              </div>
+              <span className="shrink-0 text-[#c9a84c]/40 font-serif text-xs">Uhr</span>
               <input
                 type="text"
-                value={row.time}
-                onChange={e => setRow(i, 'time', e.target.value)}
+                value={row.label}
+                onChange={e => setRow(i, 'label', e.target.value)}
                 onBlur={flushRow}
-                placeholder="HH:MM"
-                maxLength={10}
-                className={`w-24 bg-black/30 rounded-lg px-3 py-2 text-[#c9a84c] font-serif text-base focus:outline-none transition-colors ${
-                  timeInvalid
-                    ? 'border-2 border-red-400 focus:border-red-400'
-                    : 'border border-[#c9a84c]/20 focus:border-[#c9a84c]/60'
-                }`}
+                placeholder="Beschreibung"
+                className="flex-1 min-w-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-2 py-1.5 text-[#f5f0e8] font-serif text-sm focus:outline-none focus:border-[#c9a84c]/60"
               />
-              {timeInvalid && (
-                <span className="absolute -bottom-4 left-0 text-red-400 text-[10px] font-serif whitespace-nowrap">HH:MM oder Text</span>
-              )}
             </div>
-            <span className="shrink-0 text-[#c9a84c]/40 font-serif text-sm">Uhr</span>
-            <input
-              type="text"
-              value={row.label}
-              onChange={e => setRow(i, 'label', e.target.value)}
-              onBlur={flushRow}
-              placeholder="Beschreibung"
-              className="flex-1 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-3 py-2 text-[#f5f0e8] font-serif text-base focus:outline-none focus:border-[#c9a84c]/60"
-            />
-            <select
-              value={row.iconId}
-              onChange={e => setRowIcon(i, e.target.value as TimetableIconId | '')}
-              className="shrink-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-2 py-2 text-[#f5f0e8] font-serif text-xs focus:outline-none focus:border-[#c9a84c]/60 max-w-[9rem]"
-              title="Icon wählen (leer = automatisch)"
-            >
-              <option value="">⚙ Auto</option>
-              {TIMETABLE_ICON_IDS.map(id => (
-                <option key={id} value={id}>{TIMETABLE_ICON_LABELS[id]}</option>
-              ))}
-            </select>
-            <button
-              onClick={() => removeRow(i)}
-              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-base"
-              title="Eintrag entfernen"
-            >✕</button>
+            {/* Row 2: icon dropdown + delete */}
+            <div className="flex gap-2 items-center pl-6">
+              <select
+                value={row.iconId}
+                onChange={e => setRowIcon(i, e.target.value as TimetableIconId | '')}
+                className="flex-1 min-w-0 bg-black/30 border border-[#c9a84c]/20 rounded-lg px-2 py-1.5 text-[#f5f0e8] font-serif text-xs focus:outline-none focus:border-[#c9a84c]/60"
+                title="Icon wählen (leer = automatisch)"
+              >
+                <option value="">⚙ Auto</option>
+                {TIMETABLE_ICON_IDS.map(id => (
+                  <option key={id} value={id}>{TIMETABLE_ICON_LABELS[id]}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => removeRow(i)}
+                className="shrink-0 w-7 h-7 flex items-center justify-center rounded-lg border border-red-400/30 text-red-400/60 hover:border-red-400 hover:text-red-400 transition-colors text-sm"
+                title="Eintrag entfernen"
+              >✕</button>
+            </div>
           </div>
         )
       })}
