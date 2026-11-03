@@ -632,7 +632,7 @@ export default function AdminPage() {
         {/* ── Guests tab ── */}
         {tab === 'guests' && (
           <div className="flex-1 flex flex-col min-h-0">
-          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold pr-2 pb-6" style={{ paddingBottom: "50px", marginBottom: "30px"}}>
+          <div className="flex-1 overflow-y-auto min-h-0 scrollbar-gold pr-2 pb-4">
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
               {[
@@ -1077,8 +1077,8 @@ export default function AdminPage() {
             </div>
           </div>
         )}
-        {/* Version overlay */}
-        <p className="fixed bottom-2 right-3 z-20 font-serif text-[#f5f0e8]/20 text-[10px] tracking-widest pointer-events-none">
+        {/* Version overlay — top right, under hamburger */}
+        <p className="fixed top-20 right-4 z-10 font-serif text-[#f5f0e8]/20 text-[10px] tracking-widest pointer-events-none">
           {process.env.NEXT_PUBLIC_COMMIT_SHA ?? 'local'}
         </p>
 
