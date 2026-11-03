@@ -64,6 +64,49 @@ function useCountdown(targetDate: Date) {
   return { days, hours, minutes, seconds }
 }
 
+/** SVG filter definition for the liquid-glass displacement effect.
+ *  Rendered once per page; referenced by all `.liquid-glass` elements. */
+function LiquidGlassFilter() {
+  return (
+    <svg
+      aria-hidden
+      style={{ position: 'absolute', width: 0, height: 0, pointerEvents: 'none' }}
+    >
+      <defs>
+        <filter id="mic-glass-filter" colorInterpolationFilters="sRGB" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="2" seed="7" result="turb" />
+          <feGaussianBlur in="turb" stdDeviation="2" result="softMap" />
+          <feDisplacementMap in="SourceGraphic" in2="softMap" scale="22" xChannelSelector="R" yChannelSelector="G" result="disp" />
+          <feGaussianBlur in="disp" stdDeviation="0.4" />
+        </filter>
+      </defs>
+    </svg>
+  )
+}
+
+/** Liquid-glass card wrapper — frosted, refractive, inner highlight. */
+function LiquidGlass({ children, className = '', radius = '22px' }: { children: React.ReactNode; className?: string; radius?: string }) {
+  return (
+    <div className={`relative inline-flex ${className}`} style={{ borderRadius: radius }}>
+      {/* Refractive backdrop layer */}
+      <div
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          borderRadius: radius,
+          backdropFilter: 'url(#mic-glass-filter) saturate(1.3)',
+          WebkitBackdropFilter: 'url(#mic-glass-filter) saturate(1.3)',
+          background: 'rgba(255,255,255,0.08)',
+          boxShadow:
+            'inset 2px 2px 0 -2px rgba(255,255,255,0.75), inset 0 0 3px 1px rgba(255,255,255,0.55), inset 0 0 20px 4px rgba(255,255,255,0.08), 0 8px 32px rgba(0,0,0,0.25)',
+        }}
+      />
+      {/* Content */}
+      <div className="relative z-10 w-full">{children}</div>
+    </div>
+  )
+}
+
 function CountdownTimer() {
   const { days, hours, minutes, seconds } = useCountdown(WEDDING_DATE)
   const units = [
@@ -73,25 +116,24 @@ function CountdownTimer() {
     { value: seconds, label: 'SEKUNDEN' },
   ]
   return (
-    <div className="flex justify-center gap-3 sm:gap-5">
+    <div className="flex justify-center gap-2 sm:gap-3">
       {units.map(({ value, label }) => (
-        <div
-          key={label}
-          className="flex flex-col items-center px-3 py-2 rounded-xl backdrop-blur-md bg-white/10 border border-[#c9a84c]/30 shadow-[0_0_20px_rgba(201,168,76,0.15)]"
-        >
-          <span
-            className="font-serif font-bold text-[2rem] leading-none text-[#b83030]"
-            style={{ textShadow: '0 0 10px rgba(201,168,76,0.9), 0 0 20px rgba(201,168,76,0.5), 0 0 40px rgba(201,168,76,0.3)' }}
-          >
-            {String(value).padStart(2, '0')}
-          </span>
-          <span
-            className="font-serif text-[10px] sm:text-xs tracking-widest text-[#b83030]/80 mt-1 font-semibold"
-            style={{ textShadow: '0 0 8px rgba(201,168,76,0.7)' }}
-          >
-            {label}
-          </span>
-        </div>
+        <LiquidGlass key={label} radius="18px" className="min-w-[5rem]">
+          <div className="flex flex-col items-center px-3 py-3">
+            <span
+              className="font-serif font-bold text-[2rem] leading-none text-[#b83030]"
+              style={{ textShadow: '0 0 10px rgba(201,168,76,0.95), 0 0 22px rgba(201,168,76,0.55), 0 0 42px rgba(201,168,76,0.3)' }}
+            >
+              {String(value).padStart(2, '0')}
+            </span>
+            <span
+              className="font-serif font-bold tracking-widest text-[#b83030] mt-2"
+              style={{ fontSize: '2rem', lineHeight: 1, textShadow: '0 0 10px rgba(201,168,76,0.9), 0 0 18px rgba(201,168,76,0.5)' }}
+            >
+              {label}
+            </span>
+          </div>
+        </LiquidGlass>
       ))}
     </div>
   )
@@ -175,6 +217,7 @@ export default function MicInvitation({
 
   return (
     <>
+      <LiquidGlassFilter />
       {showCurtain && <MicCurtainFrame />}
       {showPetals && <MicPetalOverlay />}
       <MicHamburgerMenu stdHref={stdHref} openStdLabel={content.micMenuOpenStd} />
@@ -205,11 +248,20 @@ export default function MicInvitation({
             />
           </picture>
           <div className="absolute inset-0 bg-black/15" />
-          <div className="relative z-10 h-full flex flex-col items-center justify-end pb-16 px-6">
+          <div className="relative z-10 h-full flex flex-col items-center justify-end pb-16 px-6 gap-6">
             <FadeIn inView={v1} delay={300}>
-              <p className="font-serif text-[#c9a84c] text-sm sm:text-base tracking-widest uppercase text-center drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] mb-4">
-                {content.micHeroDate}
-              </p>
+              <LiquidGlass radius="24px">
+                <p
+                  className="font-serif font-bold text-[#b83030] text-center uppercase tracking-widest px-6 py-3"
+                  style={{
+                    fontSize: '3rem',
+                    lineHeight: 1.1,
+                    textShadow: '0 0 12px rgba(201,168,76,0.95), 0 0 24px rgba(201,168,76,0.6), 0 0 48px rgba(201,168,76,0.35)',
+                  }}
+                >
+                  {content.micHeroDate}
+                </p>
+              </LiquidGlass>
             </FadeIn>
             {showCountdown && (
               <FadeIn inView={v1} delay={500}>
