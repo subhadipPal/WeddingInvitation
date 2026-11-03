@@ -73,16 +73,24 @@ function CountdownTimer() {
     { value: seconds, label: 'SEKUNDEN' },
   ]
   return (
-    <div className="flex justify-center gap-4 sm:gap-6">
+    <div className="flex justify-center gap-3 sm:gap-5">
       {units.map(({ value, label }) => (
-        <div key={label} className="flex flex-col items-center">
+        <div
+          key={label}
+          className="flex flex-col items-center px-3 py-2 rounded-xl backdrop-blur-md bg-white/10 border border-[#c9a84c]/30 shadow-[0_0_20px_rgba(201,168,76,0.15)]"
+        >
           <span
-            className="font-serif text-2xl sm:text-3xl text-[#c9a84c] drop-shadow-[0_0_8px_rgba(201,168,76,0.8)] drop-shadow-[0_0_16px_rgba(180,50,50,0.5)]"
-            style={{ textShadow: '0 0 12px rgba(201,168,76,0.9), 0 0 24px rgba(160,60,60,0.6)' }}
+            className="font-serif font-bold text-[2rem] leading-none text-[#b83030]"
+            style={{ textShadow: '0 0 10px rgba(201,168,76,0.9), 0 0 20px rgba(201,168,76,0.5), 0 0 40px rgba(201,168,76,0.3)' }}
           >
             {String(value).padStart(2, '0')}
           </span>
-          <span className="font-serif text-[10px] sm:text-xs tracking-widest text-[#c9a84c]/70 mt-1">{label}</span>
+          <span
+            className="font-serif text-[10px] sm:text-xs tracking-widest text-[#b83030]/80 mt-1 font-semibold"
+            style={{ textShadow: '0 0 8px rgba(201,168,76,0.7)' }}
+          >
+            {label}
+          </span>
         </div>
       ))}
     </div>
